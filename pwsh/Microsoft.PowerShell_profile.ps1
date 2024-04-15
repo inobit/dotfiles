@@ -3,7 +3,7 @@
 
 Invoke-Expression (&starship init powershell)
 
-Import-Module posh-git
+# Import-Module posh-git
 # $omp_config = Join-Path -Path $ENV:USERPROFILE -ChildPath ".\powerlevel10k_lean.omp.json"
 # oh-my-posh init pwsh --config $omp_config | Invoke-Expression
 
