@@ -30,6 +30,9 @@ Set-PSReadLineKeyHandler -Key "Ctrl+p" -Function HistorySearchBackward
 # 设置向下键为前向搜索历史纪录
 Set-PSReadLineKeyHandler -Key "Ctrl+n" -Function HistorySearchForward
 
+# 移除ctrl+space，和tmux 冲突
+Remove-PSReadLineKeyHandler -Chord Ctrl+SpaceBar
+
 # Alias
 # Set-Alias ll ls
 Set-Alias vim nvim
