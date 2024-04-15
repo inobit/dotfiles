@@ -1,9 +1,11 @@
 # set PowerShell to UTF-8
 [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
+Invoke-Expression (&starship init powershell)
+
 Import-Module posh-git
-$omp_config = Join-Path -Path $ENV:USERPROFILE -ChildPath ".\powerlevel10k_lean.omp.json"
-oh-my-posh init pwsh --config $omp_config | Invoke-Expression
+# $omp_config = Join-Path -Path $ENV:USERPROFILE -ChildPath ".\powerlevel10k_lean.omp.json"
+# oh-my-posh init pwsh --config $omp_config | Invoke-Expression
 
 Import-Module -Name Terminal-Icons
 
@@ -30,7 +32,7 @@ Set-PSReadLineKeyHandler -Key "Ctrl+p" -Function HistorySearchBackward
 # 设置向下键为前向搜索历史纪录
 Set-PSReadLineKeyHandler -Key "Ctrl+n" -Function HistorySearchForward
 
-# 移除ctrl+space，和tmux 冲突
+# 移除ctrl space 和tmux冲突
 Remove-PSReadLineKeyHandler -Chord Ctrl+SpaceBar
 
 # Alias
