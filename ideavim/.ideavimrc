@@ -1,0 +1,126 @@
+" import .vimrc
+source ~/.vimrc
+
+" IdeaVim options
+" Smart join for <C-J>
+set ideajoin
+" Map vim marks to IDEA global marks
+set ideamarks
+
+" jump
+nmap <C-o> <Action>(Back)
+nmap <C-i> <Action>(Forward)
+nmap g. <Action>(JumpToLastChange)
+
+" move line
+nmap <A-j> <Action>(MoveLineDown)
+xmap <A-j> <Action>(MoveLineDown)
+nmap <A-k> <Action>(MoveLineUp)
+xmap <A-k> <Action>(MoveLineUp)
+
+" lsp config
+nmap gd <Action>(GotoDeclaration)
+nmap gr <Action>(ShowUsages)
+nmap gI <Action>(GotoImplementation)
+nmap gt <Action>(GotoTypeDeclaration)
+nmap gM <Action>(GotoSuperMethod)
+nmap gT <Action>(GotoTest)
+nmap <leader>K <Action>(QuickJavaDoc) 
+nmap ga <Action>(ShowIntentionActions)
+nmap K <Action>(ShowHoverInfo)
+nmap <leader>gi <Action>(ImplementMethods)
+nmap <leader>go <Action>(OverrideMethods)
+
+" code complete
+nmap <A-,> <Action>(CodeCompletion)
+nmap <C-y> <Action>(EditorChooseLookupItem)
+nmap <leader>g, <Action>(Generate)
+nmap <leader>s, <Action>(SurroundWith)
+vmap <leader>s, <Action>(SurroundWith)
+
+" diagnostic navigation
+nmap ]e <Action>(GotoNextError)
+nmap [e <Action>(GotoPreviousError)
+nmap <leader>es <Action>(ShowErrorDescription)
+
+" git change navigation
+nmap ]c <Action>(VcsShowNextChangeMarker)
+nmap [c <Action>(VcsShowPrevChangeMarker)
+
+" method navigation
+nmap ]] <Action>(MethodDown)
+nmap [[ <Action>(MethodUp)
+
+" search
+nmap <leader>sa <Action>(GotoAction)
+nmap <leader>sc <Action>(GotoClass)
+nmap <leader>sf <Action>(GotoFile)
+nmap <leader>sm <Action>(GotoSymbol)
+nmap <leader>sr <Action>(RecentFiles)
+
+nmap <leader>sg <Action>(FindInPath)
+vmap <leader>sg <Action>(FindInPath)
+nmap <leader>ss <Action>(Find)
+vmap <leader>ss <Action>(Find)
+nmap <leader>sR <Action>(Replace)
+vmap <leader>sR <Action>(Replace)
+
+" file manage
+nmap <leader>rn <Action>(RenameElement)
+nmap <leader>rf <Action>(RenameFile)
+
+" buffer navigation
+function! tabJump(...)
+    let count = a:1
+    let action = a:2
+    for i in range(1, count ? count : 1)
+      execute action
+    endfor
+endfunction
+
+" nmap <leader>h <Action>(PreviousTab)
+nmap <leader>h <Cmd>call <SID>tabJump(v:count,'PreviousTab')<CR>
+nmap <leader>l <Action>(NextTab)
+nmap <leader>bb <Action>(CloseEditor)
+nmap <leader>bo <Action>(CloseAllEditorsButActive)
+nmap <leader>ba <Action>(CloseAllEditors)
+nmap <leader>bh <Action>(CloseAllToTheLeft)
+nmap <leader>bl <Action>(CloseAllToTheRight)
+nmap <leader>bu <Action>(CloseAllUnmodifiedEditors)
+
+" window navigation
+nmap <leader>tt <Action>(ActivateTerminalToolWindow)
+nmap <leader>te <Action>(ActivateProjectToolWindow)
+nmap <leader>fd <Action>(ActivateDebugToolWindow)
+nmap <leader>fr <Action>(ActivateRunToolWindow)
+nmap <leader>fs <Action>(ActivateStructureToolWindow)
+nmap <leader>fe <Action>(SelectInProjectView)
+
+" window split
+nmap <leader>sp <Action>(SplitHorizontally)
+nmap <leader>vp <Action>(SplitVertically)
+
+" scroll
+nmap <leader>zh <Action>(EditorScrollLeft)
+nmap <leader>zl <Action>(EditorScrollRight)
+
+" code fold
+nmap <leader>zc <Action>(CollapseRegion)
+nmap <leader>zC <Action>(CollapseRegionRecursively)
+nmap <leader>zo <Action>(ExpandRegion)
+nmap <leader>zO <Action>(ExpandRegionRecursively)
+nmap <leader>zM <Action>(CollapseAllRegions)
+nmap <leader>zR <Action>(ExpandAllRegions)
+
+" debug
+nmap <leader>db <Action>(ToggleLineBreakpoint)
+nmap <leader>dr <Action>(ChooseRunConfiguration)
+nmap <leader>dc <Action>(ChooseDebugConfiguration)
+nmap <leader>ds <Action>(Stop)
+
+" SQL
+" nmap <leader>se :<C-u>action Console.Jdbc.Execute
+" nmap <leader>sp :<C-u>action Console.Jdbc.ExplainPlan
+" vmap <leader>se :<C-u>action Console.Jdbc.Execute
+" vmap <leader>sp :<C-u>action Console.Jdbc.ExplainPlan
+
