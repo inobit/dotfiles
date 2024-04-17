@@ -10,6 +10,7 @@ set ideamarks
 " jump
 nmap <C-o> <Action>(Back)
 nmap <C-i> <Action>(Forward)
+nmap <C-2> <Action>(JumpToLastWindow)
 nmap g. <Action>(JumpToLastChange)
 
 " move line
@@ -95,6 +96,10 @@ nmap <leader>fd <Action>(ActivateDebugToolWindow)
 nmap <leader>fr <Action>(ActivateRunToolWindow)
 nmap <leader>fs <Action>(ActivateStructureToolWindow)
 nmap <leader>fe <Action>(SelectInProjectView)
+
+nmap <leader>uw <Action>(HideActiveWindow)
+nmap <leader>ua <Action>(HideAllWindows)
+
 
 " window split
 nmap <leader>sp <Action>(SplitHorizontally)
