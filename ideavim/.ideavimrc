@@ -82,8 +82,8 @@ nmap <leader>sg <Action>(FindInPath)
 vmap <leader>sg <Action>(FindInPath)
 nmap <leader>ss <Action>(Find)
 vmap <leader>ss <Action>(Find)
-nmap <leader>sR <Action>(Replace)
-vmap <leader>sR <Action>(Replace)
+nmap <leader>sx <Action>(Replace)
+vmap <leader>sx <Action>(Replace)
 
 " file manage
 nmap <leader>rn <Action>(RenameElement)
@@ -140,7 +140,7 @@ nmap <leader>rs <Action>(Stop)
 
 " datagrip
 nmap <leader>ex <Action>(Console.Jdbc.Execute)
-nmap <leader>ep <Action>(Console.Jdbc.ExplainPlan)
 vmap <leader>ex <Action>(Console.Jdbc.Execute)
+nmap <leader>ep <Action>(Console.Jdbc.ExplainPlan)
 vmap <leader>ep <Action>(Console.Jdbc.ExplainPlan)
 
