@@ -1,17 +1,35 @@
 " import .vimrc
 source ~/.vimrc
 
+imap <C-j> <CR>
+
 " IdeaVim options
 " Smart join for <C-J>
 set ideajoin
 " Map vim marks to IDEA global marks
 set ideamarks
 
+" plugin
+set surround
+set highlightedyank
+set commentary
+
+" plugin set
+let g:highlightedyank_highlight_color = "rgba(230, 212, 130, 155)"
+
+" comment
+vmap gb <Action>(CommentByBlockComment)<Action>(EditorEscape)
+nmap gb <Action>(CommentByBlockComment)<Action>(EditorEscape)
+
+
 " jump
 nmap <C-o> <Action>(Back)
 nmap <C-i> <Action>(Forward)
 nmap <C-2> <Action>(JumpToLastWindow)
 nmap g. <Action>(JumpToLastChange)
+
+nmap g; <Action>(JumpToLastChange)
+nmap g, <Action>(JumpToNextChange)
 
 " move line
 nmap <A-j> <Action>(MoveLineDown)
@@ -35,6 +53,7 @@ nmap <leader>go <Action>(OverrideMethods)
 " code complete
 nmap <A-,> <Action>(CodeCompletion)
 nmap <C-y> <Action>(EditorChooseLookupItem)
+imap <C-y> <Action>(EditorChooseLookupItem)
 nmap <leader>g, <Action>(Generate)
 nmap <leader>s, <Action>(SurroundWith)
 vmap <leader>s, <Action>(SurroundWith)
@@ -71,16 +90,7 @@ nmap <leader>rn <Action>(RenameElement)
 nmap <leader>rf <Action>(RenameFile)
 
 " buffer navigation
-function! tabJump(...)
-    let count = a:1
-    let action = a:2
-    for i in range(1, count ? count : 1)
-      execute action
-    endfor
-endfunction
-
-" nmap <leader>h <Action>(PreviousTab)
-nmap <leader>h <Cmd>call <SID>tabJump(v:count,'PreviousTab')<CR>
+nmap <leader>h <Action>(PreviousTab)
 nmap <leader>l <Action>(NextTab)
 nmap <leader>bb <Action>(CloseEditor)
 nmap <leader>bo <Action>(CloseAllEditorsButActive)
@@ -100,7 +110,6 @@ nmap <leader>fe <Action>(SelectInProjectView)
 nmap <leader>uw <Action>(HideActiveWindow)
 nmap <leader>ua <Action>(HideAllWindows)
 
-
 " window split
 nmap <leader>sp <Action>(SplitHorizontally)
 nmap <leader>vp <Action>(SplitVertically)
@@ -110,22 +119,28 @@ nmap <leader>zh <Action>(EditorScrollLeft)
 nmap <leader>zl <Action>(EditorScrollRight)
 
 " code fold
-nmap <leader>zc <Action>(CollapseRegion)
-nmap <leader>zC <Action>(CollapseRegionRecursively)
-nmap <leader>zo <Action>(ExpandRegion)
-nmap <leader>zO <Action>(ExpandRegionRecursively)
-nmap <leader>zM <Action>(CollapseAllRegions)
-nmap <leader>zR <Action>(ExpandAllRegions)
+nmap zc <Action>(CollapseRegion)
+nmap zC <Action>(CollapseRegionRecursively)
+nmap zo <Action>(ExpandRegion)
+nmap zO <Action>(ExpandRegionRecursively)
+nmap zM <Action>(CollapseAllRegions)
+nmap zR <Action>(ExpandAllRegions)
 
-" debug
-nmap <leader>db <Action>(ToggleLineBreakpoint)
-nmap <leader>dr <Action>(ChooseRunConfiguration)
-nmap <leader>dc <Action>(ChooseDebugConfiguration)
+" run/debug
+nmap <leader>dr <Action>(ChooseDebugConfiguration)
 nmap <leader>ds <Action>(Stop)
 
-" SQL
-" nmap <leader>se :<C-u>action Console.Jdbc.Execute
-" nmap <leader>sp :<C-u>action Console.Jdbc.ExplainPlan
-" vmap <leader>se :<C-u>action Console.Jdbc.Execute
-" vmap <leader>sp :<C-u>action Console.Jdbc.ExplainPlan
+nmap <leader>dh <Action>(RunToCursor)
+nmap <leader>db <Action>(ToggleLineBreakpoint)
+nmap <leader>dc <Action>(AddConditionalBreakpoint)
+nmap <leader>de <Action>(EvaluateExpression)
+
+nmap <leader>rr <Action>(ChooseRunConfiguration)
+nmap <leader>rs <Action>(Stop)
+
+" datagrip
+nmap <leader>ex <Action>(Console.Jdbc.Execute)
+nmap <leader>ep <Action>(Console.Jdbc.ExplainPlan)
+vmap <leader>ex <Action>(Console.Jdbc.Execute)
+vmap <leader>ep <Action>(Console.Jdbc.ExplainPlan)
 
