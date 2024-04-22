@@ -68,8 +68,8 @@ nmap ]c <Action>(VcsShowNextChangeMarker)
 nmap [c <Action>(VcsShowPrevChangeMarker)
 
 " method navigation
-nmap ]] <Action>(MethodDown)
-nmap [[ <Action>(MethodUp)
+nmap ]f <Action>(MethodDown)
+nmap [f <Action>(MethodUp)
 
 " search
 nmap <leader>sa <Action>(GotoAction)
