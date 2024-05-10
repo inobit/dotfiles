@@ -183,7 +183,7 @@ return {
       })
       -- install linter
       vim.list_extend(ensure_installed, {
-        "flake8", -- python linter
+        "ruff", -- python linter
         "eslint_d", -- js,ts linter
         "htmlhint", -- html linter
         "stylelint", -- css,scss,sass,less linter

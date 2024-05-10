@@ -5,7 +5,7 @@ return {
     -- Event to trigger linters
     events = { "BufWritePost", "BufReadPost", "InsertLeave" },
     linters_by_ft = {
-      python = { "flake8" },
+      python = { "ruff" },
       javascript = { "eslint_d" },
       javascriptreact = { "eslint_d" },
       typescript = { "eslint_d" },
@@ -78,9 +78,9 @@ return {
           return vim.fs.find({ ".yamllint", ".yamllint.yaml", ".yamllint.yml" }, { path = ctx.filename, upward = true })[1]
         end,
       },
-      flake8 = {
+      ruff = {
         condition = function(ctx)
-          return vim.fs.find({ ".flake8", "tox.ini", "setup.cfg" }, { path = ctx.filename, upward = true })[1]
+          return vim.fs.find({ "pyproject.toml", "ruff.toml", ".ruff.toml" }, { path = ctx.filename, upward = true })[1]
         end,
       },
     },
