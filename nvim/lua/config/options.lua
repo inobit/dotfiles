@@ -7,6 +7,9 @@ vim.g.loaded_netrwPlugin = 1
 -- optionally enable 24-bit colour
 vim.opt.termguicolors = true
 
+-- set nvim python bin path
+vim.g.python3_host_prog = os.getenv "HOME" .. ".nvim-venv/bin/python3"
+
 -- :h hidden 允许隐藏buffer(toggleterm plugin)
 vim.opt.hidden = true
 

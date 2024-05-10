@@ -7,8 +7,7 @@ require("dap-vscode-js").setup {
 
   -- Path to vscode-js-debug installation.
   -- debugger_path = vim.fn.resolve(vim.fn.stdpath "data" .. "/lazy/vscode-js-debug"),
-  debugger_path = require("config.local-options").vscode_js_debug_path
-    or vim.fn.stdpath "data" .. "/lazy/vscode-js-debug",
+  debugger_path = vim.g.vscode_js_debug_path or vim.fn.stdpath "data" .. "/lazy/vscode-js-debug",
   -- debugger_path = vim.fn.resolve(vim.fn.stdpath "data" .. "/mason/packages/js-debug-adapter"),
 
   -- Command to use to launch the debug server. Takes precedence over "node_path" and "debugger_path"
