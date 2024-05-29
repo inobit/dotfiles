@@ -103,6 +103,8 @@ map("n", "<leader>sR", function() vscode.action "editor.action.startFindReplaceA
 -- toggle explore
 map("n", "<leader>te", function() vscode.action "workbench.action.toggleSidebarVisibility" end, "vscode: toggle side bar")
 map("n", "<leader>fe", function() vscode.action "workbench.view.explorer" end, "vscode: fouce explorer")
+-- copilot view
+map("n", "<leader>fa", function() vscode.action "codeium.openChatView" end, "vscode: fouce AI")
 
 -- toggle terminal
 map("n", "<leader>tt", function() vscode.action "workbench.action.terminal.toggleTerminal" end, "vscode: fouce")
