@@ -83,6 +83,11 @@ return {
           return vim.fs.find({ "pyproject.toml", "ruff.toml", ".ruff.toml" }, { path = ctx.filename, upward = true })[1]
         end,
       },
+      sqlfluff = {
+        condition = function(ctx)
+          return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })[1]
+        end,
+      },
     },
   },
   config = function(_, opts)

@@ -26,7 +26,7 @@ return { -- Autoformat
       json5 = { "prettier" },
       sh = { "shfmt" },
       xml = { "xmlformatter" },
-      sql = { "sql-formatter" },
+      sql = { "sql_formatter" },
       yaml = { "yamlfmt" },
     },
   },
