@@ -39,6 +39,8 @@ return { -- Autoformat
           language = "mysql",
           tabWidth = 2,
           keywordCase = "upper",
+          dataTypeCase = "upper",
+          functionCase = "upper",
           linesBetweenQueries = 2,
           paramTypes = { named = { ":" } },
         },
