@@ -30,4 +30,19 @@ return { -- Autoformat
       yaml = { "yamlfmt" },
     },
   },
+  config = function(_, opts)
+    require("conform").setup(opts)
+    require("conform").formatters.sql_formatter = {
+      prepend_args = {
+        "-c",
+        vim.json.encode {
+          language = "mysql",
+          tabWidth = 2,
+          keywordCase = "upper",
+          linesBetweenQueries = 2,
+          paramTypes = { named = { ":" } },
+        },
+      },
+    }
+  end,
 }
