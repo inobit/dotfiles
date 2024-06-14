@@ -66,7 +66,7 @@ inoremap jj <Esc>
 nnoremap <leader>w :w<CR>
 nnoremap <leader>q :q<CR>
 nnoremap <leader>wq :wq<CR>
-command! W execute 'w !sudo tee % >/dev/null' | edit!
+command! W :execute ':silent w !sudo tee % >/dev/null' | edit!
 
 " new file
 nnoremap <leader>af :enew<CR>
