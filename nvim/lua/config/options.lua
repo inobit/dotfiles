@@ -9,7 +9,7 @@ vim.opt.termguicolors = true
 
 -- set nvim python bin path
 if vim.fn.has "win32" == 0 then
-  vim.g.python3_host_prog = os.getenv "HOME" .. ".nvim-venv/bin/python3"
+  vim.g.python3_host_prog = os.getenv "HOME" .. "/.nvim-venv/bin/python3"
 end
 
 -- :h hidden 允许隐藏buffer(toggleterm plugin)
