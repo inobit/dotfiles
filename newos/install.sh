@@ -59,6 +59,7 @@ if ! which tmux >/dev/null 2>&1; then
 	cd ./tmux-3.4
 	./configure && make
 	sudo make install
+	cd "$HOME"
 fi
 
 echo "config tmux"
@@ -120,20 +121,49 @@ touch "$local_options"
 echo 'vim.g.python3_host_prog = os.getenv "HOME" .. "/.nvim-venv/bin/python3"' >>"$local_options"
 echo 'vim.g.vscode_js_debug_path = os.getenv "HOME" .. "/.dap-js"' >>"$local_options"
 
+read -r -p "Whether to install docker? y or n: " docker
+if [ "$docker" = "y" ]; then
+	# uninstall all conflicting packages
+	for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
+
+	# Add Docker's official GPG key:
+	sudo apt-get update
+	sudo apt-get install ca-certificates curl
+	sudo install -m 0755 -d /etc/apt/keyrings
+	sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+	sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+	# Add the repository to Apt sources:
+	# shellcheck disable=SC1091
+	echo \
+		"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |
+		sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+	sudo apt-get update
+	# install the latest version
+	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+fi
+
 echo "install zsh"
 sudo apt install zsh -y
 
 echo "install oh-my-zsh"
-rm -rf "$HOME"/.oh-my-zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+if [ ! -d "$HOME"/.oh-my-zsh ]; then
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 # sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
-echo "install zsh-autosuggestions"
-git clone --depth 1 git@github.com:zsh-users/zsh-autosuggestions.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-echo "install zsh-syntax-highlighting"
-git clone --depth 1 git@github.com:zsh-users/zsh-syntax-highlighting.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-echo "install zsh-autocomplete"
-git clone --depth 1 git@github.com:zsh-users/zsh-completions.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-completions
-
+fi
+if [ ! -d "$HOME"/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
+	echo "install zsh-autosuggestions"
+	git clone --depth 1 git@github.com:zsh-users/zsh-autosuggestions.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+fi
+if [ ! -d "$HOME"/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]; then
+	echo "install zsh-syntax-highlighting"
+	git clone --depth 1 git@github.com:zsh-users/zsh-syntax-highlighting.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+fi
+if [ ! -d "$HOME"/.oh-my-zsh/custom/plugins/zsh-completions ]; then
+	echo "install zsh-autocomplete"
+	git clone --depth 1 git@github.com:zsh-users/zsh-completions.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-completions
+fi
 echo "ln .zshrc"
 ln -sf "$HOME"/documents/dotfiles/zsh/.zshrc "$HOME"/.zshrc
 
