@@ -4,7 +4,7 @@ set -e
 
 # config proxy
 read -r -p "input proxy address: " proxy
-if [ -n "$proxy" ]; then
+if [[ -n $proxy ]]; then
 	export all_proxy=$proxy
 	export no_proxy="127.0.0.1,localhost,::1"
 	if grep -q 'ID=debian' /etc/os-release || grep -q 'ID=ubuntu' /etc/os-release; then
@@ -14,7 +14,7 @@ if [ -n "$proxy" ]; then
 fi
 
 echo "config ssh"
-if [ -d "$HOME"/.ssh ]; then
+if [[ -d $HOME/.ssh ]]; then
 	eval "$(ssh-agent)"
 	for possiblekey in "${HOME}"/.ssh/*; do
 		if grep -q PRIVATE "$possiblekey"; then
@@ -30,7 +30,7 @@ echo "install tools"
 sudo apt install make gcc ripgrep unzip git xclip curl wget -y
 
 echo "pull dotfiles"
-if [ ! -d "$HOME"/documents/dotfiles ]; then
+if [[ ! -d $HOME/documents/dotfiles ]]; then
 	mkdir -p "$HOME"/documents/dotfiles
 	git clone git@gitee.com:andrew_rogers/dotfiles.git "$HOME"/documents/dotfiles
 fi
@@ -51,7 +51,7 @@ echo "install tmux"
 if ! which tmux >/dev/null 2>&1; then
 	sudo apt install libevent-dev ncurses-dev build-essential bison pkg-config -y
 	# sudo apt install tmux
-	if [ ! -f ./tmux-3.4.tar.gz ]; then
+	if [[ ! -f ./tmux-3.4.tar.gz ]]; then
 		curl -LO https://github.com/tmux/tmux/releases/download/3.4/tmux-3.4.tar.gz
 	fi
 	test -d ./tmux-3.4 && rm -rf ./tmux-3.4
@@ -65,13 +65,13 @@ fi
 echo "config tmux"
 test -d "$HOME"/.config/tmux || mkdir -p ~/.config/tmux
 ln -sf "$HOME"/documents/dotfiles/tmux/tmux.conf ~/.config/tmux/tmux.conf
-if [ ! -d "$HOME"/.tmux/plugins/tpm ]; then
+if [[ ! -d $HOME/.tmux/plugins/tpm ]]; then
 	git clone https://github.com/tmux-plugins/tpm "$HOME"/.tmux/plugins/tpm
 fi
 #tmux source "$HOME"/.config/tmux/tmux.conf
 
 echo "install nvm"
-if [ ! -d "$HOME"/.nvm ]; then
+if [[ ! -d $HOME/.nvm ]]; then
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 fi
 
@@ -86,24 +86,24 @@ sudo apt install build-essential libssl-dev zlib1g-dev \
 	libbz2-dev libreadline-dev libsqlite3-dev curl git \
 	libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev -y
 
-if [ ! -f ./.pyenv/bin/pyenv ]; then
+if [[ ! -f ./.pyenv/bin/pyenv ]]; then
 	curl https://pyenv.run | bash
 fi
 
 python="3.12.3"
 echo "install python $python"
-if [ ! -f ./.pyenv/versions/$python/bin/python ]; then
+if [[ ! -f ./.pyenv/versions/$python/bin/python ]]; then
 	./.pyenv/bin/pyenv install "$python"
 fi
 
 echo "create nvim venv"
-if [ ! -d "$HOME"/.nvim-venv ]; then
+if [[ ! -d $HOME/.nvim-venv ]]; then
 	./.pyenv/versions/$python/bin/python -m venv "$HOME"/.nvim-venv
 	chmod a+x "$HOME"/.nvim-venv/bin/activate
 fi
 
 echo "install vscode-js-debug"
-if [ ! -d "$HOME"/.dap-js/out ]; then
+if [[ ! -d $HOME/.dap-js/out ]]; then
 	rm -rf "$HOME"/.dap-js
 	git clone https://github.com/microsoft/vscode-js-debug "$HOME"/.dap-js
 	cd "$HOME"/.dap-js
@@ -122,7 +122,7 @@ echo 'vim.g.python3_host_prog = os.getenv "HOME" .. "/.nvim-venv/bin/python3"' >
 echo 'vim.g.vscode_js_debug_path = os.getenv "HOME" .. "/.dap-js"' >>"$local_options"
 
 read -r -p "Whether to install docker? y or n: " docker
-if [ "$docker" = "y" ]; then
+if [[ $docker = "y" ]]; then
 	# uninstall all conflicting packages
 	for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
@@ -148,19 +148,19 @@ echo "install zsh"
 sudo apt install zsh -y
 
 echo "install oh-my-zsh"
-if [ ! -d "$HOME"/.oh-my-zsh ]; then
+if [[ ! -d $HOME/.oh-my-zsh ]]; then
 	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 # sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 fi
-if [ ! -d "$HOME"/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
+if [[ ! -d $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]]; then
 	echo "install zsh-autosuggestions"
 	git clone --depth 1 git@github.com:zsh-users/zsh-autosuggestions.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 fi
-if [ ! -d "$HOME"/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]; then
+if [[ ! -d $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]]; then
 	echo "install zsh-syntax-highlighting"
 	git clone --depth 1 git@github.com:zsh-users/zsh-syntax-highlighting.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
 fi
-if [ ! -d "$HOME"/.oh-my-zsh/custom/plugins/zsh-completions ]; then
+if [[ ! -d $HOME/.oh-my-zsh/custom/plugins/zsh-completions ]]; then
 	echo "install zsh-autocomplete"
 	git clone --depth 1 git@github.com:zsh-users/zsh-completions.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-completions
 fi
