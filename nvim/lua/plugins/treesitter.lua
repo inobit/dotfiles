@@ -9,7 +9,7 @@ return { -- Highlight, edit, and navigate code
   opts = {
     ensure_installed = {
       "bash",
-      "c",
+      "cpp",
       "css",
       "diff",
       "html",

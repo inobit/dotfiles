@@ -62,6 +62,8 @@ return {
             ["chrome"] = js_based_languages,
             ["pwa-chrome"] = js_based_languages,
           })
+        elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
+          dap_vscode.load_launchjs(nil, { codelldb = { "c", "cpp" } })
         end
       end
       dap.continue()
@@ -143,6 +145,8 @@ return {
       vim.tbl_contains(js_based_languages, vim.bo.filetype)
     then
       require "dap_set.js"
+    elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
+      require "dap_set.cpp"
     end
   end,
 }

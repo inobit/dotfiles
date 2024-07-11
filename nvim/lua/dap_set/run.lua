@@ -6,6 +6,12 @@ local commands = {
   js = function()
     return "node " .. vim.api.nvim_buf_get_name(0)
   end,
+  c = function()
+    local file = vim.api.nvim_buf_get_name(0)
+    local _, _, basename, _ = string.find(file, "^(.*)%.%a+$")
+    local output_filename = basename .. ".out"
+    return string.format("cc -g %s -o %s && %s", file, output_filename, output_filename)
+  end,
 }
 
 local function run(target_pane, command)
@@ -17,6 +23,8 @@ vim.keymap.set("n", "<leader>rr", function()
     run(vim.v.count == 0 and 2 or vim.v.count, commands.python())
   elseif vim.bo.filetype == "javascript" then
     run(vim.v.count == 0 and 2 or vim.v.count, commands.js())
+  elseif vim.bo.filetype == "c" then
+    run(vim.v.count == 0 and 2 or vim.v.count, commands.c())
   end
 end, { desc = "run code", silent = true, noremap = true })
 

@@ -166,10 +166,13 @@ return {
         sqlls = require "lsp.sqlls",
         yamlls = require "lsp.yamlls",
         docker_compose_language_service = require "lsp.docker_compose_language_service",
+        clangd = require "lsp.clangd",
       }
       require("mason").setup()
       -- install lsp server
       local ensure_installed = vim.tbl_keys(servers or {})
+      -- install debugger adapter
+      vim.list_extend(ensure_installed, { "codelldb" })
       -- install formatter
       vim.list_extend(ensure_installed, {
         "stylua", -- lua formatter
