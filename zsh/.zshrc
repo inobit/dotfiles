@@ -106,6 +106,7 @@ export EDITOR='nvim'
 alias setproxy="export ALL_PROXY=http://192.168.1.190:7890" alias unsetproxy="unset ALL_PROXY"
 alias vim="nvim"
 export no_proxy="127.0.0.1,localhost,::1"
+export TIME_STYLE="long-iso"
 
 # pyenv config
 export PYENV_ROOT="$HOME/.pyenv"
