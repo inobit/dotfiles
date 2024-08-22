@@ -98,7 +98,7 @@ map("n", "<leader>sf", function() vscode.action "workbench.action.quickOpen" end
 map("n", "<leader>sr", function() vscode.action "workbench.action.openRecent" end, "vscode: search old files")
 map("n", "<leader>sg", function() vscode.action "workbench.action.findInFiles" end, "vscode: find in files")
 map("n", "<leader>ss", function() vscode.action "actions.find" end, "vscode: find in current file")
-map("n", "<leader>sR", function() vscode.action "editor.action.startFindReplaceAction" end, "vscode: find and replace in current file")
+map("n", "<leader>sx", function() vscode.action "editor.action.startFindReplaceAction" end, "vscode: find and replace in current file")
 
 -- toggle explore
 map("n", "<leader>te", function() vscode.action "workbench.action.toggleSidebarVisibility" end, "vscode: toggle side bar")
