@@ -89,6 +89,10 @@ vmap <leader>sx <Action>(Replace)
 nmap <leader>rn <Action>(RenameElement)
 nmap <leader>rf <Action>(RenameFile)
 
+" new file
+nmap <leader>af <Action>(NewFile)
+nmap <leader>ac <Action>(NewClass)
+
 " buffer navigation
 nmap <leader>h <Action>(PreviousTab)
 nmap <leader>l <Action>(NextTab)

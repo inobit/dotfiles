@@ -93,6 +93,10 @@ map("n", "<leader>bu", function() vscode.action "workbench.action.closeUnmodifie
 map("n", "<leader>bh", function() vscode.action "workbench.action.closeEditorsToTheLeft" end, "vscode: close left buffers")
 map("n", "<leader>bl", function() vscode.action "workbench.action.closeEditorsToTheRight" end, "vscode: close right buffers")
 
+-- create file
+map("n", "<leader>af", function() vscode.action "explorer.newFile" end, "vscode: new file")
+map("n", "<leader>ad", function() vscode.action "explorer.newFolder" end, "vscode: new folder")
+
 -- file search
 map("n", "<leader>sf", function() vscode.action "workbench.action.quickOpen" end, "vscode: search files")
 map("n", "<leader>sr", function() vscode.action "workbench.action.openRecent" end, "vscode: search old files")
