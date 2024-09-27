@@ -57,6 +57,7 @@ imap <C-y> <Action>(EditorChooseLookupItem)
 nmap <leader>g, <Action>(Generate)
 nmap <leader>s, <Action>(SurroundWith)
 vmap <leader>s, <Action>(SurroundWith)
+nmap <C-,> <Action>(IntroduceVariable)
 
 " diagnostic navigation
 nmap ]e <Action>(GotoNextError)
