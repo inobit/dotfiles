@@ -157,7 +157,8 @@ return {
       local servers = {
         lua_ls = require "lsp.lua_ls",
         pyright = require "lsp.pyright",
-        tsserver = require "lsp.tsserver",
+        -- tsserver rename to ts_ls
+        ts_ls = require "lsp.tsserver",
         html = require "lsp.htmlls",
         cssls = require "lsp.cssls",
         jsonls = require "lsp.jsonls",

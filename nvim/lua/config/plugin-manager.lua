@@ -8,7 +8,8 @@ require "lib.lazy"
   -- keys = "j"
 }, ]]
 -- import plugins 会自动导入lua/plugins/*.lua文件
-require("lazy").setup({ { import = "plugins" } }, {
+require("lazy").setup {
+  spec = { { import = "plugins" } },
   ui = {
     -- If you have a Nerd Font, set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons otherwise define a unicode icons table
@@ -28,4 +29,4 @@ require("lazy").setup({ { import = "plugins" } }, {
       lazy = "💤 ",
     },
   },
-})
+}
