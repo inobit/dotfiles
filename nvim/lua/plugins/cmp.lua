@@ -102,6 +102,7 @@ return { -- Autocompletion
       sources = {
         { name = "nvim_lsp" },
         { name = "luasnip" },
+        { name = "codeium" },
         { name = "path" },
         { name = "buffer" },
       },
@@ -113,6 +114,7 @@ return { -- Autocompletion
           -- can also be a function to dynamically calculate max width such as
           -- maxwidth = function() return math.floor(0.45 * vim.o.columns) end,
           ellipsis_char = "...", -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
+          symbol_map = { Codeium = "" },
           show_labelDetails = true, -- show labelDetails in menu. Disabled by default
 
           -- The function below will be called before any actual modifications from lspkind
