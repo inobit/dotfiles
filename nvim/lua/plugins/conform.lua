@@ -9,8 +9,10 @@ return { -- Autoformat
     },
     formatters_by_ft = {
       lua = { "stylua" },
+      c = { "clang-format" },
+      cpp = { "clang-format" },
       python = {
-        "black", --[[ "isort"  ]] -- 2个同时使用，会造成都生效，以至在最后加了2个空行，造成flake8 w391报错
+        "black", --[[ "isort"  ]] -- 2个同时使用，会造成都生效，以至在最后加了2个空行，造成flake8 w391报错,插件BUG
       },
       javascript = { "prettier" },
       typescript = { "prettier" },
@@ -31,8 +33,10 @@ return { -- Autoformat
     },
   },
   config = function(_, opts)
-    require("conform").setup(opts)
-    require("conform").formatters.sql_formatter = {
+    local conform = require "conform"
+    conform.setup(opts)
+
+    conform.formatters.sql_formatter = {
       prepend_args = {
         "-c",
         vim.json.encode {
@@ -44,6 +48,40 @@ return { -- Autoformat
           linesBetweenQueries = 2,
           paramTypes = { named = { ":" } },
         },
+      },
+    }
+
+    -- clang-format global config
+    local styles = vim.json.encode {
+      BasedOnStyle = "LLVM",
+      IndentWidth = 4,
+      AllowShortBlocksOnASingleLine = true,
+      AllowShortCaseLabelsOnASingleLine = true,
+      -- AllowShortIfStatementsOnASingleLine = true,
+      AllowShortFunctionsOnASingleLine = "All",
+      AlignAfterOpenBracket = "Align",
+      BreakBeforeBraces = "Custom",
+      BraceWrapping = {
+        AfterClass = true,
+        AfterControlStatement = true,
+        AfterEnum = true,
+        AfterFunction = true,
+        AfterNamespace = true,
+        AfterStruct = true,
+        AfterUnion = true,
+        AfterExternBlock = true,
+        SplitEmptyFunction = false,
+        SplitEmptyRecord = false,
+        SplitEmptyNamespace = false,
+      },
+    }
+    styles = styles:gsub('"', ""):gsub(":", ": ")
+    conform.formatters["clang-format"] = {
+      prepend_args = {
+        -- use .clang-format file
+        -- "-style=file",
+        -- use command line arguments
+        "-style=" .. styles,
       },
     }
   end,

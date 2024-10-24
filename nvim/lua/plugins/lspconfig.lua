@@ -177,6 +177,7 @@ return {
       -- install formatter
       vim.list_extend(ensure_installed, {
         "stylua", -- lua formatter
+        "clang-format", -- c cpp formatter
         "black", -- python formatter
         "isort", -- python formatter
         "prettier", -- html,css,js,ts,json formatter
