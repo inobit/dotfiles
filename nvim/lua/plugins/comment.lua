@@ -11,6 +11,9 @@ return {
     ---@diagnostic disable-next-line: missing-fields
     require("ts_context_commentstring").setup {
       enable_autocmd = false,
+      config = {
+        c = { __default = "// %s", __multiline = "/* %s */" },
+      },
     }
     ---@diagnostic disable-next-line: missing-fields
     require("Comment").setup {
