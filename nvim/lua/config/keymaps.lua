@@ -41,7 +41,10 @@ vim.keymap.set("n", "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true })
 -- :noh
 vim.keymap.set("n", "<leader>nh", "<Cmd>nohlsearch<CR>")
 
+vim.keymap.set("n", "<leader>dL", ":<C-u>g/^$/d")
+
 -- 退出t模式
+-- stylua: ignore start
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 vim.keymap.set("t", "jj", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
@@ -51,6 +54,7 @@ vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move focus to the left window" 
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move focus to the right window" })
 vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move focus to the upper window" })
+-- stylua: ignore end
 
 -- 分屏
 vim.keymap.set("n", "<leader>sp", "<C-w>s", { desc = "horizontal split" })
