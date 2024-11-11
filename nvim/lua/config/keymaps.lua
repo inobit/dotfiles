@@ -41,7 +41,12 @@ vim.keymap.set("n", "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true })
 -- :noh
 vim.keymap.set("n", "<leader>nh", "<Cmd>nohlsearch<CR>")
 
-vim.keymap.set("n", "<leader>dL", ":<C-u>g/^$/d")
+-- delete empty line
+-- vim.keymap.set("n", "<leader>dL", ":<C-u>g/^$/d<CR> <bar> :nohlsearch<CR>")
+vim.keymap.set("n", "<leader>dL", function()
+  vim.cmd [[g/^$/d]]
+  vim.cmd.nohlsearch()
+end)
 
 -- 退出t模式
 -- stylua: ignore start
