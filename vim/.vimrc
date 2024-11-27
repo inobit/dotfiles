@@ -72,8 +72,8 @@ command! W :execute ':silent w !sudo tee % >/dev/null' | edit!
 nnoremap <leader>af :enew<CR>
 
 " use 0# register
-nnoremap <leader>p, "0p
-nnoremap <leader>P, "0P
+nnoremap <leader>p "0p
+nnoremap <leader>P "0P
 
 " jump
 " ‘a --> `a
