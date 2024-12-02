@@ -2,7 +2,7 @@
 --   normal_mode = "n",
 --   vmap for both "visual_mode" and "select_mode"
 --   visual_mode = "v",
---   select_mode = "s",
+--   select_mode = "s", -- gh
 --   xmap just for "visual_mode"
 --   visual_block_mode = "x",
 --   term_mode = "t",
@@ -13,7 +13,6 @@ vim.keymap.set("i", "jj", "<Esc>")
 -- save key map
 vim.keymap.set("n", "<leader>w", "<Cmd>w<CR>", { desc = ":w" })
 vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { desc = ":q" })
-vim.keymap.set("n", "<leader>wq", "<Cmd>wq<CR>", { desc = ":wq" })
 
 -- new file
 vim.keymap.set("n", "<leader>af", "<Cmd>enew<CR>")

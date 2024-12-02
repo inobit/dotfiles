@@ -65,7 +65,6 @@ inoremap jj <Esc>
 " save key map
 nnoremap <leader>w :w<CR>
 nnoremap <leader>q :q<CR>
-nnoremap <leader>wq :wq<CR>
 command! W :execute ':silent w !sudo tee % >/dev/null' | edit!
 
 " new file
