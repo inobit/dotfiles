@@ -25,9 +25,30 @@ vim.opt.relativenumber = true
 vim.opt.mouse = "a"
 -- 不需要显示模式，比如 --INSERT--
 vim.opt.showmode = false
--- 系统剪切板，ssh远程的需要配置x-client和x-server
+-- 系统剪切板
 vim.opt.clipboard = "unnamedplus"
-
+-- ssh连接时强制使用osc52 provider
+-- vim.opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus"
+if vim.env.SSH_TTY or vim.env.SSH_CLIENT then
+  local function my_paste()
+    return function()
+      -- 有些terminal不允许通过osc52读clipboard,所以这里的paste改为使用""p
+      local content = vim.fn.getreg '"'
+      return vim.split(content, "\n")
+    end
+  end
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy "+",
+      ["*"] = require("vim.ui.clipboard.osc52").copy "*",
+    },
+    paste = {
+      ["+"] = my_paste(),
+      ["*"] = my_paste(),
+    },
+  }
+end
 -- 换行后重复之前的缩进
 vim.opt.breakindent = true
 
