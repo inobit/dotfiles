@@ -33,6 +33,7 @@ return { -- Highlight, edit, and navigate code
       "xml",
       "yaml",
       "dockerfile",
+      "latex", -- need npm install -g tree-sitter-cli
     },
     -- Autoinstall languages that are not installed
     auto_install = true,
@@ -52,12 +53,30 @@ return { -- Highlight, edit, and navigate code
         lookahead = true,
         keymaps = {
           -- You can use the capture groups defined in textobjects.scm
-          ["aa"] = { query = "@parameter.outer", desc = "Select outer part of a function parameter" },
-          ["ia"] = { query = "@parameter.inner", desc = "Select inner part of a function parameter" },
-          ["af"] = { query = "@function.outer", desc = "Select outer part of a function region" },
-          ["if"] = { query = "@function.inner", desc = "Select inner part of a function region" },
-          ["ac"] = { query = "@class.outer", desc = "Select inner part of a class region" },
-          ["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
+          ["aa"] = {
+            query = "@parameter.outer",
+            desc = "Select outer part of a function parameter",
+          },
+          ["ia"] = {
+            query = "@parameter.inner",
+            desc = "Select inner part of a function parameter",
+          },
+          ["af"] = {
+            query = "@function.outer",
+            desc = "Select outer part of a function region",
+          },
+          ["if"] = {
+            query = "@function.inner",
+            desc = "Select inner part of a function region",
+          },
+          ["ac"] = {
+            query = "@class.outer",
+            desc = "Select inner part of a class region",
+          },
+          ["ic"] = {
+            query = "@class.inner",
+            desc = "Select inner part of a class region",
+          },
         },
         -- You can choose the select mode (default is charwise 'v')
         --
@@ -85,9 +104,15 @@ return { -- Highlight, edit, and navigate code
       move = {
         enable = true,
         set_jumps = true,
-        goto_next_start = { ["]f"] = "@function.outer", ["]C"] = "@class.outer" },
+        goto_next_start = {
+          ["]f"] = "@function.outer",
+          ["]C"] = "@class.outer",
+        },
         goto_next_end = { ["]F"] = "@function.outer" },
-        goto_previous_start = { ["[f"] = "@function.outer", ["[C"] = "@class.outer" },
+        goto_previous_start = {
+          ["[f"] = "@function.outer",
+          ["[C"] = "@class.outer",
+        },
         goto_previous_end = { ["[F"] = "@function.outer" },
       },
     },
