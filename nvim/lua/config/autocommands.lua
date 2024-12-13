@@ -73,3 +73,8 @@ vim.api.nvim_create_autocmd("BufEnter", {
     end
   end,
 })
+
+-- 取消自动添加comment leader
+vim.api.nvim_create_autocmd("FileType", {
+  command = "set formatoptions-=cro",
+})
