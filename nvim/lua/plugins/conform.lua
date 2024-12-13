@@ -55,6 +55,7 @@ return { -- Autoformat
     -- clang-format global config
     local styles = vim.json.encode {
       BasedOnStyle = "LLVM",
+      IndentPPDirectives = "AfterHash",
       IndentWidth = 4,
       AllowShortBlocksOnASingleLine = true,
       AllowShortCaseLabelsOnASingleLine = true,
