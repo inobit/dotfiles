@@ -18,6 +18,10 @@ return {
       sign = false,
       -- icons = {},
     },
+    html = {
+      enabled = true,
+      comment = { conceal = false },
+    },
   },
   ft = { "markdown", "norg", "rmd", "org" },
 }
