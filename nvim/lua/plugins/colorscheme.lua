@@ -1,3 +1,7 @@
+local function setTheme(theme)
+  vim.cmd.colorscheme(theme)
+  vim.cmd.hi "Comment gui=none"
+end
 return { -- You can easily change to a different colorscheme.
   {
     -- Change the name of the colorscheme plugin below, and then
@@ -25,5 +29,8 @@ return { -- You can easily change to a different colorscheme.
     name = "catppuccin",
     priority = 1000,
     -- cond = false,
+    config = function()
+      setTheme "catppuccin-frappe"
+    end,
   },
 }

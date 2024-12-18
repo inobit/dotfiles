@@ -4,7 +4,6 @@ if not vim.g.vscode then
   require "config.filetype"
   require "config.plugin-manager"
   require "config.autocommands"
-  require "config.theme"
   require "config.neovide"
   pcall(require, "config.local-options")
 else
