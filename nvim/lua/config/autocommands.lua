@@ -116,3 +116,12 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "BufEnter" }, {
     end
   end,
 })
+
+-- json文件的隐藏级别
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("json_conceal", { clear = true }),
+  pattern = { "json", "json5", "jsonc", "markdown" },
+  callback = function()
+    vim.opt.conceallevel = 0
+  end,
+})
