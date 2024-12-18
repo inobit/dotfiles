@@ -98,3 +98,5 @@ vim.opt.tabstop = 2
 -- 插入模式下tab插入的长度，如果和tabstop不同，则会使用制表符和空格混合来达成效果
 -- 比如sts=5 ts=2，insert时一次tab会显示为2个制表符和1个空格
 vim.opt.softtabstop = 2
+
+vim.opt.jumpoptions = "view"
