@@ -88,15 +88,19 @@ return { -- Fuzzy Finder (files, lsp, etc)
     -- telescope 接管ui-select,下拉选项
     pcall(require("telescope").load_extension, "ui-select")
     -- See `:help telescope.builtin`
+    -- stylua: ignore start
     local builtin = require "telescope.builtin"
     vim.keymap.set("n", "<leader>su", builtin.resume, { desc = "[S]earch [R]esume" })
     vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
     vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
     vim.keymap.set("n", "<leader>se", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
     vim.keymap.set("n", "<leader>sf", function()
-      builtin.find_files {
-        hidden = true,
-      }
+      local opts = { hidden = true }
+      local cmd = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+      if vim.v.shell_error == 0 then
+        opts.cwd = cmd
+      end
+      builtin.find_files(opts)
     end, { desc = "[S]earch [F]iles" })
     vim.keymap.set("n", "<leader>sr", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
     vim.keymap.set("n", "<leader>sb", builtin.buffers, { desc = "[S] Find existing buffers" })
@@ -122,5 +126,6 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set("n", "<leader>sc", function()
       builtin.find_files { cwd = vim.fn.stdpath "config", prompt_title = "Dotfiles " }
     end, { desc = "[S]earch [N]eovim files" })
+    -- stylua: ignore end
   end,
 }
