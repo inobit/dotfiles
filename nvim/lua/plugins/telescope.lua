@@ -94,6 +94,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
     vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
     vim.keymap.set("n", "<leader>se", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
+    vim.keymap.set("n", "<leader>sd", function()
+      builtin.find_files { hidden = true, cwd = require("telescope.utils").buffer_dir() }
+    end, { desc = "[S]earch [F]iles in current folder" })
     vim.keymap.set("n", "<leader>sf", function()
       local opts = { hidden = true }
       local cmd = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
