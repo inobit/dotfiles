@@ -46,6 +46,16 @@ return { -- Autocompletion
             :match "%s"
           == nil
     end
+    -- 构建sources
+    local sources = {
+      { name = "nvim_lsp" },
+      { name = "luasnip" },
+      { name = "path" },
+      { name = "buffer" },
+    }
+    if vim.g.ai_cmp then
+      table.insert(sources, 1, { name = "codeium" })
+    end
     -- 全局配置
     cmp.setup {
       -- 配置snippet,推荐必须配置,用来和snip引擎作用
@@ -104,13 +114,7 @@ return { -- Autocompletion
           end
         end, { "i", "s" }),
       },
-      sources = {
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "codeium" },
-        { name = "path" },
-        { name = "buffer" },
-      },
+      sources = sources,
       ---@diagnostic disable-next-line: missing-fields
       formatting = {
         format = lspkind.cmp_format {

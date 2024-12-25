@@ -12,6 +12,9 @@ if vim.fn.has "win32" == 0 then
   vim.g.python3_host_prog = os.getenv "HOME" .. "/.nvim-venv/bin/python3"
 end
 
+-- ai cmp
+vim.g.ai_cmp = true
+
 -- :h hidden 允许隐藏buffer(toggleterm plugin)
 vim.opt.hidden = true
 
