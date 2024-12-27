@@ -16,7 +16,7 @@ return {
     },
     heading = {
       sign = false,
-      -- icons = {},
+      icons = {},
     },
     html = {
       enabled = true,
