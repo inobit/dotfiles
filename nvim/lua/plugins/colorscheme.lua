@@ -2,6 +2,7 @@ local function setTheme(theme)
   vim.cmd.colorscheme(theme)
   vim.cmd.hi "Comment gui=none"
 end
+local theme = vim.g.theme or "catppuccin-frappe"
 return { -- You can easily change to a different colorscheme.
   {
     -- Change the name of the colorscheme plugin below, and then
@@ -11,16 +12,21 @@ return { -- You can easily change to a different colorscheme.
     "folke/tokyonight.nvim",
     lazy = false,
     priority = 1000, -- make sure to load this before all the other start plugins
-    cond = false,
+    cond = string.find(theme, "tokyonight") ~= nil,
     opts = {},
+    config = function()
+      setTheme(theme)
+    end,
   },
   {
     "navarasu/onedark.nvim",
     priority = 1000, -- make sure to load this before all the other start plugins
     lazy = false,
-    cond = false,
+    cond = string.find(theme, "onedark") ~= nil,
     config = function()
-      require("onedark").setup { style = "cool" }
+      require("onedark").setup {
+        style = string.sub(theme, string.len "onedark-" + 1),
+      }
       require("onedark").load()
     end,
   },
@@ -28,9 +34,9 @@ return { -- You can easily change to a different colorscheme.
     "catppuccin/nvim",
     name = "catppuccin",
     priority = 1000,
-    -- cond = false,
+    cond = string.find(theme, "catppuccin") ~= nil,
     config = function()
-      setTheme "catppuccin-frappe"
+      setTheme(theme)
     end,
   },
 }
