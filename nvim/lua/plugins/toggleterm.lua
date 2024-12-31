@@ -72,6 +72,9 @@ return {
     persist_size = true,
     persist_mode = true,
     direction = "horizontal", -- 'vertical' | 'horizontal' | 'tab' | 'float'
-    shell = vim.o.shell,
   },
+  config = function(_, opts)
+    opts.shell = vim.o.shell
+    require("toggleterm").setup(opts)
+  end,
 }
