@@ -34,6 +34,11 @@ return { -- Highlight, edit, and navigate code
       "yaml",
       "dockerfile",
       "latex", -- need npm install -g tree-sitter-cli
+      "git_config",
+      "git_rebase",
+      "gitattributes",
+      "gitcommit",
+      "gitignore",
     },
     -- Autoinstall languages that are not installed
     auto_install = true,
