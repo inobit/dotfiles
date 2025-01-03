@@ -125,3 +125,21 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt.conceallevel = 0
   end,
 })
+
+-- strong,italic highlight
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("md_highlight", { clear = true }),
+  pattern = "markdown",
+  callback = function()
+    vim.api.nvim_set_hl(
+      0,
+      "@markup.strong",
+      { fg = "#ff6347", bg = "", bold = true }
+    )
+    vim.api.nvim_set_hl(
+      0,
+      "@markup.italic",
+      { fg = "#4acfd3", bg = "", italic = true }
+    )
+  end,
+})
