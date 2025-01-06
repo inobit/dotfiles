@@ -143,25 +143,6 @@ local function handle_input()
   end
 end
 
-local function set_navigate_keymap()
-  -- 设置导航映射
-  vim.keymap.set("n", "<C-j>", function()
-    util.switch_to_next_float(M.input_win, M.response_win)
-  end, { buffer = M.input_buf, noremap = true, silent = true })
-
-  vim.keymap.set("n", "<C-k>", function()
-    util.switch_to_next_float(M.input_win, M.response_win)
-  end, { buffer = M.input_buf, noremap = true, silent = true })
-
-  vim.keymap.set("n", "<C-j>", function()
-    util.switch_to_next_float(M.input_win, M.response_win)
-  end, { buffer = M.response_buf, noremap = true, silent = true })
-
-  vim.keymap.set("n", "<C-k>", function()
-    util.switch_to_next_float(M.input_win, M.response_win)
-  end, { buffer = M.response_buf, noremap = true, silent = true })
-end
-
 -- 启动对话
 function M.start_chat()
   local check = servers.check_options(servers.get_server_selected().server)
@@ -179,7 +160,6 @@ function M.start_chat()
     col,
     servers.get_server_selected().server
   )
-  util.enable_buf_read_status_autocmd(response_buf)
 
   local input_buf, input_win = util.create_floating_window(
     width,
@@ -195,9 +175,16 @@ function M.start_chat()
   M.response_buf = response_buf
   M.response_win = response_win
 
-  set_navigate_keymap()
+  -- 参数顺序为实际从上到下
+  util.set_vertical_navigate_keymap(
+    config.options.mappings.up,
+    config.options.mappings.down,
+    { response_buf, input_buf },
+    { response_win, input_win }
+  )
   enable_input_enter()
-  util.bind_wins_close { input_win, response_win }
+  util.auto_skip_when_insert(response_buf, input_win)
+  util.register_close_for_wins { input_win, response_win }
   session.resume_session(response_buf)
   util.set_cursor(response_win, response_buf)
 end

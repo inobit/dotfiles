@@ -21,6 +21,7 @@ function M.defaults()
     config_dir = "config",
     session_dir = "session",
     config_filename = "config.json",
+    mappings = { up = "<C-k>", down = "<C-j>", left = "<C-h>", right = "<C-l>" },
   }
 end
 

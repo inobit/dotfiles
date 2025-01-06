@@ -19,44 +19,78 @@ function M.create_floating_window(width, height, row, col, title)
 end
 
 function M.get_last_char_position(bufnr)
-  -- 获取缓冲区的总行数
   local last_line = vim.api.nvim_buf_line_count(bufnr)
-
-  -- 获取最后一行的内容
   local last_line_content =
     vim.api.nvim_buf_get_lines(bufnr, last_line - 1, last_line, false)[1]
-
   -- 计算最后一行的字符数
   local last_char_col = #last_line_content
-
   -- 返回最后一个字符的位置（行号, 列号）
   return last_line - 1, last_char_col
 end
 
-function M.enable_buf_read_status_autocmd(target_bufnr)
-  vim.api.nvim_create_augroup("AutoReadonly", { clear = true })
-  vim.api.nvim_create_autocmd("BufEnter", {
-    group = "AutoReadonly",
-    buffer = target_bufnr,
-    callback = function()
-      vim.o.readonly = true
-    end,
-  })
+local function get_next_float(wins)
+  local cur_win = vim.api.nvim_get_current_win()
+  local cur_index = nil
+  for index, win in ipairs(wins) do
+    if win == cur_win then
+      cur_index = index
+      break
+    end
+  end
+  if not cur_index or cur_index + 1 > #wins then
+    return wins[1]
+  else
+    return wins[cur_index + 1]
+  end
+end
 
-  vim.api.nvim_create_autocmd("BufLeave", {
-    group = "AutoReadonly",
-    buffer = target_bufnr,
+local function get_prev_float(wins)
+  local cur_win = vim.api.nvim_get_current_win()
+  local cur_index = nil
+  for index, win in ipairs(wins) do
+    if win == cur_win then
+      cur_index = index
+      break
+    end
+  end
+  if not cur_index or cur_index - 1 == 0 then
+    return wins[#wins]
+  else
+    return wins[cur_index - 1]
+  end
+end
+
+function M.set_vertical_navigate_keymap(up_lhs, down_lhs, buffers, wins)
+  for _, buffer in ipairs(buffers) do
+    vim.keymap.set("n", up_lhs, function()
+      vim.api.nvim_set_current_win(get_prev_float(wins))
+    end, { buffer = buffer, noremap = true, silent = true })
+
+    vim.keymap.set("n", down_lhs, function()
+      vim.api.nvim_set_current_win(get_next_float(wins))
+    end, { buffer = buffer, noremap = true, silent = true })
+  end
+end
+
+function M.auto_skip_when_insert(source_buf, target_win)
+  vim.api.nvim_create_augroup("AutoSkipWhenInsert", { clear = true })
+  vim.api.nvim_create_autocmd("InsertEnter", {
+    group = "AutoSkipWhenInsert",
+    buffer = source_buf,
     callback = function()
-      vim.o.readonly = false
+      if target_win then
+        vim.api.nvim_set_current_win(target_win)
+        vim.api.nvim_input "<Esc>"
+      end
     end,
   })
 end
 
-function M.disable_buf_read_status_autocmd()
-  pcall(vim.api.nvim_del_augroup_by_name, "AutoReadonly")
+function M.disable_auto_skip_when_insert()
+  pcall(vim.api.nvim_del_augroup_by_name, "AutoSkipWhenInsert")
 end
 
-function M.bind_wins_close(wins)
+function M.register_close_for_wins(wins)
   vim.api.nvim_create_augroup("AutoCloseWins", { clear = true })
   vim.api.nvim_create_autocmd("WinClosed", {
     group = "AutoCloseWins",
@@ -70,28 +104,14 @@ function M.bind_wins_close(wins)
           end
         end
         pcall(vim.api.nvim_del_augroup_by_name, "AutoCloseWins")
-        M.disable_buf_read_status_autocmd()
+        M.disable_auto_skip_when_insert()
       end
     end,
   })
 end
 
-function M.switch_to_next_float(win1, win2)
-  local wins = { win1, win2 }
-  local cur_win = vim.api.nvim_get_current_win()
-  -- 遍历所有窗口，寻找下一个浮动窗口
-  for _, win in ipairs(wins) do
-    local config = vim.api.nvim_win_get_config(win)
-    if config.relative ~= "" and win ~= cur_win then
-      vim.api.nvim_set_current_win(win)
-      return
-    end
-  end
-end
-
 function M.set_cursor(win, bufnr)
   local win_height = vim.api.nvim_win_get_height(win)
-  -- 计算是否需要滚动
   local total_lines = vim.api.nvim_buf_line_count(bufnr)
   if total_lines > win_height then
     -- 设置光标到缓冲区最后一行，触发滚动
