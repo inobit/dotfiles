@@ -16,6 +16,7 @@ local default_servers = {
 function M.defaults()
   return {
     servers = {},
+    default_server = SERVERS.DEEP_SEEK,
     loading_mark = "...",
     base_config_dir = vim.fn.stdpath "cache" .. "/inobit/llm",
     config_dir = "config",

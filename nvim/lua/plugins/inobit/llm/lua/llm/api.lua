@@ -10,6 +10,20 @@ local servers = require "llm.servers"
 local active_job = nil
 local server_role = nil
 
+local function switch_enter_key(bufnr, enable)
+  if enable then
+    vim.keymap.set("n", "<CR>", function()
+      M.submit()
+    end, { buffer = bufnr, noremap = true, silent = true })
+  else
+    vim.keymap.del(
+      "n",
+      "<CR>",
+      { buffer = bufnr, noremap = true, silent = true }
+    )
+  end
+end
+
 local function handle_line(line, process_data)
   if not line then
     return false
@@ -32,16 +46,6 @@ local function write_to_buf(content)
   local lines = vim.split(content, "\n")
   vim.api.nvim_buf_set_text(M.response_buf, row, col, row, col, lines)
   util.set_cursor(M.response_win, M.response_buf)
-end
-
-local function enable_input_enter()
-  vim.keymap.set("n", "<CR>", function()
-    M.submit()
-  end, { buffer = M.input_buf, noremap = true, silent = true })
-end
-
-local function disable_input_enter()
-  vim.keymap.del("n", "<CR>", { buffer = M.input_buf })
 end
 
 local function handle_response_prev()
@@ -75,7 +79,7 @@ end
 local function handle_response_post()
   session.write_response_to_session(server_role, M.response_buf)
   vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, { "" }) -- 添加空行
-  enable_input_enter()
+  switch_enter_key(M.input_buf, true)
   active_job = nil
   server_role = nil
   first_response = false
@@ -127,7 +131,7 @@ local function handle_input()
 
   -- 清空输入行
   vim.api.nvim_buf_set_lines(M.input_buf, 0, -1, false, {})
-  disable_input_enter()
+  switch_enter_key(M.input_buf, false)
   vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, input_lines)
   vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, { "" })
   util.set_cursor(M.response_win, M.response_buf)
@@ -182,7 +186,7 @@ function M.start_chat()
     { response_buf, input_buf },
     { response_win, input_win }
   )
-  enable_input_enter()
+  switch_enter_key(input_buf, true)
   util.auto_skip_when_insert(response_buf, input_win)
   util.register_close_for_wins { input_win, response_win }
   session.resume_session(response_buf)

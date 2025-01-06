@@ -5,7 +5,7 @@ local config = require "llm.config"
 
 local M = {}
 
-local server_selected = SERVERS.DEEP_SEEK
+local server_selected = nil
 
 local function check_common_options(server_name)
   local check = true
@@ -81,7 +81,7 @@ function M.check_options(server_name)
 end
 
 function M.get_server_selected()
-  return config.options.servers[server_selected]
+  return config.options.servers[server_selected or config.options.default_server]
 end
 
 function M.set_server_selected(server_name)
