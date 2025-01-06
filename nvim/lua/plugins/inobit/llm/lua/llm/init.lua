@@ -6,8 +6,8 @@ function M.setup(opts)
   local notify = require "llm.notify"
   require("llm.config").setup(opts)
 
-  vim.api.nvim_create_user_command("LLM", function(opts)
-    local args = opts.fargs
+  vim.api.nvim_create_user_command("LLM", function(options)
+    local args = options.fargs
     local command = args[1]
     if command == nil then
       server.start_chat()
@@ -18,7 +18,7 @@ function M.setup(opts)
     elseif command == "Submit" then
       server.submit()
     elseif command == "Clear" then
-      server.clear_history_message()
+      server.clear_session()
     else
       notify.warn "Invalid LLM command"
     end

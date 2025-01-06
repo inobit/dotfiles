@@ -1,4 +1,4 @@
-local plugins_path = vim.fn.stdpath "config" .. "/lua/plugins/my_plugins"
+local plugins_path = vim.fn.stdpath "config" .. "/lua/plugins/inobit"
 return {
   {
     dir = plugins_path .. "/llm",

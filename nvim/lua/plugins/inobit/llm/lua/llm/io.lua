@@ -93,4 +93,25 @@ function M.write_json(path, json)
   return size, nil
 end
 
+function M.input_api_key(service, path)
+  local err = nil
+  local key = vim.fn.inputsecret("Enter your " .. service .. " API Key: ", "")
+  if util.empty_str(key) then
+    err = "empty key is not allowed!"
+    log.error(err)
+    return nil, err
+  end
+  _, err = M.write_json(path, { api_key = key })
+  return key, err
+end
+
+function M.load_api_key(path)
+  local json, err = M.read_json(path)
+  if err then
+    return nil, err
+  else
+    return json and json.api_key, nil
+  end
+end
+
 return M
