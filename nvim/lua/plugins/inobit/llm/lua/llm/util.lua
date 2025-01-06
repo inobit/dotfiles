@@ -59,9 +59,9 @@ end
 function M.bind_wins_close(wins)
   vim.api.nvim_create_augroup("AutoCloseWins", { clear = true })
   vim.api.nvim_create_autocmd("WinClosed", {
-    pattern = "*",
-    callback = function()
-      local win = vim.api.nvim_get_current_win()
+    group = "AutoCloseWins",
+    callback = function(args)
+      local win = tonumber(args.match)
       if vim.tbl_contains(wins, win) then
         -- 遍历窗口表，关闭其他所有窗口
         for _, other_win in ipairs(wins) do
