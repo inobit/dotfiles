@@ -1,6 +1,7 @@
 local M = {}
 local config = require "llm.config"
 local servers = require "llm.servers"
+local util = require "llm.util"
 
 function M.create_floating_window(width, height, row, col, winblend, title)
   local bufnr = vim.api.nvim_create_buf(false, true)
@@ -58,7 +59,7 @@ local function get_prev_float(wins)
   end
 end
 
-function M.set_vertical_navigate_keymap(up_lhs, down_lhs, buffers, wins)
+local function set_vertical_navigate_keymap(up_lhs, down_lhs, buffers, wins)
   for _, buffer in ipairs(buffers) do
     vim.keymap.set("n", up_lhs, function()
       vim.api.nvim_set_current_win(get_prev_float(wins))
@@ -70,7 +71,7 @@ function M.set_vertical_navigate_keymap(up_lhs, down_lhs, buffers, wins)
   end
 end
 
-function M.auto_skip_when_insert(source_buf, target_win)
+local function register_auto_skip_when_insert(source_buf, target_win)
   vim.api.nvim_create_augroup("AutoSkipWhenInsert", { clear = true })
   vim.api.nvim_create_autocmd("InsertEnter", {
     group = "AutoSkipWhenInsert",
@@ -88,7 +89,7 @@ function M.disable_auto_skip_when_insert()
   pcall(vim.api.nvim_del_augroup_by_name, "AutoSkipWhenInsert")
 end
 
-function M.register_close_for_wins(wins, group_prefix, callback)
+local function register_close_for_wins(wins, group_prefix, callback)
   vim.api.nvim_create_augroup(group_prefix .. "AutoCloseWins", { clear = true })
   vim.api.nvim_create_autocmd("WinClosed", {
     group = group_prefix .. "AutoCloseWins",
@@ -107,6 +108,19 @@ function M.register_close_for_wins(wins, group_prefix, callback)
         end
       end
     end,
+  })
+end
+
+local function register_content_change(bufnr, win_id)
+  vim.api.nvim_buf_attach(bufnr, false, {
+    on_lines = util.debounce(100, function()
+      local lines = vim.api.nvim_buf_line_count(bufnr)
+      if lines <= 1 then
+        vim.api.nvim_set_option_value("cursorline", false, { win = win_id })
+      else
+        vim.api.nvim_set_option_value("cursorline", true, { win = win_id })
+      end
+    end),
   })
 end
 
@@ -147,7 +161,7 @@ function M.create_chat_win(callback)
     "input"
   )
 
-  M.set_vertical_navigate_keymap(
+  set_vertical_navigate_keymap(
     config.options.mappings.up,
     config.options.mappings.down,
     -- 顺序为布局顺序
@@ -155,10 +169,9 @@ function M.create_chat_win(callback)
     { response_win, input_win }
   )
 
-  vim.api.nvim_set_option_value("cursorline", true, { win = input_win })
-  vim.api.nvim_set_option_value("cursorline", true, { win = response_win })
-  M.auto_skip_when_insert(response_buf, input_win)
-  M.register_close_for_wins({ input_win, response_win }, server, callback)
+  register_content_change(response_buf, response_win)
+  register_auto_skip_when_insert(response_buf, input_win)
+  register_close_for_wins({ input_win, response_win }, server, callback)
 
   return response_buf, response_win, input_buf, input_win
 end
@@ -195,15 +208,19 @@ local function register_line_move(
   return pos
 end
 
-local function register_data_handler(input_buf, content_buf, data_handler)
-  vim.api.nvim_create_augroup("AutoLoadWhenTextChanged", { clear = true })
+local function register_data_filter(input_buf, content_buf, data_handler)
+  vim.api.nvim_create_augroup("AutoFilteringWhenTextChanged", { clear = true })
   vim.api.nvim_create_autocmd("TextChangedI", {
-    group = "AutoLoadWhenTextChanged",
+    group = "AutoFilteringWhenTextChanged",
     buffer = input_buf,
-    callback = function()
+    callback = util.debounce(100, function()
       data_handler(input_buf, content_buf)
-    end,
+    end),
   })
+end
+
+function M.disable_data_filter()
+  pcall(vim.api.nvim_del_augroup_by_name, "AutoFilteringWhenTextChanged")
 end
 
 function M.create_select_picker(
@@ -244,17 +261,18 @@ function M.create_select_picker(
     ""
   )
 
+  -- load data
   local data_handler = data_handler_wrap()
-  vim.api.nvim_set_option_value("cursorline", true, { win = content_win })
   vim.api.nvim_set_option_value("wrap", false, { win = content_win })
 
-  M.register_close_for_wins({ input_win, content_win }, title)
-
+  register_close_for_wins({ input_win, content_win }, title, function()
+    M.disable_data_filter()
+  end)
   local content_selected =
     register_line_move(input_buf, input_win, content_buf, content_win)
-
-  register_data_handler(input_buf, content_buf, data_handler)
-
+  register_content_change(content_buf, content_win)
+  register_data_filter(input_buf, content_buf, data_handler)
+  -- trigger filtering
   data_handler(input_buf, content_buf)
 
   return input_buf, input_win, content_buf, content_win, content_selected

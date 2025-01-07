@@ -153,6 +153,7 @@ local function clear_chat()
   M.response_win = nil
   M.input_buf = nil
   M.input_win = nil
+  win.disable_auto_skip_when_insert()
 end
 
 -- 启动对话
@@ -230,6 +231,9 @@ function M.select_sessions()
     end
     if M.input_buf and M.response_buf then
       session.resume_session(M.response_buf)
+      if M.input_win then
+        vim.api.nvim_set_current_win(M.input_win)
+      end
     else
       M.start_chat()
     end
