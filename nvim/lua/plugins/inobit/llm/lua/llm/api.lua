@@ -46,7 +46,7 @@ local function write_to_buf(content)
   local row, col = util.get_last_char_position(M.response_buf)
   local lines = vim.split(content, "\n")
   vim.api.nvim_buf_set_text(M.response_buf, row, col, row, col, lines)
-  util.set_cursor(M.response_win, M.response_buf)
+  util.scroll_to_end(M.response_win, M.response_buf)
 end
 
 local function handle_response_prev()
@@ -135,7 +135,7 @@ local function handle_input()
   switch_enter_key(M.input_buf, false)
   vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, input_lines)
   vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, { "" })
-  util.set_cursor(M.response_win, M.response_buf)
+  util.scroll_to_end(M.response_win, M.response_buf)
   -- 发送请求到LLM
   local message = { role = "user", content = input }
   session.write_request_to_session(message)
@@ -167,7 +167,7 @@ function M.start_chat()
     win.create_chat_win(clear_chat)
   switch_enter_key(M.input_buf, true)
   session.resume_session(M.response_buf)
-  util.set_cursor(M.response_win, M.response_buf)
+  util.scroll_to_end(M.response_win, M.response_buf)
 end
 
 -- 提交输入

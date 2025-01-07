@@ -96,10 +96,9 @@ local function register_close_for_wins(wins, group_prefix, callback)
     callback = function(args)
       local win = tonumber(args.match)
       if vim.tbl_contains(wins, win) then
-        -- 遍历窗口表，关闭其他所有窗口
         for _, other_win in ipairs(wins) do
           if other_win ~= win and vim.api.nvim_win_is_valid(other_win) then
-            vim.api.nvim_win_close(other_win, true) -- 强制关闭窗口
+            vim.api.nvim_win_close(other_win, true)
           end
         end
         pcall(vim.api.nvim_del_augroup_by_name, group_prefix .. "AutoCloseWins")
@@ -249,7 +248,7 @@ function M.create_select_picker(
     input_top,
     left,
     winblend,
-    title
+    "filter"
   )
 
   local content_buf, content_win = M.create_floating_window(
@@ -258,7 +257,7 @@ function M.create_select_picker(
     content_top,
     left,
     winblend,
-    ""
+    title
   )
 
   -- load data
