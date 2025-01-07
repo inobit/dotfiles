@@ -1,23 +1,5 @@
 local M = {}
 
--- 创建浮动窗口
-function M.create_floating_window(width, height, row, col, title)
-  local buf = vim.api.nvim_create_buf(false, true)
-  local win = vim.api.nvim_open_win(buf, true, {
-    relative = "editor",
-    width = width,
-    height = height,
-    row = row,
-    col = col,
-    style = "minimal",
-    border = "rounded",
-    title = title,
-    title_pos = "center",
-    focusable = true,
-  })
-  return buf, win
-end
-
 function M.get_last_char_position(bufnr)
   local last_line = vim.api.nvim_buf_line_count(bufnr)
   local last_line_content =
@@ -28,116 +10,12 @@ function M.get_last_char_position(bufnr)
   return last_line - 1, last_char_col
 end
 
-local function get_next_float(wins)
-  local cur_win = vim.api.nvim_get_current_win()
-  local cur_index = nil
-  for index, win in ipairs(wins) do
-    if win == cur_win then
-      cur_index = index
-      break
-    end
-  end
-  if not cur_index or cur_index + 1 > #wins then
-    return wins[1]
-  else
-    return wins[cur_index + 1]
-  end
-end
-
-local function get_prev_float(wins)
-  local cur_win = vim.api.nvim_get_current_win()
-  local cur_index = nil
-  for index, win in ipairs(wins) do
-    if win == cur_win then
-      cur_index = index
-      break
-    end
-  end
-  if not cur_index or cur_index - 1 == 0 then
-    return wins[#wins]
-  else
-    return wins[cur_index - 1]
-  end
-end
-
-function M.set_vertical_navigate_keymap(up_lhs, down_lhs, buffers, wins)
-  for _, buffer in ipairs(buffers) do
-    vim.keymap.set("n", up_lhs, function()
-      vim.api.nvim_set_current_win(get_prev_float(wins))
-    end, { buffer = buffer, noremap = true, silent = true })
-
-    vim.keymap.set("n", down_lhs, function()
-      vim.api.nvim_set_current_win(get_next_float(wins))
-    end, { buffer = buffer, noremap = true, silent = true })
-  end
-end
-
-function M.auto_skip_when_insert(source_buf, target_win)
-  vim.api.nvim_create_augroup("AutoSkipWhenInsert", { clear = true })
-  vim.api.nvim_create_autocmd("InsertEnter", {
-    group = "AutoSkipWhenInsert",
-    buffer = source_buf,
-    callback = function()
-      if target_win then
-        vim.api.nvim_set_current_win(target_win)
-        vim.api.nvim_input "<Esc>"
-      end
-    end,
-  })
-end
-
-function M.disable_auto_skip_when_insert()
-  pcall(vim.api.nvim_del_augroup_by_name, "AutoSkipWhenInsert")
-end
-
-function M.register_close_for_wins(wins)
-  vim.api.nvim_create_augroup("AutoCloseWins", { clear = true })
-  vim.api.nvim_create_autocmd("WinClosed", {
-    group = "AutoCloseWins",
-    callback = function(args)
-      local win = tonumber(args.match)
-      if vim.tbl_contains(wins, win) then
-        -- 遍历窗口表，关闭其他所有窗口
-        for _, other_win in ipairs(wins) do
-          if other_win ~= win and vim.api.nvim_win_is_valid(other_win) then
-            vim.api.nvim_win_close(other_win, true) -- 强制关闭窗口
-          end
-        end
-        pcall(vim.api.nvim_del_augroup_by_name, "AutoCloseWins")
-        M.disable_auto_skip_when_insert()
-      end
-    end,
-  })
-end
-
 function M.set_cursor(win, bufnr)
   local win_height = vim.api.nvim_win_get_height(win)
   local total_lines = vim.api.nvim_buf_line_count(bufnr)
   if total_lines > win_height then
     -- 设置光标到缓冲区最后一行，触发滚动
     vim.api.nvim_win_set_cursor(win, { total_lines, 0 })
-  end
-end
-
-function M.handle_exit_code(code)
-  local msg
-  if code == 0 then
-    msg = "Request succeeded!"
-  elseif code == 1 then
-    msg = "Unsupported protocol or malformed URL."
-  elseif code == 6 then
-    msg = "Could not resolve host."
-  elseif code == 7 then
-    msg = "Failed to connect to host."
-  elseif code == 22 then
-    msg = "HTTP error (e.g., 404 Not Found, 401 Unauthorized)."
-  elseif code == 28 then
-    msg = "Request timed out."
-  else
-    msg = "Request failed with unknown exit code: " .. code
-  end
-  if code ~= 0 then
-    vim.notify(msg, vim.log.levels.ERROR)
   end
 end
 
@@ -165,7 +43,7 @@ local function is_legal_char(char)
     or (byte >= 97 and byte <= 122) -- 小写字母 a-z
     or byte == 95 -- 下划线 _
     or byte == 45 -- 连字符 -
-    or (byte >= 0x4e00 and byte <= 0x9fff) -- 中文字符范围
+    or (byte >= 0x4e00 and byte <= 0x9fa5) -- 中文字符范围
   )
 end
 
@@ -176,6 +54,7 @@ function M.generate_session_name(session)
   for _, item in ipairs(session) do
     if item.content then
       for i = 1, #item.content do
+        --BUG: 不符合预期
         local char = item.content:sub(i, i)
         if is_legal_char(char) then
           result = result .. char

@@ -6,6 +6,7 @@ local notify = require "llm.notify"
 local config = require "llm.config"
 local session = require "llm.session"
 local servers = require "llm.servers"
+local win = require "llm.win"
 
 local active_job = nil
 local server_role = nil
@@ -147,50 +148,25 @@ local function handle_input()
   end
 end
 
+local function clear_chat()
+  M.response_buf = nil
+  M.response_win = nil
+  M.input_buf = nil
+  M.input_win = nil
+end
+
 -- 启动对话
 function M.start_chat()
   local check = servers.check_options(servers.get_server_selected().server)
   if not check then
     return
   end
-  local width = math.floor(vim.o.columns * 0.7)
-  local response_height = math.floor(vim.o.lines * 0.5)
-  local input_height = 5
-  local col = (vim.o.columns - width) / 2
-  local response_buf, response_win = util.create_floating_window(
-    width,
-    response_height,
-    (vim.o.lines - response_height - input_height) / 2,
-    col,
-    servers.get_server_selected().server
-  )
-
-  local input_buf, input_win = util.create_floating_window(
-    width,
-    input_height,
-    (vim.o.lines - response_height - input_height) / 2 + response_height + 2,
-    col,
-    "input"
-  )
-
-  -- 保存缓冲区引用
-  M.input_buf = input_buf
-  M.input_win = input_win
-  M.response_buf = response_buf
-  M.response_win = response_win
-
-  -- 参数顺序为实际从上到下
-  util.set_vertical_navigate_keymap(
-    config.options.mappings.up,
-    config.options.mappings.down,
-    { response_buf, input_buf },
-    { response_win, input_win }
-  )
-  switch_enter_key(input_buf, true)
-  util.auto_skip_when_insert(response_buf, input_win)
-  util.register_close_for_wins { input_win, response_win }
-  session.resume_session(response_buf)
-  util.set_cursor(response_win, response_buf)
+  -- create chat window
+  M.response_buf, M.response_win, M.input_buf, M.input_win =
+    win.create_chat_win(clear_chat)
+  switch_enter_key(M.input_buf, true)
+  session.resume_session(M.response_buf)
+  util.set_cursor(M.response_win, M.response_buf)
 end
 
 -- 提交输入
@@ -201,4 +177,62 @@ function M.submit()
   handle_input()
 end
 
+function M.clear(save)
+  if not M.input_buf or not M.response_buf then
+    return
+  end
+  session.clear_session(save)
+  vim.api.nvim_buf_set_lines(M.input_buf, 0, -1, false, {})
+  vim.api.nvim_buf_set_lines(M.response_buf, 0, -1, false, {})
+end
+
+function M.new()
+  if not M.input_buf or not M.response_buf then
+    M.start_chat()
+  else
+    session.clear_session(true)
+    vim.api.nvim_buf_set_lines(M.input_buf, 0, -1, false, {})
+    vim.api.nvim_buf_set_lines(M.response_buf, 0, -1, false, {})
+  end
+end
+
+function M.input_auth()
+  local server = servers.get_server_selected().server
+  local path = config.get_config_file_path(server)
+  local key, err = server.input_api_key(server, path)
+  if err then
+    notify.warn(err)
+  end
+  if key then
+    servers.update_auth(key)
+  end
+end
+
+function M.select_sessions()
+  local input_buf, input_win, content_buf, content_win, content_selected =
+    session.create_session_picker_win()
+
+  vim.keymap.set("n", "<CR>", function()
+    local lines = vim.api.nvim_buf_get_lines(
+      content_buf,
+      content_selected[1] - 1,
+      content_selected[1],
+      false
+    )
+    if lines and lines[1] then
+      session.load_session(lines[1])
+    end
+    if vim.api.nvim_win_is_valid(input_win) then
+      vim.api.nvim_win_close(input_win, true)
+    end
+    if vim.api.nvim_buf_is_valid(content_win) then
+      vim.api.nvim_win_close(content_win, true)
+    end
+    if M.input_buf and M.response_buf then
+      session.resume_session(M.response_buf)
+    else
+      M.start_chat()
+    end
+  end, { buffer = input_buf })
+end
 return M

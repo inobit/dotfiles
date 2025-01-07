@@ -1,1 +1,1 @@
--- require("llm").create_command()
+-- require("llm").setup()

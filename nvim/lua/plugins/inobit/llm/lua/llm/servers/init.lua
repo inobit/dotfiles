@@ -1,4 +1,6 @@
+local log = require "llm.log"
 local io = require "llm.io"
+local util = require "llm.util"
 local notify = require "llm.notify"
 local SERVERS = require "llm.servers.const"
 local config = require "llm.config"
@@ -6,6 +8,29 @@ local config = require "llm.config"
 local M = {}
 
 local server_selected = nil
+
+function M.input_api_key(service, path)
+  local err = nil
+  local key = vim.fn.inputsecret("Enter your " .. service .. " API Key: ", "")
+  if util.empty_str(key) then
+    err = "empty key!"
+    return nil, err
+  end
+  _, err = io.write_json(path, { api_key = key })
+  if err then
+    log.error(err)
+  end
+  return key, err
+end
+
+function M.load_api_key(path)
+  local json, err = io.read_json(path)
+  if err then
+    return nil, err
+  else
+    return json and json.api_key, nil
+  end
+end
 
 local function check_common_options(server_name)
   local check = true
@@ -21,9 +46,9 @@ local function check_api_key(server_name)
   local path = config.get_config_file_path(server_name)
   local check = true
   if not api_key then
-    api_key, _ = io.load_api_key(path)
+    api_key, _ = M.load_api_key(path)
     if not api_key then
-      api_key, _ = io.input_api_key(server_name, path)
+      api_key, _ = M.input_api_key(server_name, path)
       if not api_key then
         notify.error "A valid key is required!"
         check = false
@@ -86,6 +111,15 @@ end
 
 function M.set_server_selected(server_name)
   server_selected = server_name
+end
+
+function M.update_auth(key)
+  config.options.servers[server_selected or config.options.default_server].api_key =
+    key
+end
+
+function M.get_auth()
+  return config.options.servers[server_selected or config.options.default_server].api_key
 end
 
 return M

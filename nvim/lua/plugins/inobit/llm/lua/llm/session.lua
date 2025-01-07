@@ -4,6 +4,7 @@ local util = require "llm.util"
 local servers = require "llm.servers"
 local notify = require "llm.notify"
 local config = require "llm.config"
+local win = require "llm.win"
 local io = require "llm.io"
 
 -- 对话历史
@@ -113,5 +114,61 @@ function M.resume_session(bufnr)
       vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { "" })
     end
   end
+end
+
+function M.load_sessions(server)
+  if not server then
+    notify.error "No server selected"
+    return
+  end
+  local dir = config.options.base_config_dir
+    .. "/"
+    .. config.options.session_dir
+    .. "/"
+    .. server
+  local files = io.get_files(dir)
+  if files and #files > 0 then
+    files = vim.tbl_map(function(file)
+      return file:gsub(".json", "")
+    end, files)
+  end
+  return files
+end
+
+function M.session_filter(input, files)
+  if files and #files > 0 then
+    return vim.tbl_filter(function(file)
+      return file:find(input)
+    end, files)
+  end
+end
+
+local function data_handler(input_buf, content_buf, files)
+  local input = vim.api.nvim_buf_get_lines(input_buf, 0, -1, false)[1] or ""
+  vim.api.nvim_buf_set_lines(
+    content_buf,
+    0,
+    -1,
+    false,
+    M.session_filter(input, files)
+  )
+end
+
+function M.create_session_picker_win()
+  local session_win = config.options.session_picker_win
+  local input_buf, input_win, content_buf, content_win, content_selected = win.create_select_picker(
+    session_win.width_percentage,
+    session_win.input_height,
+    session_win.content_height_percentage,
+    session_win.winblend,
+    "sessions",
+    function()
+      local data = M.load_sessions(servers.get_server_selected().server) or {}
+      return function(input_buf, content_buf)
+        data_handler(input_buf, content_buf, data)
+      end
+    end
+  )
+  return input_buf, input_win, content_buf, content_win, content_selected
 end
 return M

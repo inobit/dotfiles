@@ -23,6 +23,24 @@ function M.defaults()
     session_dir = "session",
     config_filename = "config.json",
     mappings = { up = "<C-k>", down = "<C-j>", left = "<C-h>", right = "<C-l>" },
+    chat_win = {
+      width_percentage = 0.8,
+      response_height_percentage = 0.7,
+      input_height_percentage = 0.1,
+      winblend = 5,
+    },
+    session_picker_win = {
+      width_percentage = 0.5,
+      input_height = 1,
+      content_height_percentage = 0.3,
+      winblend = 5,
+    },
+    server_picker_win = {
+      width_percentage = 0.4,
+      input_height = 1,
+      content_height_percentage = 0.3,
+      winblend = 5,
+    },
   }
 end
 
@@ -35,7 +53,6 @@ local function install_servers(servers)
 
   for _, item in ipairs(servers) do
     if hash[item.server] then
-      -- 如果 server 已存在，深度合并
       hash[item.server] =
         vim.tbl_deep_extend("force", {}, hash[item.server], item)
     else
