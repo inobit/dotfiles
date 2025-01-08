@@ -118,24 +118,35 @@ local function handle_input()
     return
   end
 
-  -- 清空输入行
+  -- clear input
   vim.api.nvim_buf_set_lines(M.input_buf, 0, -1, false, {})
-  vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, input_lines)
+
+  -- write to response_buf
+  if
+    vim.api.nvim_buf_line_count(M.response_buf) == 1
+    and vim.api.nvim_buf_get_lines(M.response_buf, 0, 1, false)[1] == ""
+  then
+    vim.api.nvim_buf_set_lines(M.response_buf, 0, -1, false, input_lines)
+  else
+    vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, input_lines)
+  end
+
   vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, { "" })
   util.scroll_to_end(M.response_win, M.response_buf)
-  -- 发送请求到LLM
-  local message = { role = "user", content = input }
+  -- send to LLM
+  local message =
+    { role = servers.get_server_selected().user_role, content = input }
   session.write_request_to_session(message)
-  -- 多轮发送整个session
+  -- send session
   if servers.get_server_selected().multi_round then
     send_request(session.get_session())
   else
-    -- 只发送本次input
+    -- send current input
     send_request(message)
   end
 end
 
-local function clear_chat()
+local function clear_chat_win()
   M.response_buf = nil
   M.response_win = nil
   M.input_buf = nil
@@ -149,9 +160,13 @@ function M.start_chat()
   if not check then
     return
   end
+  if M.input_buf and M.response_buf then
+    M.new()
+    return
+  end
   -- create chat window
   M.response_buf, M.response_win, M.input_buf, M.input_win, M.register_enter_handler =
-    win.create_chat_win(M.submit, clear_chat)
+    win.create_chat_win(M.submit, clear_chat_win)
   session.resume_session(M.response_buf)
   util.scroll_to_end(M.response_win, M.response_buf)
 end
@@ -200,15 +215,68 @@ function M.input_auth()
 end
 
 function M.select_sessions()
-  session.create_session_picker_win(function()
-    if M.input_buf and M.response_buf then
-      session.resume_session(M.response_buf)
+  if session.input_buf then
+    return
+  end
+  --TODO:
+  ---@diagnostic disable-next-line: unused-local
+  local input_buf, input_win, content_buf, content_win, selected_line = session.create_session_picker_win(
+    -- enter callback
+    function()
+      if M.input_buf and M.response_buf then
+        session.resume_session(M.response_buf)
+        if M.input_win then
+          vim.api.nvim_set_current_win(M.input_win)
+        end
+      else
+        M.start_chat()
+      end
+    end,
+    -- close callback
+    function()
       if M.input_win then
         vim.api.nvim_set_current_win(M.input_win)
       end
-    else
-      M.start_chat()
     end
-  end)
+  )
+
+  if input_buf then
+    M.delete_session = function()
+      if selected_line then
+        local lines = vim.api.nvim_buf_get_lines(
+          content_buf,
+          selected_line[1] - 1,
+          selected_line[1],
+          false
+        )
+        if lines and lines[1] then
+          local tip = "Delete session "
+            .. vim.fn.strcharpart(lines[1], 0, 10)
+            .. "...? (Y/N): "
+
+          local answer = vim.fn.input(tip)
+          answer = string.upper(answer)
+          if answer == "Y" then
+            local session_name = session.delete_session(lines[1])
+            vim.api.nvim_buf_set_lines(
+              content_buf,
+              selected_line[1] - 1,
+              selected_line[1],
+              false,
+              {}
+            )
+            -- current session
+            if session_name and M.response_buf then
+              vim.api.nvim_buf_set_lines(M.response_buf, 0, -1, false, {})
+            end
+          elseif answer == "N" then
+          elseif answer == "" then
+          else
+            notify.warn "Invalid input. Please enter Y or N."
+          end
+        end
+      end
+    end
+  end
 end
 return M

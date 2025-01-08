@@ -10,6 +10,7 @@ local default_servers = {
     model = "deepseek-chat",
     stream = true,
     multi_round = true,
+    user_role = "user",
   },
 }
 
@@ -22,7 +23,6 @@ function M.defaults()
     config_dir = "config",
     session_dir = "session",
     config_filename = "config.json",
-    mappings = { up = "<C-k>", down = "<C-j>", left = "<C-h>", right = "<C-l>" },
     chat_win = {
       width_percentage = 0.8,
       response_height_percentage = 0.7,
@@ -62,6 +62,10 @@ local function install_servers(servers)
   return hash
 end
 
+function M.install_win_cursor_move_keymap(mappings)
+  M.options.win_cursor_move_mappings = mappings
+end
+
 function M.get_config_file_path(server_name)
   if server_name then
     return M.options.base_config_dir
@@ -80,7 +84,12 @@ M.options = {}
 
 function M.setup(options)
   options = options or {}
-  M.options = vim.tbl_deep_extend("force", {}, M.defaults(), options)
+  M.options = vim.tbl_deep_extend(
+    "force",
+    { win_cursor_move_mappings = M.options.win_cursor_move_mappings },
+    M.defaults(),
+    options
+  )
   M.options.servers = install_servers(M.options.servers)
 end
 

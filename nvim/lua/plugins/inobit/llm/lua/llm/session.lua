@@ -7,8 +7,6 @@ local config = require "llm.config"
 local win = require "llm.win"
 local io = require "llm.io"
 
--- session buffer and win
--- local session_buf_win = {}
 local session_name = nil
 -- current seesion
 local session = {}
@@ -131,12 +129,39 @@ function M.load_session(name)
   end
 end
 
+local function delete_session(name)
+  local err = io.rm_file(
+    M.get_session_file_path(servers.get_server_selected().server, name)
+  )
+  if err then
+    notify.error(err)
+    return false
+  end
+  return true
+end
+
+function M.delete_session(name)
+  if delete_session(name) then
+    if name == session_name then
+      M.clear_session(false)
+      return name
+    end
+  end
+end
+
+--TODO: add empty_buffer()
 function M.resume_session(bufnr)
   if bufnr and session and #session > 0 then
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
+    local first = true
     for _, item in ipairs(session) do
       local lines = vim.split(item.content, "\n")
-      vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, lines)
+      if first then
+        vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+        first = false
+      else
+        vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, lines)
+      end
       vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { "" })
     end
   end
@@ -180,9 +205,18 @@ local function data_filter(input_buf, content_buf, files)
   )
 end
 
-function M.create_session_picker_win(callback)
+local function clear_session_picker_win()
+  M.input_buf = nil
+  M.input_win = nil
+  M.content_buf = nil
+  M.content_win = nil
+  M.selected_line = nil
+  win.disable_picker_data_filter()
+end
+
+function M.create_session_picker_win(enter_callback, close_callback)
   local session_win = config.options.session_picker_win
-  local input_buf, input_win, content_buf, content_win = win.create_select_picker(
+  local input_buf, input_win, content_buf, content_win, selected_line = win.create_select_picker(
     session_win.width_percentage,
     session_win.input_height,
     session_win.content_height_percentage,
@@ -205,12 +239,26 @@ function M.create_session_picker_win(callback)
         if vim.api.nvim_buf_is_valid(content_win) then
           vim.api.nvim_win_close(content_win, true)
         end
-        if callback then
-          callback()
+        if enter_callback then
+          enter_callback()
         end
+      end
+    end,
+    -- close_callback
+    function()
+      clear_session_picker_win()
+      if close_callback then
+        close_callback()
       end
     end
   )
-  return input_buf, input_win, content_buf, content_win
+
+  M.input_buf = input_buf
+  M.input_win = input_win
+  M.content_buf = content_buf
+  M.content_win = content_win
+  M.selected_line = selected_line
+
+  return input_buf, input_win, content_buf, content_win, selected_line
 end
 return M

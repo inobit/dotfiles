@@ -114,7 +114,7 @@ local function register_content_change(bufnr, win_id)
   vim.api.nvim_buf_attach(bufnr, false, {
     on_lines = util.debounce(100, function()
       local lines = vim.api.nvim_buf_line_count(bufnr)
-      if lines <= 1 then
+      if lines == 0 then
         vim.api.nvim_set_option_value("cursorline", false, { win = win_id })
       else
         vim.api.nvim_set_option_value("cursorline", true, { win = win_id })
@@ -123,13 +123,13 @@ local function register_content_change(bufnr, win_id)
   })
 end
 
-local function disable_enter_key(bufnr)
+local function disable_input_enter_key(bufnr)
   vim.keymap.del("n", "<CR>", { buffer = bufnr, noremap = true, silent = true })
 end
 
-local function register_enter_handler(bufnr, enter_handler)
+local function register_input_enter_handler(bufnr, enter_handler)
   vim.keymap.set("n", "<CR>", function()
-    disable_enter_key(bufnr)
+    disable_input_enter_key(bufnr)
     enter_handler()
   end, { buffer = bufnr, noremap = true, silent = true })
 end
@@ -172,8 +172,8 @@ function M.create_chat_win(enter_handler, callback)
   )
 
   set_vertical_navigate_keymap(
-    config.options.mappings.up,
-    config.options.mappings.down,
+    config.options.win_cursor_move_mappings.up,
+    config.options.win_cursor_move_mappings.down,
     -- 顺序为布局顺序
     { response_buf, input_buf },
     { response_win, input_win }
@@ -182,14 +182,14 @@ function M.create_chat_win(enter_handler, callback)
   register_content_change(response_buf, response_win)
   register_auto_skip_when_insert(response_buf, input_win)
   register_close_for_wins({ input_win, response_win }, server, callback)
-  register_enter_handler(input_buf, enter_handler)
+  register_input_enter_handler(input_buf, enter_handler)
 
   return response_buf,
     response_win,
     input_buf,
     input_win,
     function()
-      register_enter_handler(input_buf, enter_handler)
+      register_input_enter_handler(input_buf, enter_handler)
     end
 end
 
@@ -240,24 +240,9 @@ function M.disable_picker_data_filter()
   pcall(vim.api.nvim_del_augroup_by_name, "AutoFilteringWhenTextChanged")
 end
 
-local function register_picker_enter(
-  content_selected,
-  input_buf,
-  content_buf,
-  input_win,
-  content_win,
-  enter_handler
-)
+local function register_picker_enter(input_buf, enter_handler)
   vim.keymap.set("n", "<CR>", function()
-    local lines = vim.api.nvim_buf_get_lines(
-      content_buf,
-      content_selected[1] - 1,
-      content_selected[1],
-      false
-    )
-    if lines and lines[1] then
-      enter_handler(lines[1], input_win, content_win)
-    end
+    enter_handler()
   end, { buffer = input_buf })
 end
 
@@ -268,7 +253,8 @@ function M.create_select_picker(
   winblend,
   title,
   data_filter_wraper,
-  enter_handler
+  enter_handler,
+  close_callback
 )
   local width = math.floor(vim.o.columns * width_percentage)
 
@@ -304,25 +290,26 @@ function M.create_select_picker(
   local data_filter = data_filter_wraper()
   vim.api.nvim_set_option_value("wrap", false, { win = content_win })
 
-  register_close_for_wins({ input_win, content_win }, title, function()
-    M.disable_picker_data_filter()
-  end)
-  local content_selected =
+  register_close_for_wins({ input_win, content_win }, title, close_callback)
+  local selected_line =
     register_picker_line_move(input_buf, input_win, content_buf, content_win)
   register_content_change(content_buf, content_win)
   register_picker_data_filter(input_buf, content_buf, data_filter)
   -- trigger filtering
   data_filter(input_buf, content_buf)
-  register_picker_enter(
-    content_selected,
-    input_buf,
-    content_buf,
-    input_win,
-    content_win,
-    enter_handler
-  )
+  register_picker_enter(input_buf, function()
+    local lines = vim.api.nvim_buf_get_lines(
+      content_buf,
+      selected_line[1] - 1,
+      selected_line[1],
+      false
+    )
+    if lines and lines[1] then
+      enter_handler(lines[1], input_win, content_win)
+    end
+  end)
 
-  return input_buf, input_win, content_buf, content_win
+  return input_buf, input_win, content_buf, content_win, selected_line
 end
 
 return M

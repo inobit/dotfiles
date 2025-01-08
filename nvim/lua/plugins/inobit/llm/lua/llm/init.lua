@@ -25,6 +25,10 @@ function M.setup(opts)
       server.save()
     elseif command == "Sessions" then
       server.select_sessions()
+    elseif command == "SessionDel" then
+      if server.delete_session then
+        server.delete_session()
+      end
     else
       notify.warn "Invalid LLM command"
     end

@@ -1,5 +1,4 @@
 local log = require "llm.log"
-local util = require "llm.util"
 local Path = require "plenary.path"
 local Job = require "plenary.job"
 local uv = vim.uv or vim.loop
@@ -138,6 +137,16 @@ function M.get_files(dir)
     end
     return files
   end
+end
+
+function M.rm_file(path)
+  local err = nil
+  local file = Path:new(path)
+  if not file:is_absolute() then
+    err = "path is not absolute"
+  end
+  file:rm(false)
+  return err
 end
 
 return M
