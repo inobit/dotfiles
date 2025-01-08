@@ -123,7 +123,18 @@ local function register_content_change(bufnr, win_id)
   })
 end
 
-function M.create_chat_win(callback)
+local function disable_enter_key(bufnr)
+  vim.keymap.del("n", "<CR>", { buffer = bufnr, noremap = true, silent = true })
+end
+
+local function register_enter_handler(bufnr, enter_handler)
+  vim.keymap.set("n", "<CR>", function()
+    disable_enter_key(bufnr)
+    enter_handler()
+  end, { buffer = bufnr, noremap = true, silent = true })
+end
+
+function M.create_chat_win(enter_handler, callback)
   local server = servers.get_server_selected().server
   local chat_win = config.options.chat_win
 
@@ -171,11 +182,18 @@ function M.create_chat_win(callback)
   register_content_change(response_buf, response_win)
   register_auto_skip_when_insert(response_buf, input_win)
   register_close_for_wins({ input_win, response_win }, server, callback)
+  register_enter_handler(input_buf, enter_handler)
 
-  return response_buf, response_win, input_buf, input_win
+  return response_buf,
+    response_win,
+    input_buf,
+    input_win,
+    function()
+      register_enter_handler(input_buf, enter_handler)
+    end
 end
 
-local function register_line_move(
+local function register_picker_line_move(
   input_buf,
   input_win,
   content_buf,
@@ -207,19 +225,40 @@ local function register_line_move(
   return pos
 end
 
-local function register_data_filter(input_buf, content_buf, data_handler)
+local function register_picker_data_filter(input_buf, content_buf, data_filter)
   vim.api.nvim_create_augroup("AutoFilteringWhenTextChanged", { clear = true })
   vim.api.nvim_create_autocmd("TextChangedI", {
     group = "AutoFilteringWhenTextChanged",
     buffer = input_buf,
     callback = util.debounce(100, function()
-      data_handler(input_buf, content_buf)
+      data_filter(input_buf, content_buf)
     end),
   })
 end
 
-function M.disable_data_filter()
+function M.disable_picker_data_filter()
   pcall(vim.api.nvim_del_augroup_by_name, "AutoFilteringWhenTextChanged")
+end
+
+local function register_picker_enter(
+  content_selected,
+  input_buf,
+  content_buf,
+  input_win,
+  content_win,
+  enter_handler
+)
+  vim.keymap.set("n", "<CR>", function()
+    local lines = vim.api.nvim_buf_get_lines(
+      content_buf,
+      content_selected[1] - 1,
+      content_selected[1],
+      false
+    )
+    if lines and lines[1] then
+      enter_handler(lines[1], input_win, content_win)
+    end
+  end, { buffer = input_buf })
 end
 
 function M.create_select_picker(
@@ -228,7 +267,8 @@ function M.create_select_picker(
   content_height_percentage,
   winblend,
   title,
-  data_handler_wrap
+  data_filter_wraper,
+  enter_handler
 )
   local width = math.floor(vim.o.columns * width_percentage)
 
@@ -261,20 +301,28 @@ function M.create_select_picker(
   )
 
   -- load data
-  local data_handler = data_handler_wrap()
+  local data_filter = data_filter_wraper()
   vim.api.nvim_set_option_value("wrap", false, { win = content_win })
 
   register_close_for_wins({ input_win, content_win }, title, function()
-    M.disable_data_filter()
+    M.disable_picker_data_filter()
   end)
   local content_selected =
-    register_line_move(input_buf, input_win, content_buf, content_win)
+    register_picker_line_move(input_buf, input_win, content_buf, content_win)
   register_content_change(content_buf, content_win)
-  register_data_filter(input_buf, content_buf, data_handler)
+  register_picker_data_filter(input_buf, content_buf, data_filter)
   -- trigger filtering
-  data_handler(input_buf, content_buf)
+  data_filter(input_buf, content_buf)
+  register_picker_enter(
+    content_selected,
+    input_buf,
+    content_buf,
+    input_win,
+    content_win,
+    enter_handler
+  )
 
-  return input_buf, input_win, content_buf, content_win, content_selected
+  return input_buf, input_win, content_buf, content_win
 end
 
 return M

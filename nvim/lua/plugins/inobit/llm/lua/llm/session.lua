@@ -7,8 +7,10 @@ local config = require "llm.config"
 local win = require "llm.win"
 local io = require "llm.io"
 
--- 对话历史
+-- session buffer and win
+-- local session_buf_win = {}
 local session_name = nil
+-- current seesion
 local session = {}
 -- 最后一次响应在response_buf的区域
 local response_last_points = {}
@@ -73,6 +75,9 @@ function M.clear_session(save)
   end
   session = {}
   session_name = nil
+  response_last_points = {}
+end
+
 local function generate_session_name(s)
   local LEN = 50
   local RANDOM_LEN = 10
@@ -128,6 +133,7 @@ end
 
 function M.resume_session(bufnr)
   if bufnr and session and #session > 0 then
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
     for _, item in ipairs(session) do
       local lines = vim.split(item.content, "\n")
       vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, lines)
@@ -163,7 +169,7 @@ function M.session_filter(input, files)
   end
 end
 
-local function data_handler(input_buf, content_buf, files)
+local function data_filter(input_buf, content_buf, files)
   local input = vim.api.nvim_buf_get_lines(input_buf, 0, -1, false)[1] or ""
   vim.api.nvim_buf_set_lines(
     content_buf,
@@ -174,21 +180,37 @@ local function data_handler(input_buf, content_buf, files)
   )
 end
 
-function M.create_session_picker_win()
+function M.create_session_picker_win(callback)
   local session_win = config.options.session_picker_win
-  local input_buf, input_win, content_buf, content_win, content_selected = win.create_select_picker(
+  local input_buf, input_win, content_buf, content_win = win.create_select_picker(
     session_win.width_percentage,
     session_win.input_height,
     session_win.content_height_percentage,
     session_win.winblend,
     "sessions",
+    -- data_filter_wraper
     function()
       local data = M.load_sessions(servers.get_server_selected().server) or {}
       return function(input_buf, content_buf)
-        data_handler(input_buf, content_buf, data)
+        data_filter(input_buf, content_buf, data)
+      end
+    end,
+    -- enter handler
+    function(line, input_win, content_win)
+      if line then
+        M.load_session(line)
+        if vim.api.nvim_win_is_valid(input_win) then
+          vim.api.nvim_win_close(input_win, true)
+        end
+        if vim.api.nvim_buf_is_valid(content_win) then
+          vim.api.nvim_win_close(content_win, true)
+        end
+        if callback then
+          callback()
+        end
       end
     end
   )
-  return input_buf, input_win, content_buf, content_win, content_selected
+  return input_buf, input_win, content_buf, content_win
 end
 return M

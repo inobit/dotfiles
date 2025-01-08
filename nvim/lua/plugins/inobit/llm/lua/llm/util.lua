@@ -60,39 +60,6 @@ function M.generate_random_string(length)
   return table.concat(result)
 end
 
-local function is_legal_char(char)
-  -- 允许的字符：字母、数字、中文字符
-  local byte = char:byte() -- 获取字符的 ASCII/Unicode 值
-  return (
-    (byte >= 48 and byte <= 57) -- 数字 0-9
-    or (byte >= 65 and byte <= 90) -- 大写字母 A-Z
-    or (byte >= 97 and byte <= 122) -- 小写字母 a-z
-    or (byte >= 0x4e00 and byte <= 0x9fa5) -- 中文字符范围
-  )
-end
-
-function M.generate_session_name(session)
-  local LEN = 50
-  local m = 0
-  local result = ""
-  for _, item in ipairs(session) do
-    if item.content then
-      for i = 1, #item.content do
-        --BUG: 不符合预期
-        local char = item.content:sub(i, i)
-        if is_legal_char(char) then
-          result = result .. char
-          m = m + 1
-          if m == LEN then
-            return result .. "-" .. generate_random_string(16)
-          end
-        end
-      end
-    end
-  end
-  return result .. "-" .. generate_random_string(16)
-end
-
 function M.debounce(ms, fn)
   local timer = vim.uv.new_timer()
   return function(...)

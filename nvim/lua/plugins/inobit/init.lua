@@ -7,12 +7,12 @@ return {
     },
     keys = {
       -- stylua: ignore start
-      { "<leader>mb", "<Cmd>LLM Chat<CR>", desc = "LLM: chat start" },
+      { "<leader>mm", "<Cmd>LLM Chat<CR>", desc = "LLM: chat start" },
       { "<leader>ma", "<Cmd>LLM Auth<CR>", desc = "LLM: chat auth" },
       { "<leader>mn", "<Cmd>LLM New<CR>", desc = "LLM: chat new" },
       { "<leader>ms", "<Cmd>LLM Sessions<CR>", desc = "LLM: chat sessions" },
-      { "<leader>ml", "<Cmd>LLM Clear<CR>", desc = "LLM: chat clear screen" },
-      { "<leader>mL", "<Cmd>LLM Clean<CR>", desc = "LLM: chat clear screen and save" },
+      { "<leader>ml", "<Cmd>LLM Clear<CR>", desc = "LLM: chat clear" },
+      { "<leader>mS", "<Cmd>LLM Save<CR>", desc = "LLM: chat  save" },
       -- stylua: ignore end
     },
     opts = {},

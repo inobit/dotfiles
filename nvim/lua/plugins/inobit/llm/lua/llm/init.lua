@@ -21,8 +21,8 @@ function M.setup(opts)
       server.new()
     elseif command == "Clear" then
       server.clear(false)
-    elseif command == "Clean" then
-      server.clear(true)
+    elseif command == "Save" then
+      server.save()
     elseif command == "Sessions" then
       server.select_sessions()
     else
