@@ -73,6 +73,26 @@ function M.clear_session(save)
   end
   session = {}
   session_name = nil
+local function generate_session_name(s)
+  local LEN = 50
+  local RANDOM_LEN = 10
+  local m = 0
+  local result = ""
+  for _, item in ipairs(s) do
+    if item.content then
+      for i = 0, vim.fn.strchars(item.content) do
+        local char = vim.fn.strcharpart(item.content, i, 1)
+        if util.is_legal_char(char) then
+          result = result .. char
+          m = m + 1
+          if m == LEN then
+            return result .. "-" .. util.generate_random_string(RANDOM_LEN)
+          end
+        end
+      end
+    end
+  end
+  return result .. "-" .. util.generate_random_string(RANDOM_LEN)
 end
 
 function M.save_session()
@@ -81,7 +101,7 @@ function M.save_session()
     return
   end
   if not session_name then
-    session_name = util.generate_session_name(session)
+    session_name = generate_session_name(session)
   end
   local _, err = io.write_json(
     M.get_session_file_path(servers.get_server_selected().server, session_name),

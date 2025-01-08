@@ -21,7 +21,35 @@ function M.empty_str(str)
   return str == nil or str:match "^%s*$" ~= nil
 end
 
-local function generate_random_string(length)
+-- 解码 UTF-8 字节序列 LuaJIT没有内置UTF8模块
+function M.is_chinese(byte_sequence)
+  if #byte_sequence ~= 3 then
+    return false
+  end
+  local b1, b2, b3 = byte_sequence[1], byte_sequence[2], byte_sequence[3]
+  -- 检查首字节是否符合 3 字节 UTF-8 编码规则
+  if b1 < 0xE0 or b1 >= 0xF0 then
+    return false
+  end
+  -- 提取有效位并计算 Unicode 码点(竟然不支持位操作)
+  local code_point = ((b1 % 0x10) * 0x1000) + ((b2 % 0x40) * 0x40) + (b3 % 0x40)
+  -- 判断是否在中文字符范围内
+  return code_point >= 0x4E00 and code_point <= 0x9FFF
+end
+
+function M.is_legal_char(char)
+  if char:len() == 1 then
+    return string.match(char, "%w")
+  else
+    local sequence = {}
+    for i = 1, char:len() do
+      table.insert(sequence, char:sub(i, i):byte())
+    end
+    return M.is_chinese(sequence)
+  end
+end
+
+function M.generate_random_string(length)
   math.randomseed(os.time())
   local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   local result = {}
