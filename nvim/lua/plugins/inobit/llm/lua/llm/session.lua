@@ -77,7 +77,7 @@ function M.clear_session(save)
 end
 
 local function generate_session_name(s)
-  local LEN = 50
+  local LEN = 30
   local RANDOM_LEN = 10
   local m = 0
   local result = ""
@@ -149,7 +149,6 @@ function M.delete_session(name)
   end
 end
 
---TODO: add empty_buffer()
 function M.resume_session(bufnr)
   if bufnr and session and #session > 0 then
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
@@ -186,7 +185,7 @@ function M.load_sessions(server)
   return files
 end
 
-function M.session_filter(input, files)
+local function session_filter(input, files)
   if files and #files > 0 then
     return vim.tbl_filter(function(file)
       return file:find(input)
@@ -194,15 +193,8 @@ function M.session_filter(input, files)
   end
 end
 
-local function data_filter(input_buf, content_buf, files)
-  local input = vim.api.nvim_buf_get_lines(input_buf, 0, -1, false)[1] or ""
-  vim.api.nvim_buf_set_lines(
-    content_buf,
-    0,
-    -1,
-    false,
-    M.session_filter(input, files)
-  )
+local function data_filter(input, files)
+  return session_filter(input, files)
 end
 
 local function clear_session_picker_win()
@@ -222,11 +214,11 @@ function M.create_session_picker_win(enter_callback, close_callback)
     session_win.content_height_percentage,
     session_win.winblend,
     "sessions",
-    -- data_filter_wraper
+    -- data_filter_wraper, delay load data
     function()
       local data = M.load_sessions(servers.get_server_selected().server) or {}
-      return function(input_buf, content_buf)
-        data_filter(input_buf, content_buf, data)
+      return function(input)
+        return data_filter(input, data)
       end
     end,
     -- enter handler

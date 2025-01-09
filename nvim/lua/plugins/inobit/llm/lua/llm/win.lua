@@ -225,13 +225,10 @@ local function register_picker_line_move(
   return pos
 end
 
-local function register_picker_data_filter(input_buf, content_buf, data_filter)
-  vim.api.nvim_create_augroup("AutoFilteringWhenTextChanged", { clear = true })
-  vim.api.nvim_create_autocmd("TextChangedI", {
-    group = "AutoFilteringWhenTextChanged",
-    buffer = input_buf,
-    callback = util.debounce(100, function()
-      data_filter(input_buf, content_buf)
+local function register_picker_data_filter(bufnr, filter_handler)
+  vim.api.nvim_buf_attach(bufnr, false, {
+    on_lines = util.debounce(100, function(_, _, _, first)
+      filter_handler(vim.api.nvim_buf_get_lines(bufnr, first, -1, false)[1])
     end),
   })
 end
@@ -286,17 +283,23 @@ function M.create_select_picker(
     title
   )
 
+  vim.api.nvim_set_option_value("wrap", false, { win = content_win })
+
   -- load data
   local data_filter = data_filter_wraper()
-  vim.api.nvim_set_option_value("wrap", false, { win = content_win })
 
   register_close_for_wins({ input_win, content_win }, title, close_callback)
   local selected_line =
     register_picker_line_move(input_buf, input_win, content_buf, content_win)
   register_content_change(content_buf, content_win)
-  register_picker_data_filter(input_buf, content_buf, data_filter)
-  -- trigger filtering
-  data_filter(input_buf, content_buf)
+
+  local filter_handler = function(input)
+    vim.api.nvim_buf_set_lines(content_buf, 0, -1, false, data_filter(input))
+  end
+  register_picker_data_filter(input_buf, filter_handler)
+  -- manual trigger
+  filter_handler ""
+
   register_picker_enter(input_buf, function()
     local lines = vim.api.nvim_buf_get_lines(
       content_buf,
