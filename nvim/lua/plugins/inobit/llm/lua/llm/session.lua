@@ -5,6 +5,7 @@ local servers = require "llm.servers"
 local notify = require "llm.notify"
 local config = require "llm.config"
 local win = require "llm.win"
+local Path = require "plenary.path"
 local io = require "llm.io"
 
 local session_name = nil
@@ -76,14 +77,14 @@ function M.clear_session(save)
   response_last_points = {}
 end
 
-local function generate_session_name(s)
+local function auto_generate_session_name(s)
   local LEN = 30
   local RANDOM_LEN = 10
   local m = 0
   local result = ""
   for _, item in ipairs(s) do
     if item.content then
-      for i = 0, vim.fn.strchars(item.content) do
+      for i = 0, vim.fn.strchars(item.content) - 1 do
         local char = vim.fn.strcharpart(item.content, i, 1)
         if util.is_legal_char(char) then
           result = result .. char
@@ -98,13 +99,49 @@ local function generate_session_name(s)
   return result .. "-" .. util.generate_random_string(RANDOM_LEN)
 end
 
+local function generate_session_name()
+  local name = ""
+  local legal = false
+  while not legal do
+    name = vim.fn.input("Input session name: ", name or "")
+    notify.info "\n"
+    if not util.empty_str(name) then
+      legal = true
+      for i = 0, vim.fn.strchars(name) - 1 do
+        local char = vim.fn.strcharpart(name, i, 1)
+        if not util.is_legal_char(char) then
+          notify.error "Contains illegal char,try again."
+          legal = false
+          break
+        end
+      end
+      if
+        legal
+        and Path
+          :new(
+            M.get_session_file_path(servers.get_server_selected().server, name)
+          )
+          :exists()
+      then
+        notify.error "Session name exists."
+        legal = false
+      end
+    else
+      notify.info "Empty input,auto generate."
+      name = auto_generate_session_name(session)
+      legal = true
+    end
+  end
+  return name
+end
+
 function M.save_session()
   if not session or #session == 0 then
     notify.info "No session to save."
     return
   end
   if not session_name then
-    session_name = generate_session_name(session)
+    session_name = generate_session_name()
   end
   local _, err = io.write_json(
     M.get_session_file_path(servers.get_server_selected().server, session_name),

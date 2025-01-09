@@ -250,9 +250,13 @@ function M.select_sessions()
           false
         )
         if lines and lines[1] then
-          local tip = "Delete session "
-            .. vim.fn.strcharpart(lines[1], 0, 10)
-            .. "...? (Y/N): "
+          local tip = "Delete session: "
+            .. (vim.fn.strchars(lines[1]) > 20 and (vim.fn.strcharpart(
+              lines[1],
+              0,
+              20
+            ) .. "...") or lines[1])
+            .. "? (Y/N): "
 
           local answer = vim.fn.input(tip)
           answer = string.upper(answer)
