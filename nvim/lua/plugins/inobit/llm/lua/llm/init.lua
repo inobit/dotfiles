@@ -2,36 +2,40 @@ local M = {}
 
 -- options
 function M.setup(opts)
-  require("llm.config").setup(opts)
-  local server = require "llm.api"
+  local api = require "llm.api"
+  local servers = require "llm.servers"
   local notify = require "llm.notify"
+  local config = require "llm.config"
+  config.setup(opts)
+  -- ensure default server is selected
+  servers.set_server_selected(config.options.default_server)
 
   vim.api.nvim_create_user_command("LLM", function(options)
     local args = options.fargs
     local command = args[1]
     if command == nil then
-      server.start_chat()
+      api.start_chat()
     elseif command == "Chat" then
-      server.start_chat()
+      api.start_chat()
     elseif command == "Auth" then
-      server.input_auth()
-    elseif command == "Submit" then
-      server.submit()
+      api.input_auth()
     elseif command == "New" then
-      server.new()
+      api.new()
     elseif command == "Clear" then
-      server.clear(false)
+      if api.clear then
+        api.clear()
+      end
     elseif command == "Save" then
-      server.save()
+      api.save()
     elseif command == "Sessions" then
-      server.select_sessions()
+      api.select_sessions()
     elseif command == "Delete" then --delete session
-      if server.delete_session then
-        server.delete_session()
+      if api.delete_session then
+        api.delete_session()
       end
     elseif command == "Rename" then -- rename session
-      if server.rename_session then
-        server.rename_session()
+      if api.rename_session then
+        api.rename_session()
       end
     else
       notify.warn "Invalid LLM command"

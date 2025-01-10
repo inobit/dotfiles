@@ -7,23 +7,27 @@ local config = require "llm.config"
 
 local M = {}
 
-local server_selected = nil
+-- need set up after config.setup()
+local server_selected = config.options.default_server
 
-function M.input_api_key(service, path)
-  local err = nil
-  local key = vim.fn.inputsecret("Enter your " .. service .. " API Key: ", "")
-  if util.empty_str(key) then
-    err = "empty key!"
-    return nil, err
-  end
-  _, err = io.write_json(path, { api_key = key })
+local function update_auth(server_name, key)
+  config.options.servers[server_name].api_key = key
+  local _, err =
+    io.write_json(config.get_config_file_path(server_name), { api_key = key })
   if err then
     log.error(err)
   end
-  return key, err
 end
 
-function M.load_api_key(path)
+local function input_api_key(server_name)
+  local key =
+    vim.fn.inputsecret("Enter your " .. server_name .. " API Key: ", "")
+  if not util.empty_str(key) then
+    return key
+  end
+end
+
+local function load_api_key(path)
   local json, err = io.read_json(path)
   if err then
     return nil, err
@@ -46,17 +50,18 @@ local function check_api_key(server_name)
   local path = config.get_config_file_path(server_name)
   local check = true
   if not api_key then
-    api_key, _ = M.load_api_key(path)
+    api_key, _ = load_api_key(path)
     if not api_key then
-      api_key, _ = M.input_api_key(server_name, path)
+      api_key = input_api_key()
       if not api_key then
         notify.error "A valid key is required!"
         check = false
+      else
+        update_auth(server_name, api_key)
       end
+    else
+      config.options.servers[server_name].api_key = api_key
     end
-  end
-  if check then
-    config.options.servers[server_name].api_key = api_key
   end
   return check
 end
@@ -106,20 +111,24 @@ function M.check_options(server_name)
 end
 
 function M.get_server_selected()
-  return config.options.servers[server_selected or config.options.default_server]
+  return config.options.servers[server_selected]
 end
 
 function M.set_server_selected(server_name)
   server_selected = server_name
 end
 
-function M.update_auth(key)
-  config.options.servers[server_selected or config.options.default_server].api_key =
-    key
+function M.get_auth()
+  return config.options.servers[server_selected].api_key
 end
 
-function M.get_auth()
-  return config.options.servers[server_selected or config.options.default_server].api_key
+function M.input_auth(server_name)
+  local key = input_api_key(server_name)
+  if key then
+    update_auth(server_name, key)
+  else
+    notify.warn "Invalid input! The key is not updated!"
+  end
 end
 
 return M

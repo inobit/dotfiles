@@ -154,6 +154,14 @@ local function clear_chat_win()
   win.disable_auto_skip_when_insert()
 end
 
+-- submit input
+local function submit()
+  if not M.input_buf or not M.response_buf then
+    return
+  end
+  handle_input()
+end
+
 -- 启动对话
 function M.start_chat()
   local check = servers.check_options(servers.get_server_selected().server)
@@ -166,30 +174,22 @@ function M.start_chat()
   end
   -- create chat window
   M.response_buf, M.response_win, M.input_buf, M.input_win, M.register_enter_handler =
-    win.create_chat_win(M.submit, clear_chat_win)
+    win.create_chat_win(submit, clear_chat_win)
   session.resume_session(M.response_buf)
   util.scroll_to_end(M.response_win, M.response_buf)
-end
 
--- 提交输入
-function M.submit()
-  if not M.input_buf or not M.response_buf then
-    return
+  -- functions that depend on chat windows
+  if M.input_buf then
+    M.clear = function()
+      session.clear_session(false)
+      vim.api.nvim_buf_set_lines(M.input_buf, 0, -1, false, {})
+      vim.api.nvim_buf_set_lines(M.response_buf, 0, -1, false, {})
+    end
   end
-  handle_input()
 end
 
 function M.save()
   session.save_session()
-end
-
-function M.clear(save)
-  if not M.input_buf or not M.response_buf then
-    return
-  end
-  session.clear_session(save)
-  vim.api.nvim_buf_set_lines(M.input_buf, 0, -1, false, {})
-  vim.api.nvim_buf_set_lines(M.response_buf, 0, -1, false, {})
 end
 
 function M.new()
@@ -203,15 +203,7 @@ function M.new()
 end
 
 function M.input_auth()
-  local server = servers.get_server_selected().server
-  local path = config.get_config_file_path(server)
-  local key, err = server.input_api_key(server, path)
-  if err then
-    notify.warn(err)
-  end
-  if key then
-    servers.update_auth(key)
-  end
+  servers.input_auth(servers.get_server_selected().server)
 end
 
 function M.select_sessions()
@@ -240,6 +232,7 @@ function M.select_sessions()
     end
   )
 
+  -- functions that depend on session selection windows
   if input_buf then
     M.delete_session = function()
       if selected_line then
