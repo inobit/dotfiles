@@ -27,9 +27,9 @@ function M.setup(opts)
       end
     elseif command == "Save" then
       api.save()
-    elseif command == "Sessions" then
+    elseif command == "Sessions" then -- select session
       api.select_sessions()
-    elseif command == "Delete" then --delete session
+    elseif command == "Delete" then -- delete session
       if api.delete_session then
         api.delete_session()
       end
