@@ -4,6 +4,7 @@ local util = require "llm.util"
 local notify = require "llm.notify"
 local SERVERS = require "llm.servers.const"
 local config = require "llm.config"
+local win = require "llm.win"
 
 local M = {}
 
@@ -129,6 +130,72 @@ function M.input_auth(server_name)
   else
     notify.warn "Invalid input! The key is not updated!"
   end
+end
+
+local function load_servers()
+  return vim.tbl_keys(config.options.servers)
+end
+
+local function data_filter(input, data)
+  if data then
+    return vim.tbl_filter(function(server)
+      return server:find(input)
+    end, data)
+  end
+end
+
+local function clear_server_picker_win()
+  M.input_buf = nil
+  M.input_win = nil
+  M.content_buf = nil
+  M.content_win = nil
+  M.selected_line = nil
+end
+
+function M.create_server_picker_win(enter_callback, close_callback)
+  local server_win = config.options.server_picker_win
+  local input_buf, input_win, content_buf, content_win, selected_line = win.create_select_picker(
+    server_win.width_percentage,
+    server_win.input_height,
+    server_win.content_height_percentage,
+    server_win.winblend,
+    "servers",
+    -- data_filter_wraper, delay load data
+    function()
+      local data = load_servers() or {}
+      return function(input)
+        return data_filter(input, data)
+      end
+    end,
+    -- enter handler
+    function(line, input_win, content_win)
+      if line then
+        if vim.api.nvim_win_is_valid(input_win) then
+          vim.api.nvim_win_close(input_win, true)
+        end
+        if vim.api.nvim_buf_is_valid(content_win) then
+          vim.api.nvim_win_close(content_win, true)
+        end
+        if enter_callback and line ~= server_selected then
+          enter_callback()
+        end
+      end
+    end,
+    -- close_callback
+    function()
+      if close_callback then
+        close_callback()
+      end
+    end
+  )
+
+  M.input_buf = input_buf
+  M.input_win = input_win
+  M.content_buf = content_buf
+  M.content_win = content_win
+  M.selected_line = selected_line
+
+  return input_buf, input_win, content_buf, content_win, selected_line
 end
 
 return M

@@ -237,10 +237,6 @@ local function register_picker_data_filter(bufnr, filter_handler)
   })
 end
 
-function M.disable_picker_data_filter()
-  pcall(vim.api.nvim_del_augroup_by_name, "AutoFilteringWhenTextChanged")
-end
-
 local function register_picker_enter(input_buf, enter_handler)
   vim.keymap.set("n", "<CR>", function()
     enter_handler()

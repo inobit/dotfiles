@@ -271,7 +271,6 @@ local function clear_session_picker_win()
   M.content_buf = nil
   M.content_win = nil
   M.selected_line = nil
-  win.disable_picker_data_filter()
 end
 
 function M.create_session_picker_win(enter_callback, close_callback)
