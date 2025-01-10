@@ -53,7 +53,7 @@ local function check_api_key(server_name)
   if not api_key then
     api_key, _ = load_api_key(path)
     if not api_key then
-      api_key = input_api_key()
+      api_key = input_api_key(server_name)
       if not api_key then
         notify.error "A valid key is required!"
         check = false
