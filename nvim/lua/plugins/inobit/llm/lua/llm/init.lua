@@ -25,7 +25,7 @@ function M.setup(opts)
       server.save()
     elseif command == "Sessions" then
       server.select_sessions()
-    elseif command == "SessionDel" then
+    elseif command == "Delete" then --delete session
       if server.delete_session then
         server.delete_session()
       end

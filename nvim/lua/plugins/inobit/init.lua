@@ -13,7 +13,7 @@ return {
       { "<leader>ms", "<Cmd>LLM Sessions<CR>", desc = "LLM: chat sessions" },
       { "<leader>ml", "<Cmd>LLM Clear<CR>", desc = "LLM: chat clear" },
       { "<leader>mS", "<Cmd>LLM Save<CR>", desc = "LLM: chat  save" },
-      { "<leader>md", "<Cmd>LLM SessionDel<CR>", desc = "LLM: delete session" },
+      { "<leader>md", "<Cmd>LLM Delete<CR>", desc = "LLM: delete session" },
       -- stylua: ignore end
     },
     opts = {},
