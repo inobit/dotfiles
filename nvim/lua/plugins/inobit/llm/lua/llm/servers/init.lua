@@ -116,7 +116,12 @@ function M.get_server_selected()
 end
 
 function M.set_server_selected(server_name)
-  server_selected = server_name
+  if not util.empty_str(server_name) then
+    server_selected = server_name
+    notify.info("Server is " .. server_name)
+  else
+    notify.info "Server not changed."
+  end
 end
 
 function M.get_auth()
