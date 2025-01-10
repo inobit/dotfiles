@@ -127,7 +127,7 @@ local function generate_session_name(default_name, new_session)
   while not legal do
     name = vim.fn.input("Input session name: ", name or "")
     -- OPTIM: not automatically wrap? bug?
-    notify.info "\n"
+    -- notify.info "\n"
     if not util.empty_str(name) then
       legal, err = check_session_name_char(name)
       if err then
