@@ -195,6 +195,8 @@ function M.create_chat_win(server, enter_handler, callback)
   floating_win_stack[input_win] = cur_win
   floating_win_stack[response_win] = cur_win
 
+  vim.api.nvim_set_current_win(input_win)
+
   set_vertical_navigate_keymap(
     config.options.win_cursor_move_mappings.up,
     config.options.win_cursor_move_mappings.down,
@@ -305,6 +307,7 @@ function M.create_select_picker(
   floating_win_stack[content_win] = cur_win
 
   vim.api.nvim_set_option_value("wrap", false, { win = content_win })
+  vim.api.nvim_set_current_win(input_win)
 
   -- load data
   local data_filter = data_filter_wraper()
