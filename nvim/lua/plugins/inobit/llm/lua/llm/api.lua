@@ -174,7 +174,11 @@ function M.start_chat()
   end
   -- create chat window
   M.response_buf, M.response_win, M.input_buf, M.input_win, M.register_enter_handler =
-    win.create_chat_win(submit, clear_chat_win)
+    win.create_chat_win(
+      servers.get_server_selected().server,
+      submit,
+      clear_chat_win
+    )
   session.resume_session(M.response_buf)
   util.scroll_to_end(M.response_win, M.response_buf)
 
