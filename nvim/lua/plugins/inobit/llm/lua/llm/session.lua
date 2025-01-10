@@ -5,7 +5,6 @@ local servers = require "llm.servers"
 local notify = require "llm.notify"
 local config = require "llm.config"
 local win = require "llm.win"
-local Path = require "plenary.path"
 local io = require "llm.io"
 
 local session_name = nil
@@ -99,32 +98,48 @@ local function auto_generate_session_name(s)
   return result .. "-" .. util.generate_random_string(RANDOM_LEN)
 end
 
-local function generate_session_name()
-  local name = ""
+local function check_session_name_char(name)
+  for i = 0, vim.fn.strchars(name) - 1 do
+    local char = vim.fn.strcharpart(name, i, 1)
+    if not util.is_legal_char(char) then
+      return false, "Contains illegal char"
+    end
+  end
+  return true, nil
+end
+
+local function check_session_name_not_exists(name)
+  if
+    io.file_is_exist(
+      M.get_session_file_path(servers.get_server_selected().server, name)
+    )
+  then
+    return false, "Session name exists."
+  else
+    return true, nil
+  end
+end
+
+local function generate_session_name(default_name, new_session)
+  local name = default_name
   local legal = false
+  local err = nil
   while not legal do
     name = vim.fn.input("Input session name: ", name or "")
+    -- OPTIM: not automatically wrap? bug?
     notify.info "\n"
     if not util.empty_str(name) then
-      legal = true
-      for i = 0, vim.fn.strchars(name) - 1 do
-        local char = vim.fn.strcharpart(name, i, 1)
-        if not util.is_legal_char(char) then
-          notify.error "Contains illegal char,try again."
-          legal = false
-          break
+      legal, err = check_session_name_char(name)
+      if err then
+        notify.error(err)
+      else
+        -- new session or rename to another name
+        if new_session or name ~= default_name then
+          legal, err = check_session_name_not_exists(name)
+          if err then
+            notify.error(err)
+          end
         end
-      end
-      if
-        legal
-        and Path
-          :new(
-            M.get_session_file_path(servers.get_server_selected().server, name)
-          )
-          :exists()
-      then
-        notify.error "Session name exists."
-        legal = false
       end
     else
       notify.info "Empty input,auto generate."

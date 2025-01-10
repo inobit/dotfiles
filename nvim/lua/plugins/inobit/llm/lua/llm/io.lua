@@ -149,4 +149,7 @@ function M.rm_file(path)
   return err
 end
 
+function M.file_is_exist(path)
+  return Path:new(path):exists()
+end
 return M
