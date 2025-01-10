@@ -77,8 +77,8 @@ function M.clear_session(save)
 end
 
 local function auto_generate_session_name(s)
-  local LEN = 30
-  local RANDOM_LEN = 10
+  local LEN = 10
+  local RANDOM_LEN = 5
   local m = 0
   local result = ""
   for _, item in ipairs(s) do
@@ -150,13 +150,29 @@ local function generate_session_name(default_name, new_session)
   return name
 end
 
+function M.rename_session(old_name)
+  local name = generate_session_name(old_name, false)
+  local success, _, err = io.rename(
+    M.get_session_file_path(servers.get_server_selected().server, old_name),
+    M.get_session_file_path(servers.get_server_selected().server, name)
+  )
+  if not success then
+    notify.error(err)
+    return success, err
+  end
+  if old_name == session_name then
+    session_name = name
+  end
+  return success, name
+end
+
 function M.save_session()
   if not session or #session == 0 then
     notify.info "No session to save."
     return
   end
   if not session_name then
-    session_name = generate_session_name()
+    session_name = generate_session_name(_, true)
   end
   local _, err = io.write_json(
     M.get_session_file_path(servers.get_server_selected().server, session_name),

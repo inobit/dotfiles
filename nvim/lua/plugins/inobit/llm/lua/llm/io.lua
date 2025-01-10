@@ -152,4 +152,9 @@ end
 function M.file_is_exist(path)
   return Path:new(path):exists()
 end
+
+function M.rename(path, new_name)
+  return Path:new(path):rename { new_name = new_name }
+end
+
 return M

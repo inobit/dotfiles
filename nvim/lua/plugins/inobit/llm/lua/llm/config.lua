@@ -30,15 +30,15 @@ function M.defaults()
       winblend = 5,
     },
     session_picker_win = {
-      width_percentage = 0.5,
+      width_percentage = 0.4,
       input_height = 1,
       content_height_percentage = 0.3,
       winblend = 5,
     },
     server_picker_win = {
-      width_percentage = 0.4,
+      width_percentage = 0.3,
       input_height = 1,
-      content_height_percentage = 0.3,
+      content_height_percentage = 0.2,
       winblend = 5,
     },
   }

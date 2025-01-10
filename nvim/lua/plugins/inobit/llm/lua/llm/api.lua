@@ -281,6 +281,29 @@ function M.select_sessions()
         end
       end
     end
+
+    M.rename_session = function()
+      if selected_line then
+        local lines = vim.api.nvim_buf_get_lines(
+          content_buf,
+          selected_line[1] - 1,
+          selected_line[1],
+          false
+        )
+        if lines and lines[1] then
+          local success, name = session.rename_session(lines[1])
+          if success then
+            vim.api.nvim_buf_set_lines(
+              content_buf,
+              selected_line[1] - 1,
+              selected_line[1],
+              false,
+              { name }
+            )
+          end
+        end
+      end
+    end
   end
 end
 return M

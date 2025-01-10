@@ -29,6 +29,10 @@ function M.setup(opts)
       if server.delete_session then
         server.delete_session()
       end
+    elseif command == "Rename" then -- rename session
+      if server.rename_session then
+        server.rename_session()
+      end
     else
       notify.warn "Invalid LLM command"
     end
