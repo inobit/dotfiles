@@ -290,14 +290,14 @@ function M.select_sessions()
           false
         )
         if lines and lines[1] and lines[1] ~= "" then
-          local success, name = session.rename_session(lines[1])
+          local success, str = session.rename_session(lines[1])
           if success then
             vim.api.nvim_buf_set_lines(
               content_buf,
               selected_line[1] - 1,
               selected_line[1],
               false,
-              { name }
+              { str }
             )
           end
         end

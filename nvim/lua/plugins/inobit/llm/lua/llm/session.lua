@@ -160,7 +160,7 @@ function M.rename_session(old_name)
   local name = generate_session_name(old_name, false)
   if not name then
     notify.warn "Rename operation canceled."
-    return false, _
+    return false, nil
   end
   local success, _, err = io.rename(
     M.get_session_file_path(servers.get_server_selected().server, old_name),
