@@ -223,7 +223,7 @@ function M.load_sessions(server)
 end
 
 local function session_filter(input, files)
-  if files and #files > 0 then
+  if files then
     return vim.tbl_filter(function(file)
       return file:find(input)
     end, files)

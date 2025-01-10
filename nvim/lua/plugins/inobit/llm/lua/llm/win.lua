@@ -116,6 +116,10 @@ local function register_content_change(bufnr, win_id)
       local lines = vim.api.nvim_buf_line_count(bufnr)
       if lines == 0 then
         vim.api.nvim_set_option_value("cursorline", false, { win = win_id })
+      elseif
+        lines == 1 and vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1] == ""
+      then
+        vim.api.nvim_set_option_value("cursorline", false, { win = win_id })
       else
         vim.api.nvim_set_option_value("cursorline", true, { win = win_id })
       end
