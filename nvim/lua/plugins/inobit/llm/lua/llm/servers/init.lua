@@ -1,3 +1,5 @@
+local M = {}
+
 local log = require "llm.log"
 local io = require "llm.io"
 local util = require "llm.util"
@@ -5,8 +7,6 @@ local notify = require "llm.notify"
 local SERVERS = require "llm.servers.const"
 local config = require "llm.config"
 local win = require "llm.win"
-
-local M = {}
 
 -- need set up after config.setup()
 local server_selected = config.options.default_server
