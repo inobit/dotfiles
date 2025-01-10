@@ -151,6 +151,7 @@ local function clear_chat_win()
   M.response_win = nil
   M.input_buf = nil
   M.input_win = nil
+  M.clear = nil
   win.disable_auto_skip_when_insert()
 end
 
@@ -229,7 +230,10 @@ function M.select_sessions()
       end
     end,
     -- close callback
-    nil
+    function()
+      M.delete_session = nil
+      M.rename_session = nil
+    end
   )
 
   -- functions that depend on session selection windows
