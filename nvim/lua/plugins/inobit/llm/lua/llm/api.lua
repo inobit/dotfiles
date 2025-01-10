@@ -297,4 +297,25 @@ function M.select_sessions()
     end
   end
 end
+
+function M.select_server()
+  if servers.input_buf then
+    return
+  end
+  servers.create_server_picker_win(
+    -- enter callback
+    function()
+      local opened_wins =
+        { M.input_win, M.response_win, session.input_win, session.response_win }
+      for _, win_id in ipairs(opened_wins) do
+        if win_id and vim.api.nvim_win_is_valid(win_id) then
+          vim.api.nvim_win_close(win_id, true)
+        end
+      end
+    end,
+    -- close callback
+    nil
+  )
+end
+
 return M

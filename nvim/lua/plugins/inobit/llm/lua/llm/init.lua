@@ -37,6 +37,8 @@ function M.setup(opts)
       if api.rename_session then
         api.rename_session()
       end
+    elseif command == "Servers" then
+      api.select_server()
     else
       notify.warn "Invalid LLM command"
     end

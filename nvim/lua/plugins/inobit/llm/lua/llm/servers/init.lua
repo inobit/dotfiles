@@ -176,13 +176,17 @@ function M.create_server_picker_win(enter_callback, close_callback)
         if vim.api.nvim_buf_is_valid(content_win) then
           vim.api.nvim_win_close(content_win, true)
         end
-        if enter_callback and line ~= server_selected then
-          enter_callback()
+        if line ~= server_selected then
+          M.set_server_selected(line)
+          if enter_callback then
+            enter_callback()
+          end
         end
       end
     end,
     -- close_callback
     function()
+      clear_server_picker_win()
       if close_callback then
         close_callback()
       end
