@@ -10,9 +10,9 @@ return {
       { "<leader>mm", "<Cmd>LLM Chat<CR>", desc = "LLM: chat start" },
       { "<leader>ma", "<Cmd>LLM Auth<CR>", desc = "LLM: chat auth" },
       { "<leader>mn", "<Cmd>LLM New<CR>", desc = "LLM: chat new" },
-      { "<leader>ms", "<Cmd>LLM Sessions<CR>", desc = "LLM: chat select session" },
-      { "<leader>ml", "<Cmd>LLM Clear<CR>", desc = "LLM: chat clear" },
+      { "<leader>mx", "<Cmd>LLM Clear<CR>", desc = "LLM: chat clear(unsaved)" },
       { "<leader>mS", "<Cmd>LLM Save<CR>", desc = "LLM: chat  save" },
+      { "<leader>ms", "<Cmd>LLM Sessions<CR>", desc = "LLM: select session" },
       { "<leader>md", "<Cmd>LLM Delete<CR>", desc = "LLM: delete session" },
       { "<leader>mr", "<Cmd>LLM Rename<CR>", desc = "LLM: rename session" },
       -- stylua: ignore end
