@@ -1,7 +1,9 @@
 local M = {}
 local config = require "llm.config"
-local servers = require "llm.servers"
 local util = require "llm.util"
+
+-- floating windows from-stack
+local floating_win_stack = {}
 
 function M.create_floating_window(width, height, row, col, winblend, title)
   local bufnr = vim.api.nvim_create_buf(false, true)
@@ -89,6 +91,17 @@ function M.disable_auto_skip_when_insert()
   pcall(vim.api.nvim_del_augroup_by_name, "AutoSkipWhenInsert")
 end
 
+local function pop_win_stack(win)
+  if floating_win_stack[win] then
+    vim.api.nvim_set_current_win(
+      vim.api.nvim_win_is_valid(floating_win_stack[win])
+          and floating_win_stack[win]
+        or vim.api.nvim_list_wins()[1]
+    )
+    floating_win_stack[win] = nil
+  end
+end
+
 local function register_close_for_wins(wins, group_prefix, callback)
   vim.api.nvim_create_augroup(group_prefix .. "AutoCloseWins", { clear = true })
   vim.api.nvim_create_autocmd("WinClosed", {
@@ -97,6 +110,7 @@ local function register_close_for_wins(wins, group_prefix, callback)
       local win = tonumber(args.match)
       if vim.tbl_contains(wins, win) then
         for _, other_win in ipairs(wins) do
+          pop_win_stack(other_win)
           if other_win ~= win and vim.api.nvim_win_is_valid(other_win) then
             vim.api.nvim_win_close(other_win, true)
           end
@@ -138,8 +152,10 @@ local function register_input_enter_handler(bufnr, enter_handler)
   end, { buffer = bufnr, noremap = true, silent = true })
 end
 
-function M.create_chat_win(enter_handler, callback)
-  local server = servers.get_server_selected().server
+function M.create_chat_win(server, enter_handler, callback)
+  -- record where from
+  local cur_win = vim.api.nvim_get_current_win()
+
   local chat_win = config.options.chat_win
 
   local width = math.floor(vim.o.columns * chat_win.width_percentage)
@@ -174,6 +190,10 @@ function M.create_chat_win(enter_handler, callback)
     chat_win.winblend,
     "input"
   )
+
+  -- push win stack
+  floating_win_stack[input_win] = cur_win
+  floating_win_stack[response_win] = cur_win
 
   set_vertical_navigate_keymap(
     config.options.win_cursor_move_mappings.up,
@@ -253,6 +273,9 @@ function M.create_select_picker(
   enter_handler,
   close_callback
 )
+  -- record where from
+  local cur_win = vim.api.nvim_get_current_win()
+
   local width = math.floor(vim.o.columns * width_percentage)
 
   local content_height = math.floor(vim.o.lines * content_height_percentage)
@@ -282,6 +305,10 @@ function M.create_select_picker(
     winblend,
     title
   )
+
+  -- push win stack
+  floating_win_stack[input_win] = cur_win
+  floating_win_stack[content_win] = cur_win
 
   vim.api.nvim_set_option_value("wrap", false, { win = content_win })
 

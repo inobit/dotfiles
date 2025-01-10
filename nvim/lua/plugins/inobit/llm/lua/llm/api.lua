@@ -225,11 +225,7 @@ function M.select_sessions()
       end
     end,
     -- close callback
-    function()
-      if M.input_win then
-        vim.api.nvim_set_current_win(M.input_win)
-      end
-    end
+    nil
   )
 
   -- functions that depend on session selection windows
