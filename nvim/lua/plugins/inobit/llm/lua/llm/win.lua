@@ -217,36 +217,30 @@ function M.create_chat_win(server, enter_handler, callback)
     end
 end
 
-local function register_picker_line_move(
-  input_buf,
-  input_win,
-  content_buf,
-  content_win
-)
-  local pos = { 1, 0 }
-  vim.api.nvim_set_current_win(input_win)
-
+local function register_picker_line_move(input_buf, content_buf, content_win)
   vim.keymap.set("n", "j", function()
     local lines = vim.api.nvim_buf_line_count(content_buf)
-    if pos[1] + 1 > lines then
-      pos[1] = 1
+    local cur_line = vim.api.nvim_win_get_cursor(content_win)
+    local next_line = nil
+    if cur_line[1] + 1 > lines then
+      next_line = 1
     else
-      pos[1] = pos[1] + 1
+      next_line = cur_line[1] + 1
     end
-    vim.api.nvim_win_set_cursor(content_win, pos)
+    vim.api.nvim_win_set_cursor(content_win, { next_line, 0 })
   end, { buffer = input_buf })
 
   vim.keymap.set("n", "k", function()
     local lines = vim.api.nvim_buf_line_count(content_buf)
-    if pos[1] - 1 == 0 then
-      pos[1] = lines
+    local cur_line = vim.api.nvim_win_get_cursor(content_win)
+    local next_line = nil
+    if cur_line[1] - 1 == 0 then
+      next_line = lines
     else
-      pos[1] = pos[1] - 1
+      next_line = cur_line[1] - 1
     end
-    vim.api.nvim_win_set_cursor(content_win, pos)
+    vim.api.nvim_win_set_cursor(content_win, { next_line, 0 })
   end, { buffer = input_buf })
-
-  return pos
 end
 
 local function register_picker_data_filter(bufnr, filter_handler)
@@ -316,8 +310,7 @@ function M.create_select_picker(
   local data_filter = data_filter_wraper()
 
   register_close_for_wins({ input_win, content_win }, title, close_callback)
-  local selected_line =
-    register_picker_line_move(input_buf, input_win, content_buf, content_win)
+  register_picker_line_move(input_buf, content_buf, content_win)
   register_content_change(content_buf, content_win)
 
   local filter_handler = function(input)
@@ -330,16 +323,16 @@ function M.create_select_picker(
   register_picker_enter(input_buf, function()
     local lines = vim.api.nvim_buf_get_lines(
       content_buf,
-      selected_line[1] - 1,
-      selected_line[1],
+      vim.api.nvim_win_get_cursor(content_win)[1] - 1,
+      vim.api.nvim_win_get_cursor(content_win)[1],
       false
     )
-    if lines and lines[1] then
+    if lines and lines[1] and lines[1] ~= "" then
       enter_handler(lines[1], input_win, content_win)
     end
   end)
 
-  return input_buf, input_win, content_buf, content_win, selected_line
+  return input_buf, input_win, content_buf, content_win
 end
 
 return M

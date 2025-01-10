@@ -212,7 +212,7 @@ function M.select_sessions()
   end
   --TODO:
   ---@diagnostic disable-next-line: unused-local
-  local input_buf, input_win, content_buf, content_win, selected_line = session.create_session_picker_win(
+  local input_buf, input_win, content_buf, content_win = session.create_session_picker_win(
     -- enter callback
     function()
       if M.input_buf and M.response_buf then
@@ -231,6 +231,7 @@ function M.select_sessions()
   -- functions that depend on session selection windows
   if input_buf then
     M.delete_session = function()
+      local selected_line = vim.api.nvim_win_get_cursor(content_win)
       if selected_line then
         local lines = vim.api.nvim_buf_get_lines(
           content_buf,
@@ -238,7 +239,7 @@ function M.select_sessions()
           selected_line[1],
           false
         )
-        if lines and lines[1] then
+        if lines and lines[1] and lines[1] ~= "" then
           local tip = "Delete session: "
             .. (vim.fn.strchars(lines[1]) > 20 and (vim.fn.strcharpart(
               lines[1],
@@ -272,6 +273,7 @@ function M.select_sessions()
     end
 
     M.rename_session = function()
+      local selected_line = vim.api.nvim_win_get_cursor(content_win)
       if selected_line then
         local lines = vim.api.nvim_buf_get_lines(
           content_buf,
@@ -279,7 +281,7 @@ function M.select_sessions()
           selected_line[1],
           false
         )
-        if lines and lines[1] then
+        if lines and lines[1] and lines[1] ~= "" then
           local success, name = session.rename_session(lines[1])
           if success then
             vim.api.nvim_buf_set_lines(

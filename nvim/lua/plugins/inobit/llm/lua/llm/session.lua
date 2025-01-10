@@ -275,7 +275,7 @@ end
 
 function M.create_session_picker_win(enter_callback, close_callback)
   local session_win = config.options.session_picker_win
-  local input_buf, input_win, content_buf, content_win, selected_line = win.create_select_picker(
+  local input_buf, input_win, content_buf, content_win = win.create_select_picker(
     session_win.width_percentage,
     session_win.input_height,
     session_win.content_height_percentage,
@@ -316,8 +316,7 @@ function M.create_session_picker_win(enter_callback, close_callback)
   M.input_win = input_win
   M.content_buf = content_buf
   M.content_win = content_win
-  M.selected_line = selected_line
 
-  return input_buf, input_win, content_buf, content_win, selected_line
+  return input_buf, input_win, content_buf, content_win
 end
 return M
