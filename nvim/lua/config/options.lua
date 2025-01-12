@@ -15,6 +15,9 @@ end
 -- ai cmp
 vim.g.ai_cmp = true
 
+-- custom filetype
+vim.g.inobit_filetype = "inobit"
+
 -- :h hidden 允许隐藏buffer(toggleterm plugin)
 vim.opt.hidden = true
 

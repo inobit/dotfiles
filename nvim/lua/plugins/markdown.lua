@@ -23,5 +23,5 @@ return {
       comment = { conceal = false },
     },
   },
-  ft = { "markdown", "norg", "rmd", "org" },
+  ft = { "markdown", "norg", "rmd", "org", vim.g.inobit_filetype },
 }

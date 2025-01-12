@@ -191,6 +191,18 @@ function M.create_chat_win(server, enter_handler, callback)
     "input"
   )
 
+  -- set filetype
+  vim.api.nvim_set_option_value(
+    "filetype",
+    vim.g.inobit_filetype,
+    { buf = input_buf }
+  )
+  vim.api.nvim_set_option_value(
+    "filetype",
+    vim.g.inobit_filetype,
+    { buf = response_buf }
+  )
+
   -- push win stack
   floating_win_stack[input_win] = cur_win
   floating_win_stack[response_win] = cur_win
@@ -300,6 +312,18 @@ function M.create_select_picker(
     left,
     winblend,
     title
+  )
+
+  -- set filetype
+  vim.api.nvim_set_option_value(
+    "filetype",
+    vim.g.inobit_filetype,
+    { buf = input_buf }
+  )
+  vim.api.nvim_set_option_value(
+    "filetype",
+    vim.g.inobit_filetype,
+    { buf = content_buf }
   )
 
   -- push win stack

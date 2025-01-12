@@ -157,7 +157,7 @@ return { -- Autocompletion
       }),
     })
     -- 针对md help文件只使用path buffer
-    cmp.setup.filetype({ "markdown", "help" }, {
+    cmp.setup.filetype({ "markdown", "help", vim.g.inobit_filetype }, {
       sources = {
         { name = "path" },
         { name = "buffer" },
