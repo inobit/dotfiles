@@ -31,33 +31,20 @@ end
 
 local function get_next_float(wins)
   local cur_win = vim.api.nvim_get_current_win()
-  local cur_index = nil
-  for index, win in ipairs(wins) do
-    if win == cur_win then
-      cur_index = index
-      break
-    end
-  end
-  if not cur_index or cur_index + 1 > #wins then
-    return wins[1]
-  else
-    return wins[cur_index + 1]
-  end
+  local it = vim.iter(wins)
+  it:find(cur_win)
+  return it:next() or wins[1]
 end
 
 local function get_prev_float(wins)
   local cur_win = vim.api.nvim_get_current_win()
-  local cur_index = nil
-  for index, win in ipairs(wins) do
+  local iter = vim.iter(wins)
+  local prev_win = nil
+  for win in iter do
     if win == cur_win then
-      cur_index = index
-      break
+      return prev_win or wins[#wins]
     end
-  end
-  if not cur_index or cur_index - 1 == 0 then
-    return wins[#wins]
-  else
-    return wins[cur_index - 1]
+    prev_win = win
   end
 end
 

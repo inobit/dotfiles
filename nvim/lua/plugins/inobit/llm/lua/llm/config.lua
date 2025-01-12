@@ -46,20 +46,16 @@ end
 
 local function install_servers(servers)
   servers = servers or {}
-  local hash = {}
-  for _, item in ipairs(default_servers) do
-    hash[item.server] = item
-  end
+  local map = vim.iter(default_servers):fold({}, function(acc, v)
+    acc[v.server] = v
+    return acc
+  end)
 
-  for _, item in ipairs(servers) do
-    if hash[item.server] then
-      hash[item.server] =
-        vim.tbl_deep_extend("force", {}, hash[item.server], item)
-    else
-      hash[item.server] = item
-    end
-  end
-  return hash
+  vim.iter(servers):each(function(item)
+    map[item.server] =
+      vim.tbl_deep_extend("force", {}, map[item.server] or {}, item)
+  end)
+  return map
 end
 
 function M.install_win_cursor_move_keymap(mappings)
