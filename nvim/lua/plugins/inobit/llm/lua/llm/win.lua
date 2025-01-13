@@ -20,12 +20,12 @@ function M.create_floating_window(width, height, row, col, winblend, title)
     focusable = true,
   })
   vim.api.nvim_set_option_value("winblend", winblend, { win = win_id })
-  vim.cmd(
-    string.format(
-      "autocmd WinClosed <buffer> silent! execute 'bdelete! %s'",
-      bufnr
-    )
-  )
+  -- vim.cmd(
+  --   string.format(
+  --     "autocmd WinClosed <buffer> silent! execute 'bdelete! %s'",
+  --     bufnr
+  --   )
+  -- )
   return bufnr, win_id
 end
 
@@ -89,22 +89,36 @@ local function pop_win_stack(win)
   end
 end
 
-local function register_close_for_wins(wins, group_prefix, callback)
+local function delete_buf_in_win(win_id)
+  local bufnr = vim.api.nvim_win_get_buf(win_id)
+  pcall(vim.api.nvim_buf_delete, bufnr, { force = true })
+end
+
+local function register_close_for_wins(
+  wins,
+  group_prefix,
+  close_post,
+  close_prev
+)
   vim.api.nvim_create_augroup(group_prefix .. "AutoCloseWins", { clear = true })
   vim.api.nvim_create_autocmd("WinClosed", {
     group = group_prefix .. "AutoCloseWins",
     callback = function(args)
       local win = tonumber(args.match)
       if vim.tbl_contains(wins, win) then
+        if close_prev then
+          close_prev()
+        end
         for _, other_win in ipairs(wins) do
           pop_win_stack(other_win)
+          delete_buf_in_win(other_win)
           if other_win ~= win and vim.api.nvim_win_is_valid(other_win) then
             vim.api.nvim_win_close(other_win, true)
           end
         end
         pcall(vim.api.nvim_del_augroup_by_name, group_prefix .. "AutoCloseWins")
-        if callback then
-          callback()
+        if close_post then
+          close_post()
         end
       end
     end,
@@ -139,7 +153,7 @@ local function register_input_enter_handler(bufnr, enter_handler)
   end, { buffer = bufnr, noremap = true, silent = true })
 end
 
-function M.create_chat_win(server, enter_handler, callback)
+function M.create_chat_win(server, enter_handler, close_prev, close_post)
   -- record where from
   local cur_win = vim.api.nvim_get_current_win()
 
@@ -206,7 +220,12 @@ function M.create_chat_win(server, enter_handler, callback)
 
   register_content_change(response_buf, response_win)
   register_auto_skip_when_insert(response_buf, input_win)
-  register_close_for_wins({ input_win, response_win }, server, callback)
+  register_close_for_wins(
+    { input_win, response_win },
+    server,
+    close_post,
+    close_prev
+  )
   register_input_enter_handler(input_buf, enter_handler)
 
   return response_buf,
@@ -266,7 +285,7 @@ function M.create_select_picker(
   title,
   data_filter_wraper,
   enter_handler,
-  close_callback
+  close_post
 )
   -- record where from
   local cur_win = vim.api.nvim_get_current_win()
@@ -323,7 +342,7 @@ function M.create_select_picker(
   -- load data
   local data_filter = data_filter_wraper()
 
-  register_close_for_wins({ input_win, content_win }, title, close_callback)
+  register_close_for_wins({ input_win, content_win }, title, close_post)
   register_picker_line_move(input_buf, content_buf, content_win)
   register_content_change(content_buf, content_win)
 
