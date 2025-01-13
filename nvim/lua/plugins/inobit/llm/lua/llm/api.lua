@@ -7,6 +7,7 @@ local config = require "llm.config"
 local session = require "llm.session"
 local servers = require "llm.servers"
 local win = require "llm.win"
+local hl = require "llm.highlights"
 
 local active_job = nil
 local server_role = nil
@@ -118,20 +119,30 @@ local function handle_input()
     return
   end
 
+  -- add user prompt
+  input_lines[1] = config.options.user_prompt .. " " .. input_lines[1]
+
   -- clear input
   vim.api.nvim_buf_set_lines(M.input_buf, 0, -1, false, {})
+
+  local count
 
   -- write to response_buf
   if
     vim.api.nvim_buf_line_count(M.response_buf) == 1
     and vim.api.nvim_buf_get_lines(M.response_buf, 0, 1, false)[1] == ""
   then
+    count = 0
     vim.api.nvim_buf_set_lines(M.response_buf, 0, -1, false, input_lines)
   else
+    count = vim.api.nvim_buf_line_count(M.response_buf)
     vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, input_lines)
   end
 
-  vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, { "" })
+  -- set question highlight
+  hl.set_lines_highlights(M.response_buf, count, count + #input_lines)
+
+  vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, { "", "" })
   util.scroll_to_end(M.response_win, M.response_buf)
   -- send to LLM
   local message =

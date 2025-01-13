@@ -18,13 +18,15 @@ function M.defaults()
   return {
     servers = {},
     default_server = SERVERS.DEEP_SEEK,
-    loading_mark = "...",
+    loading_mark = "**Generating response ...**",
+    user_prompt = "❯",
+    question_hi = { fg = "#1abc9c" },
     base_config_dir = vim.fn.stdpath "cache" .. "/inobit/llm",
     config_dir = "config",
     session_dir = "session",
     config_filename = "config.json",
     chat_win = {
-      width_percentage = 0.8,
+      width_percentage = 0.7,
       response_height_percentage = 0.7,
       input_height_percentage = 0.1,
       winblend = 5,

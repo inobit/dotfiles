@@ -6,6 +6,7 @@ local notify = require "llm.notify"
 local config = require "llm.config"
 local win = require "llm.win"
 local io = require "llm.io"
+local hl = require "llm.highlights"
 
 local session_name = nil
 -- current seesion
@@ -233,17 +234,29 @@ end
 
 function M.resume_session(bufnr)
   if bufnr and session and #session > 0 then
+    local server = servers.get_server_selected()
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
     local first = true
+    local count
     for _, item in ipairs(session) do
       local lines = vim.split(item.content, "\n")
+      if item.role == server.user_role then
+        lines[1] = config.options.user_prompt .. " " .. lines[1]
+      end
       if first then
         vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+        count = 0
         first = false
       else
+        count = vim.api.nvim_buf_line_count(bufnr)
         vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, lines)
       end
-      vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { "" })
+      vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { "", "" })
+
+      -- set question highlight
+      if item.role == server.user_role then
+        hl.set_lines_highlights(bufnr, count, count + #lines)
+      end
     end
   end
 end
