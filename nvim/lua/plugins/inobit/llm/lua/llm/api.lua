@@ -151,6 +151,7 @@ local function handle_input()
   session.write_request_to_session(message)
   -- send session
   if servers.get_server_selected().multi_round then
+    --TODO: max_tokens
     send_request(session.get_session())
   else
     -- send current input
