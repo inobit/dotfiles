@@ -170,7 +170,6 @@ end
 
 local function record_input()
   M.input_cache = vim.api.nvim_buf_get_lines(M.input_buf, 0, -1, false)
-  print(#M.input_cache)
 end
 -- submit input
 local function submit()
