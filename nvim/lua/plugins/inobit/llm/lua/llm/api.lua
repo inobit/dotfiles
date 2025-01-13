@@ -66,7 +66,7 @@ end
 -- 后置处理器
 local function handle_response_post()
   session.write_response_to_session(server_role, M.response_buf)
-  vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, { "" }) -- 添加空行
+  util.add_line_separator(M.response_buf)
   if M.register_enter_handler then
     M.register_enter_handler()
   end
@@ -142,7 +142,8 @@ local function handle_input()
   -- set question highlight
   hl.set_lines_highlights(M.response_buf, count, count + #input_lines)
 
-  vim.api.nvim_buf_set_lines(M.response_buf, -1, -1, false, { "", "" })
+  util.add_line_separator(M.response_buf)
+
   util.scroll_to_end(M.response_win, M.response_buf)
   -- send to LLM
   local message =

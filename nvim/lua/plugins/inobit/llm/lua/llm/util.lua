@@ -71,4 +71,8 @@ function M.debounce(ms, fn)
   end
 end
 
+function M.add_line_separator(bufnr)
+  vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { "", "" })
+end
+
 return M

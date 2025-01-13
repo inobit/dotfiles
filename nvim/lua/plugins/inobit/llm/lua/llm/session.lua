@@ -251,7 +251,7 @@ function M.resume_session(bufnr)
         count = vim.api.nvim_buf_line_count(bufnr)
         vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, lines)
       end
-      vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { "", "" })
+      util.add_line_separator(bufnr)
 
       -- set question highlight
       if item.role == server.user_role then
