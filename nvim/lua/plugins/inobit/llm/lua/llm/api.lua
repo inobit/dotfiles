@@ -162,10 +162,15 @@ local function clear_chat_win()
   M.response_win = nil
   M.input_buf = nil
   M.input_win = nil
+  -- get input
   M.clear = nil
   win.disable_auto_skip_when_insert()
 end
 
+local function record_input()
+  M.input_cache = vim.api.nvim_buf_get_lines(M.input_buf, 0, -1, false)
+  print(#M.input_cache)
+end
 -- submit input
 local function submit()
   if not M.input_buf or not M.response_buf then
@@ -189,13 +194,19 @@ function M.start_chat()
     win.create_chat_win(
       servers.get_server_selected().server,
       submit,
+      record_input,
       clear_chat_win
     )
   session.resume_session(M.response_buf)
   util.scroll_to_end(M.response_win, M.response_buf)
 
-  -- functions that depend on chat windows
   if M.input_buf then
+    -- resume cache
+    if M.input_cache and #M.input_cache > 0 then
+      vim.api.nvim_buf_set_lines(M.input_buf, 0, -1, false, M.input_cache)
+    end
+
+    -- functions that depend on chat windows
     M.clear = function()
       session.clear_session(false)
       vim.api.nvim_buf_set_lines(M.input_buf, 0, -1, false, {})
