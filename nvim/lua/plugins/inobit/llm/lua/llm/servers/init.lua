@@ -21,8 +21,13 @@ local function update_auth(server_name, key)
 end
 
 local function input_api_key(server_name)
-  local key =
-    vim.fn.inputsecret("Enter your " .. server_name .. " API Key: ", "")
+  local key = nil
+  vim.ui.input(
+    { prompt = "Enter your " .. server_name .. " API Key: " },
+    function(input)
+      key = input and tostring(input)
+    end
+  )
   if not util.empty_str(key) then
     return key
   end

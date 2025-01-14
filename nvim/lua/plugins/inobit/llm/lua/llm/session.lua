@@ -126,10 +126,18 @@ local function generate_session_name(default_name, new_session)
   local legal = false
   local err = nil
   while not legal do
-    name = vim.fn.input("Input session name: ", name or "")
+    vim.ui.input(
+      { prompt = "Input session name: ", default = name },
+      function(input)
+        name = input and tostring(input)
+      end
+    )
     -- OPTIM: not automatically wrap? bug?
     -- notify.info "\n"
-    if not util.empty_str(name) then
+    if not name then
+      -- ESC/C-c cancle
+      return nil
+    elseif not util.empty_str(name) then
       legal, err = check_session_name_char(name)
       if err then
         notify.error(err)
@@ -145,9 +153,6 @@ local function generate_session_name(default_name, new_session)
           return nil
         end
       end
-    elseif name == "" then
-      -- cancle
-      return nil
     else
       notify.warn "Empty input,auto generate."
       name = auto_generate_session_name(session)
