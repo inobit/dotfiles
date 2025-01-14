@@ -39,7 +39,7 @@ end
 
 function M.is_legal_char(char)
   if char:len() == 1 then
-    return string.match(char, "%w")
+    return string.match(char, "[%w-]")
   else
     local sequence = {}
     for i = 1, char:len() do
