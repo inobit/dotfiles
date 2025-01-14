@@ -323,12 +323,17 @@ function M.create_session_picker_win(enter_callback, close_callback)
     -- enter handler
     function(line, input_win, content_win)
       if line then
-        M.load_session(line)
         if vim.api.nvim_win_is_valid(input_win) then
           vim.api.nvim_win_close(input_win, true)
         end
         if vim.api.nvim_buf_is_valid(content_win) then
           vim.api.nvim_win_close(content_win, true)
+        end
+        if line ~= session_name then
+          if #session > 0 then
+            M.save_session()
+          end
+          M.load_session(line)
         end
         if enter_callback then
           enter_callback()
