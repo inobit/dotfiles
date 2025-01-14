@@ -2,6 +2,8 @@ local M = {}
 local config = require "llm.config"
 local util = require "llm.util"
 
+--TODO: refactor through metatable/prototype
+
 -- floating windows from-stack
 local floating_win_stack = {}
 
