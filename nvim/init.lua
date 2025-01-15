@@ -5,6 +5,7 @@ if not vim.g.vscode then
   require "config.filetype"
   require "config.plugin-manager"
   require "config.autocommands"
+  require "config.globals"
   require "config.neovide"
 else
   require "config.options"
