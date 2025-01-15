@@ -88,3 +88,5 @@ vim.keymap.set("c", "<A-b>", "<S-Left>")
 vim.keymap.set("c", "<A-f>", "<S-Right>")
 -- cmdline下粘贴,使用系统clip
 vim.keymap.set("c", "<C-q>", "<C-R>+")
+
+vim.keymap.set("n", "<leader><leader>x", "<Cmd>source %<CR>", { desc = "execute current file" })
