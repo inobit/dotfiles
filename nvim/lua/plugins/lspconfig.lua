@@ -6,6 +6,20 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPost", "BufWritePost", "BufNewFile" },
     dependencies = {
+      {
+        -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+        -- used for completion, annotations and signatures of Neovim apis
+        -- make sure to uninstall or disable neodev.nvim
+        "folke/lazydev.nvim",
+        ft = "lua", -- only load on lua files
+        opts = {
+          library = {
+            -- Load luvit types when the `vim.uv` word is found
+            { path = "luvit-meta/library", words = { "vim%.uv" } },
+          },
+        },
+      },
+      { "Bilal2453/luvit-meta", lazy = true },
       -- install LSPs and related tools to stdpath for neovim
       { "williamboman/mason.nvim", version = "^1.10.0" },
       -- 这个扩展可以快速调用lspconfig来配置lsp,相当于mason和lspconfig的桥梁
@@ -14,10 +28,6 @@ return {
       "WhoIsSethDaniel/mason-tool-installer.nvim",
       -- 显示进度条,通知等
       { "j-hui/fidget.nvim", opts = {} },
-      -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-      -- used for completion, annotations and signatures of Neovim apis
-      -- 增强Lua lsp,针对配置neovim写lua时
-      { "folke/neodev.nvim", opts = {} },
       {
         "nvimdev/lspsaga.nvim",
         config = function()
@@ -45,62 +55,29 @@ return {
           -- In this case, we create a function that lets us more easily define mappings specific
           -- for LSP related items. It sets the mode, buffer and description for us each time.
           local map = function(keys, func, desc)
-            vim.keymap.set(
-              "n",
-              keys,
-              func,
-              { buffer = event.buf, desc = "LSP: " .. desc }
-            )
+            vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
           end
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map(
-            "<leader>gd",
-            require("telescope.builtin").lsp_definitions,
-            "[G]oto [D]efinition"
-          )
+          map("<leader>gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
           map("gd", "<Cmd>Lspsaga peek_definition<CR>", "[G]oto [D]efinition")
           -- Find references for the word under your cursor.
-          map(
-            "gr",
-            require("telescope.builtin").lsp_references,
-            "[G]oto [R]eferences"
-          )
+          map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
           -- Jump to the implementation of the word under your cursor. Useful when your language has ways of declaring types without an actual implementation.
-          map(
-            "gI",
-            require("telescope.builtin").lsp_implementations,
-            "[G]oto [I]mplementation"
-          )
+          map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
-          map(
-            "<leader>gt",
-            require("telescope.builtin").lsp_type_definitions,
-            "[G]oto [T]ype Definition"
-          )
-          map(
-            "gt",
-            "<Cmd>Lspsaga peek_type_definition<CR>",
-            "[G]oto [T]ype [D]efinition"
-          )
+          map("<leader>gt", require("telescope.builtin").lsp_type_definitions, "[G]oto [T]ype Definition")
+          map("gt", "<Cmd>Lspsaga peek_type_definition<CR>", "[G]oto [T]ype [D]efinition")
           -- Fuzzy find all the symbols in your current document.
           --  Symbols are things like variables, functions, types, etc.
           map("<leader>gs", "<Cmd>Lspsaga outline<CR>", "[D]ocument [S]ymbols")
-          map(
-            "gs",
-            require("telescope.builtin").lsp_document_symbols,
-            "[D]ocument [S]ymbols"
-          )
+          map("gs", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
           -- Fuzzy find all the symbols in your current workspace
           --  Similar to document symbols, except searches over your whole project.
-          map(
-            "gS",
-            require("telescope.builtin").lsp_workspace_symbols,
-            "[W]orkspace [S]ymbols"
-          )
+          map("gS", require("telescope.builtin").lsp_workspace_symbols, "[W]orkspace [S]ymbols")
           -- quickfix
           map("gq", require("telescope.builtin").quickfix, "[Q]uickfix")
 
@@ -124,21 +101,9 @@ return {
           -- Diagnostic keymaps
           -- map("<leader>ej", vim.diagnostic.goto_next, "Go to next [D]iagnostic message")
           -- map("<leader>ek", vim.diagnostic.goto_prev, "Go to previous [D]iagnostic message")
-          map(
-            "]e",
-            "<Cmd>Lspsaga diagnostic_jump_next<CR>",
-            "Go to next [D]iagnostic message"
-          )
-          map(
-            "[e",
-            "<Cmd>Lspsaga diagnostic_jump_prev<CR>",
-            "Go to previous [D]iagnostic message"
-          )
-          map(
-            "<leader>es",
-            "<Cmd>Lspsaga show_cursor_diagnostics ++unfocus<CR>",
-            "Show diagnostic [E]rror messages"
-          )
+          map("]e", "<Cmd>Lspsaga diagnostic_jump_next<CR>", "Go to next [D]iagnostic message")
+          map("[e", "<Cmd>Lspsaga diagnostic_jump_prev<CR>", "Go to previous [D]iagnostic message")
+          map("<leader>es", "<Cmd>Lspsaga show_cursor_diagnostics ++unfocus<CR>", "Show diagnostic [E]rror messages")
           -- map("<leader>ew", "<Cmd>Lspsaga show_workspace_diagnostics<CR>", "show [W]orkspace diagnostics")
           -- map("<leader>eb", "<Cmd>Lspsaga show_buf_diagnostics<CR>", "show [B]uffer diagnostics")
           -- 设置diagnostics 格式和标记
@@ -154,22 +119,10 @@ return {
               end,
             },
           }
-          vim.fn.sign_define(
-            "DiagnosticSignError",
-            { text = "", texthl = "DiagnosticSignError" }
-          )
-          vim.fn.sign_define(
-            "DiagnosticSignWarn",
-            { text = "", texthl = "DiagnosticSignWarn" }
-          )
-          vim.fn.sign_define(
-            "DiagnosticSignInfo",
-            { text = "", texthl = "DiagnosticSignInfo" }
-          )
-          vim.fn.sign_define(
-            "DiagnosticSignHint",
-            { text = "", texthl = "DiagnosticSignHint" }
-          )
+          vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" })
+          vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
+          vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
+          vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
           --
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
@@ -177,9 +130,7 @@ return {
           --
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if
-            client and client.server_capabilities.documentHighlightProvider
-          then
+          if client and client.server_capabilities.documentHighlightProvider then
             vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
               buffer = event.buf,
               callback = vim.lsp.buf.document_highlight,
@@ -203,11 +154,7 @@ return {
         lineFoldingOnly = true,
       }
       -- 这里扩展了一个cmp_nvim_lsp的能力,告诉lsp server,当前客户端支持这个能力(实现了某些接口),这样服务端响应时就会携带对应的信息了,服务端是根据客户端的能力来响应的
-      capabilities = vim.tbl_deep_extend(
-        "force",
-        capabilities,
-        require("cmp_nvim_lsp").default_capabilities()
-      )
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -271,12 +218,7 @@ return {
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend(
-              "force",
-              {},
-              capabilities,
-              server.capabilities or {}
-            )
+            server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
             -- 配置lsp
             require("lspconfig")[server_name].setup(server)
           end,

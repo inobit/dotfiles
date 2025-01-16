@@ -39,22 +39,21 @@ return { -- Autocompletion
     local has_words_before = function()
       unpack = unpack or table.unpack
       local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-      return col ~= 0
-        and vim.api
-            .nvim_buf_get_lines(0, line - 1, line, true)[1]
-            :sub(col, col)
-            :match "%s"
-          == nil
+      return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
     end
     -- 构建sources
     local sources = {
+      {
+        name = "lazydev",
+        group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+      },
       { name = "nvim_lsp" },
       { name = "luasnip" },
       { name = "path" },
       { name = "buffer" },
     }
     if vim.g.ai_cmp then
-      table.insert(sources, 1, { name = "codeium" })
+      table.insert(sources, 2, { name = "codeium" })
     end
     -- 全局配置
     cmp.setup {
