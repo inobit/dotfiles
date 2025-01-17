@@ -40,6 +40,16 @@ return {
         vim.keymap.set("n", "[e", api.node.navigate.diagnostics.prev, opts "Prev Diagnostic")
         vim.keymap.set("n", "<leader>cd", api.tree.change_root_to_node, opts "CD")
         vim.keymap.set("n", "<leader>cp", api.tree.change_root_to_parent, opts "Up")
+
+        -- disable highlight group NvimTreeSpecialFile underline
+        local color = vim.api.nvim_get_hl(0, {
+          name = "NvimTreeSpecialFile",
+        })
+        color.underline = nil
+        if color.cterm.underline then
+          color.cterm.underline = nil
+        end
+        vim.api.nvim_set_hl(0, "NvimTreeSpecialFile", color --[[@as vim.api.keyset.highlight]])
       end,
       view = {
         signcolumn = "yes",
@@ -97,7 +107,7 @@ return {
           resize_window = true,
           -- 关闭pick window否则split/vsplit open会失败
           window_picker = {
-            enable = false,
+            enable = true,
           },
         },
         change_dir = {
