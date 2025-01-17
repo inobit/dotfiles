@@ -28,40 +28,19 @@ return {
       "WhoIsSethDaniel/mason-tool-installer.nvim",
       -- 显示进度条,通知等
       { "j-hui/fidget.nvim", opts = {} },
-      {
-        "nvimdev/lspsaga.nvim",
-        config = function()
-          require("lspsaga").setup {
-            symbol_in_winbar = {
-              show_file = false,
-              folder_level = 0,
-            },
-          }
-        end,
-        dependencies = {
-          "nvim-treesitter/nvim-treesitter", -- optional
-          "nvim-tree/nvim-web-devicons", -- optional
-        },
-      },
     },
     config = function()
-      -- 注册事件监听,但lsp server attach 时触发,主要进行一些映射
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("lspconfig", { clear = true }),
         callback = function(event)
-          -- NOTE: Remember that lua is a real programming language, and as such it is possible
-          -- to define small helper and utility functions so you don't have to repeat yourself
-          -- many times.
-          -- In this case, we create a function that lets us more easily define mappings specific
-          -- for LSP related items. It sets the mode, buffer and description for us each time.
-          local map = function(keys, func, desc)
-            vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+          local map = function(keys, func, desc, mode)
+            if mode == nil then
+              mode = "n"
+            end
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
           end
-          -- Jump to the definition of the word under your cursor.
-          --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map("<leader>gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
-          map("gd", "<Cmd>Lspsaga peek_definition<CR>", "[G]oto [D]efinition")
+          map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
           -- Find references for the word under your cursor.
           map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
           -- Jump to the implementation of the word under your cursor. Useful when your language has ways of declaring types without an actual implementation.
@@ -69,11 +48,9 @@ return {
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
-          map("<leader>gt", require("telescope.builtin").lsp_type_definitions, "[G]oto [T]ype Definition")
-          map("gt", "<Cmd>Lspsaga peek_type_definition<CR>", "[G]oto [T]ype [D]efinition")
+          map("gt", require("telescope.builtin").lsp_type_definitions, "[G]oto [T]ype Definition")
           -- Fuzzy find all the symbols in your current document.
           --  Symbols are things like variables, functions, types, etc.
-          map("<leader>gs", "<Cmd>Lspsaga outline<CR>", "[D]ocument [S]ymbols")
           map("gs", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
           -- Fuzzy find all the symbols in your current workspace
           --  Similar to document symbols, except searches over your whole project.
@@ -83,29 +60,29 @@ return {
 
           -- Rename the variable under your cursor
           --  Most Language Servers support renaming across files, etc.
-          map("<leader>rn", "<Cmd>Lspsaga rename<CR>", "[R]e[n]ame")
+          map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          -- map("ga", vim.lsp.buf.code_action, "[C]ode [A]ction")
-          map("ga", "<Cmd>Lspsaga code_action<CR>", "[C]ode [A]ction")
+          map("ga", vim.lsp.buf.code_action, "[C]ode [A]ction")
+          map("gA", function()
+            vim.lsp.buf.code_action {
+              apply = true,
+              context = {
+                only = { "source" },
+                diagnostics = {},
+              },
+            }
+          end, "[S]ource [A]ction")
           -- Opens a popup that displays documentation about the word under your cursor
-          --  See `:help K` for why this keymap
-          map("K", "<Cmd>Lspsaga hover_doc<Cr>", "Hover Documentation")
-          -- map("K", vim.lsp.buf.hover, "Hover Documentation")
+          map("K", vim.lsp.buf.hover, "Hover Documentation")
           map("<leader>K", vim.lsp.buf.signature_help, "Hover Signature")
-          -- WARN: This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header
+          map("<c-K>", vim.lsp.buf.signature_help, "Hover Signature", "i")
           map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 
           -- Diagnostic settings
           -- Diagnostic keymaps
-          -- map("<leader>ej", vim.diagnostic.goto_next, "Go to next [D]iagnostic message")
-          -- map("<leader>ek", vim.diagnostic.goto_prev, "Go to previous [D]iagnostic message")
-          map("]e", "<Cmd>Lspsaga diagnostic_jump_next<CR>", "Go to next [D]iagnostic message")
-          map("[e", "<Cmd>Lspsaga diagnostic_jump_prev<CR>", "Go to previous [D]iagnostic message")
-          map("<leader>es", "<Cmd>Lspsaga show_cursor_diagnostics ++unfocus<CR>", "Show diagnostic [E]rror messages")
-          -- map("<leader>ew", "<Cmd>Lspsaga show_workspace_diagnostics<CR>", "show [W]orkspace diagnostics")
-          -- map("<leader>eb", "<Cmd>Lspsaga show_buf_diagnostics<CR>", "show [B]uffer diagnostics")
+          map("]e", vim.diagnostic.goto_next, "Go to next [D]iagnostic message")
+          map("[e", vim.diagnostic.goto_prev, "Go to previous [D]iagnostic message")
           -- 设置diagnostics 格式和标记
           vim.diagnostic.config {
             virtual_text = {
@@ -229,14 +206,12 @@ return {
   {
     "ray-x/lsp_signature.nvim", -- signatures增强
     event = "VeryLazy",
+    cond = false,
     opts = {
-      floating_window = false, -- virtual hint enable
+      floating_window = true, -- virtual hint enable
       hint_prefix = " ",
       hint_scheme = "String",
       floating_window_above_cur_line = true,
     },
-    config = function(_, opts)
-      require("lsp_signature").setup(opts)
-    end,
   },
 }
