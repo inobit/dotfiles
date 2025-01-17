@@ -45,11 +45,13 @@ return {
         local color = vim.api.nvim_get_hl(0, {
           name = "NvimTreeSpecialFile",
         })
-        color.underline = nil
-        if color.cterm.underline then
-          color.cterm.underline = nil
+        if color then
+          color.underline = nil
+          if color.cterm and color.cterm.underline then
+            color.cterm.underline = nil
+          end
+          vim.api.nvim_set_hl(0, "NvimTreeSpecialFile", color --[[@as vim.api.keyset.highlight]])
         end
-        vim.api.nvim_set_hl(0, "NvimTreeSpecialFile", color --[[@as vim.api.keyset.highlight]])
       end,
       view = {
         signcolumn = "yes",
