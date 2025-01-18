@@ -90,3 +90,4 @@ vim.keymap.set("c", "<A-f>", "<S-Right>")
 vim.keymap.set("c", "<C-q>", "<C-R>+")
 
 vim.keymap.set("n", "<leader><leader>x", "<Cmd>source %<CR>", { desc = "execute current file" })
+vim.keymap.set("n", "<leader><leader>t", "<Cmd>PlenaryBustedFile %<CR>", { desc = "run test" })
