@@ -66,7 +66,7 @@ vim.keymap.set("n", "<leader>vp", "<C-w>v", { desc = "vertical split" })
 
 -- resize
 vim.keymap.set("n", "<C-Up>", "<Cmd>resize +2<CR>")
-vim.keymap.set("n", "<C-Down>", "<Cmd>resize -2<CR")
+vim.keymap.set("n", "<C-Down>", "<Cmd>resize -2<CR>")
 vim.keymap.set("n", "<C-Left>", "<Cmd>vertical resize -2<CR>")
 vim.keymap.set("n", "<C-Right>", "<Cmd>vertical resize +2<CR>")
 
