@@ -1,7 +1,7 @@
-local plugins_path = vim.fn.stdpath "config" .. "/lua/plugins/inobit"
 return {
   {
-    dir = plugins_path .. "/llm",
+    url = "https://gitee.com/inobit/llm.nvim.git",
+    dev = vim.g.llm_dev or false,
     dependencies = {
       "nvim-lua/plenary.nvim",
     },

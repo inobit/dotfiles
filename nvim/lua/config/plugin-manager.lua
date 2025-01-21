@@ -29,4 +29,5 @@ require("lazy").setup {
       lazy = "💤 ",
     },
   },
+  dev = { path = vim.g.local_plugins or "~/projects" },
 }
