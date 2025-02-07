@@ -18,6 +18,8 @@ return {
       { "<leader>mv", "<Cmd>LLM Servers<CR>", desc = "LLM: select server" },
       -- stylua: ignore end
     },
+    name = "inobit-llm.nvim",
+    main = "inobit/llm",
     opts = {},
   },
 }
