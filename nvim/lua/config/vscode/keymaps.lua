@@ -160,4 +160,7 @@ map({ "n", "x" }, "]b", function() vscode.action "editor.debug.action.goToPrevio
 map("n", "<leader>rr", function() vscode.action "code-runner.run" end, "vscode: code run")
 map("n", "<leader>rs", function() vscode.action "code-runner.stop" end, "vscode: code stop")
 
+-- translate
+map("x", "<leader><leader>e", function() vscode.action "extension.translateTextPreferred" end, "vscode: translate")
+
 -- stylua: ignore end
