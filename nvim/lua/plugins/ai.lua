@@ -11,7 +11,7 @@ return {
       virtual_text = {
         enabled = not vim.g.ai_cmp,
         key_bindings = {
-          accept = "<M-l>",
+          accept = "<M-a>",
           next = "<M-]>",
           prev = "<M-[>",
         },
@@ -31,29 +31,15 @@ return {
     },
   },
   {
-    "olimorris/codecompanion.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
+    "supermaven-inc/supermaven-nvim",
+    opts = {
+      keymaps = {
+        accept_suggestion = "<M-a>",
+        clear_suggestion = "<M-e>",
+        accept_word = "<M-l>",
+      },
+      -- ignore_filetypes = {},
+      disable_inline_completion = vim.g.ai_cmp,
     },
-    cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionCmd", "CodeCompanionActions" },
-    config = function()
-      require("codecompanion").setup {
-        adapters = {
-          deepseek = function()
-            return require("codecompanion.adapters").extend("deepseek", {
-              env = {
-                api_key = vim.g.deepseek_fim_api_key,
-              },
-            })
-          end,
-        },
-        strategies = {
-          chat = { adapter = "deepseek" },
-          inline = { adapter = "deepseek" },
-          agent = { adapter = "deepseek" },
-        },
-      }
-    end,
   },
 }
