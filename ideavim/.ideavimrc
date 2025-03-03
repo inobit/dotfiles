@@ -144,8 +144,8 @@ nmap <leader>rr <Action>(ChooseRunConfiguration)
 nmap <leader>rs <Action>(Stop)
 
 " datagrip
-nmap <leader>ex <Action>(Console.Jdbc.Execute)
-vmap <leader>ex <Action>(Console.Jdbc.Execute)
-nmap <leader>ep <Action>(Console.Jdbc.ExplainPlan)
-vmap <leader>ep <Action>(Console.Jdbc.ExplainPlan)
+nmap <leader>rx <Action>(Console.Jdbc.Execute)
+vmap <leader>rx <Action>(Console.Jdbc.Execute)
+nmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
+vmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
 
