@@ -34,8 +34,17 @@ map("v", "<", "<gv","vscode: left indent")
 map("v", ">", ">gv","vscode: right indent")
 
 -- wrap lines j k
-vim.keymap.set("n", "k", [[v:count == 0 ? 'gk' : 'k']], { expr = true, desc = "vscode: wrap lines k" })
-vim.keymap.set("n", "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true, desc = "vscode: wrap lines k" })
+local function moveCursor(direction)
+    if (vim.v.count == 0 and vim.fn.reg_recording() == '' and vim.fn.reg_executing() == '') then
+        return ('g' .. direction)
+    else
+        return direction
+    end
+end
+vim.keymap.set("n", "k", function () return moveCursor("k") end, { expr = true, remap=true, desc = "vscode: wrap lines k" })
+vim.keymap.set("n", "j", function () return moveCursor("j") end, { expr = true, remap=true, desc = "vscode: wrap lines j" })
+-- vim.keymap.set("n", "k", [[v:count == 0 ? 'gk' : 'k']], { expr = true, desc = "vscode: wrap lines k" })
+-- vim.keymap.set("n", "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true, desc = "vscode: wrap lines j" })
 
 -- lsp navigation
 map("n", "gr", function() vscode.action "editor.action.goToReferences" end, "vscode: go to references")
