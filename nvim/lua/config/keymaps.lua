@@ -87,3 +87,11 @@ vim.keymap.set("c", "<C-q>", "<C-R>+")
 
 vim.keymap.set("n", "<leader><leader>x", "<Cmd>source %<CR>", { desc = "execute current file" })
 vim.keymap.set("n", "<leader><leader>t", "<Cmd>PlenaryBustedFile %<CR>", { desc = "run test" })
+
+-- show messages
+vim.keymap.set("n", "<leader><leader>m", function()
+  local lines = vim.split(vim.fn.execute("messages", "silent"), "\n")
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  row = row - 1
+  vim.api.nvim_buf_set_text(0, row, col, row, col, lines)
+end, { desc = "show messages in current cursor" })
