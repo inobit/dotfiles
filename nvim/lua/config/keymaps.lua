@@ -14,9 +14,6 @@ vim.keymap.set("i", "jj", "<Esc>")
 vim.keymap.set("n", "<leader>w", "<Cmd>w<CR>", { desc = ":w" })
 vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { desc = ":q" })
 
--- new file
-vim.keymap.set("n", "<leader>af", "<Cmd>enew<CR>")
-
 -- use 0# register
 vim.keymap.set("n", "<leader>p", '"0p')
 vim.keymap.set("n", "<leader>P", '"0P')
@@ -70,7 +67,6 @@ vim.keymap.set("n", "<C-Down>", "<Cmd>resize -2<CR>")
 vim.keymap.set("n", "<C-Left>", "<Cmd>vertical resize -2<CR>")
 vim.keymap.set("n", "<C-Right>", "<Cmd>vertical resize +2<CR>")
 
-vim.keymap.set("n", "<leader>at", "<Cmd>tabnew<CR>", { desc = "new tab" })
 vim.keymap.set("n", "]T", "<Cmd>tabnext<CR>", { desc = "next tab" })
 vim.keymap.set("n", "[T", "<Cmd>tabprevious<CR>", { desc = "previous tab" })
 
