@@ -106,3 +106,6 @@ vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 
 vim.opt.jumpoptions = "view"
+
+-- views can only be fully collapsed with the global statusline
+vim.opt.laststatus = 3
