@@ -34,12 +34,12 @@ return {
         -- default mappings
         api.config.mappings.default_on_attach(bufnr)
         -- custom mappings
-        vim.keymap.set("n", "<leader>v", api.node.open.vertical, opts "Open: vertical Split")
-        vim.keymap.set("n", "<leader>s", api.node.open.horizontal, opts "Open: horizontal Split")
+        vim.keymap.set("n", "V", api.node.open.vertical, opts "Open: vertical Split")
+        vim.keymap.set("n", "S", api.node.open.horizontal, opts "Open: horizontal Split")
         vim.keymap.set("n", "]e", api.node.navigate.diagnostics.next, opts "Next Diagnostic")
         vim.keymap.set("n", "[e", api.node.navigate.diagnostics.prev, opts "Prev Diagnostic")
-        vim.keymap.set("n", "<leader>cd", api.tree.change_root_to_node, opts "CD")
-        vim.keymap.set("n", "<leader>cp", api.tree.change_root_to_parent, opts "Up")
+        vim.keymap.set("n", "<leader>t", api.tree.change_root_to_node, opts "Change cwd")
+        vim.keymap.set("n", "<leader>p", api.tree.change_root_to_parent, opts "Goto parent dir")
 
         -- disable highlight group NvimTreeSpecialFile underline
         local color = vim.api.nvim_get_hl(0, {

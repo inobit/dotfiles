@@ -19,6 +19,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     -- telescope扩展插件,用于neovim一些内置功能可以直接调用telescope picker,比如lua vim.lsp.buf.code_action()
     -- 本质上是使用vim.ui.select to telescope
     { "nvim-telescope/telescope-ui-select.nvim" },
+    { "nvim-telescope/telescope-file-browser.nvim" },
     -- Useful for getting pretty icons, but requires a Nerd Font.
     { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
   },
@@ -27,6 +28,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     --  - Insert mode: <c-/>
     --  - Normal mode: ?
     local actions = require "telescope.actions"
+    local fb_actions = require("telescope").extensions.file_browser.actions
     require("telescope").setup {
       -- You can put your default mappings / updates / etc. in here
       --  All the info you're looking for is in `:help telescope.setup()`
@@ -38,7 +40,6 @@ return { -- Fuzzy Finder (files, lsp, etc)
           -- i = { ['<c-enter>'] = 'to_fuzzy_refine' },
           n = {
             ["<leader>q"] = actions.close,
-            ["<space>"] = actions.toggle_selection,
           },
         },
       },
@@ -64,12 +65,30 @@ return { -- Fuzzy Finder (files, lsp, etc)
         ["ui-select"] = {
           require("telescope.themes").get_dropdown(),
         },
+        file_browser = {
+          theme = "ivy",
+          mappings = {
+            ["n"] = {
+              ["a"] = fb_actions.create,
+              c = false,
+              ["o"] = fb_actions.open_dir,
+              ["p"] = fb_actions.goto_parent_dir,
+              g = false,
+              ["~"] = fb_actions.goto_home_dir,
+              e = false,
+              ["<C-CR>"] = fb_actions.open,
+            },
+          },
+        },
       },
     }
     -- Enable telescope extensions, if they are installed
     pcall(require("telescope").load_extension, "fzf")
     -- telescope 接管ui-select,下拉选项
     pcall(require("telescope").load_extension, "ui-select")
+    -- file_browser
+    pcall(require("telescope").load_extension, "file_browser")
+
     -- See `:help telescope.builtin`
     -- stylua: ignore start
     local builtin = require "telescope.builtin"
@@ -77,20 +96,31 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "Telescope: Search Help" })
     vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "Telescope: Search Keymaps" })
     vim.keymap.set("n", "<leader>se", builtin.diagnostics, { desc = "Telescope: Search Diagnostics" })
+
+    vim.keymap.set( "n", "<leader>fd", "<Cmd>Telescope file_browser path=%:p:h select_buffer=true<CR>",
+      { desc = "Telescope: Search Files in current folder" }
+    )
+
     vim.keymap.set("n", "<leader>sd", function()
       builtin.find_files { hidden = true, cwd = require("telescope.utils").buffer_dir() }
-    end, { desc = "Telescope: Search Files in current folder" })
+    end, { desc = "telescope: search files in current folder" })
+
+    vim.keymap.set("n", "<leader>ff", function()
+      require("telescope").extensions.file_browser.file_browser()
+    end,{desc = "Telescope: Search Files in CWD" })
 
     local search_files = function(hidden)
       local opts = { hidden = hidden, no_ignore = hidden }
-      local cmd = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-      if vim.v.shell_error == 0 then
-        opts.cwd = cmd
-      end
+      -- local cmd = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+      -- if vim.v.shell_error == 0 then
+      --   opts.cwd = cmd
+      -- end
       builtin.find_files(opts)
     end
-    vim.keymap.set("n", "<leader>sf", function() search_files(false) end, {desc = "Telescope: Search Files" })
-    vim.keymap.set("n", "<leader>sF", function() search_files(true) end, { desc = "Telescope: Search Files(including hidden and ignored)" })
+    vim.keymap.set("n", "<leader>sf", function() search_files(false) end, {desc = "Telescope: Search Files in CWD" })
+    vim.keymap.set("n", "<leader>sF", function() search_files(true) end, { desc = "Telescope: Search Files(including hidden and ignored) in CWD" })
+
+    -- vim.keymap.set("n", "<leader>sf", builtin.find_files, {desc = "Telescope: Search Files in CWD" })
 
     vim.keymap.set("n", "<leader>sr", builtin.oldfiles, { desc = 'Telescope: Search Recent Files ("." for repeat)' })
     vim.keymap.set("n", "<leader>sb", builtin.buffers, { desc = "Telescope: Find existing buffers" })
