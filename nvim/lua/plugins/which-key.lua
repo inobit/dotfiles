@@ -6,6 +6,7 @@ return { -- Useful plugin to show you pending keybinds.
     spec = {
       {
         mode = { "n", "v" },
+        { "<leader>a", group = "avante" },
         { "<leader>b", group = "buffer" },
         { "<leader>c", group = "gitsigns" },
         { "<leader>d", group = "debug" },

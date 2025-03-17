@@ -65,19 +65,6 @@ return {
           modified_placement = "after",
           bookmarks_placement = "signcolumn",
           glyphs = {
-            default = "",
-            symlink = "",
-            modified = "●",
-            folder = {
-              arrow_closed = "",
-              arrow_open = "",
-              default = "",
-              open = "",
-              empty = "",
-              empty_open = "",
-              symlink = "",
-              symlink_open = "",
-            },
             git = {
               unstaged = "",
               staged = "✓",
