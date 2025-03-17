@@ -33,6 +33,17 @@ return {
     cmd = { "LLM", "TS" },
     name = "inobit-llm.nvim",
     main = "inobit/llm",
-    opts = {},
+    opts = {
+      servers = {
+        {
+          server = "Qwen",
+          base_url = "https://api.siliconflow.cn/v1",
+          model = "Qwen/Qwen2.5-Coder-7B-Instruct",
+          stream = true,
+          multi_round = true,
+          user_role = "user",
+        },
+      },
+    },
   },
 }
