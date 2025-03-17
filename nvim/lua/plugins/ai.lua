@@ -59,6 +59,11 @@ return {
       --- The below dependencies are optional,
       "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
     },
+    keys = {
+      { "<leader>ta", "<cmd>AvanteToggle<cr>", desc = "avante: toggle" },
+      { "<leader>fa", "<cmd>AvanteFocus<cr>", desc = "avante: focus" },
+      { "<leader>al", "<cmd>AvanteClear<cr>", desc = "avante: clear" },
+    },
     opts = {
       provider = "deepseek",
       vendors = {
@@ -67,6 +72,17 @@ return {
           api_key_name = "DEEPSEEK_API_KEY",
           endpoint = "https://api.siliconflow.cn/v1",
           model = "deepseek-ai/DeepSeek-R1",
+          temperature = 0.6,
+          max_tokens = 4096,
+        },
+        qwen = {
+          __inherited_from = "openai",
+          api_key_name = "DEEPSEEK_API_KEY", -- for free
+          endpoint = "https://api.siliconflow.cn/v1",
+          model = "Qwen/Qwen2.5-Coder-7B-Instruct",
+          temperature = 0.7,
+          max_tokens = 4096,
+          disable_tools = true,
         },
       },
     },
