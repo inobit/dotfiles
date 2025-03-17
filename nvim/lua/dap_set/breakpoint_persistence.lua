@@ -1,25 +1,27 @@
+local M = {}
 local breakpoints = require "dap.breakpoints"
-local filename = "breakpoints.json"
-local filedir = vim.fn.stdpath "data" .. "/dap/"
-local breakpoints_fp = filedir .. filename
+local Path = require "plenary.path"
 
+---@type Path
+local breakpoints_fp = Path:new(vim.fn.stdpath "data", "dap", "breakpoints.json")
+
+---@param file_path Path
 local function file_exist(file_path)
-  if vim.fn.isdirectory(filedir) ~= 1 then
-    vim.fn.mkdir(filedir, "p")
-  end
-  local f = io.open(file_path, "r")
+  vim.fn.mkdir(file_path:parent().filename, "p")
+  local f = io.open(file_path.filename, "r")
   return f ~= nil and io.close(f)
 end
 
-function _G.store_breakpoints(clear)
+function M.store_breakpoints(clear)
   local bps = {}
 
-  local load_bps_raw = file_exist(breakpoints_fp) and io.open(breakpoints_fp, "r"):read "*a"
+  local load_bps_raw = file_exist(breakpoints_fp) and io.open(breakpoints_fp.filename, "r"):read "*a"
   if load_bps_raw and string.len(load_bps_raw) ~= 0 then -- empty string causes an error when decoding json
     bps = vim.fn.json_decode(load_bps_raw)
   end
 
   if clear then
+    --TODO: session manage
     for _, bufrn in ipairs(vim.api.nvim_list_bufs()) do
       bps[vim.api.nvim_buf_get_name(bufrn)] = nil
     end
@@ -29,18 +31,18 @@ function _G.store_breakpoints(clear)
       bps[vim.api.nvim_buf_get_name(bufrn)] = breakpoints_by_buf[bufrn]
     end
   end
-  local fp = io.open(breakpoints_fp, "w")
+  local fp = io.open(breakpoints_fp.filename, "w")
   if fp ~= nil then
     fp:write(vim.fn.json_encode(bps))
     fp:close()
   end
 end
 
-function _G.load_breakpoints()
+function M.load_breakpoints()
   if not file_exist(breakpoints_fp) then
     return
   end
-  local content = io.open(breakpoints_fp, "r"):read "*a"
+  local content = io.open(breakpoints_fp.filename, "r"):read "*a"
   if string.len(content) == 0 then
     return
   end
@@ -61,11 +63,13 @@ function _G.load_breakpoints()
   end
 end
 
-function _G.toggle_breakpoints()
+function M.toggle_breakpoints()
   if not vim.tbl_isempty(breakpoints.get()) then
-    store_breakpoints(false)
+    M.store_breakpoints(false)
     require("dap").clear_breakpoints()
   else
-    load_breakpoints()
+    M.load_breakpoints()
   end
 end
+
+return M

@@ -1,10 +1,10 @@
 local dap_python = require "dap-python"
 local dap = require "dap"
 
-vim.keymap.set("n", "<leader>dpt", function()
+vim.keymap.set("n", "<leader>dtm", function()
   require("dap-python").test_method()
 end, { noremap = true, silent = true, desc = "Debug python method test" })
-vim.keymap.set("n", "<leader>dpc", function()
+vim.keymap.set("n", "<leader>dtc", function()
   require("dap-python").test_class()
 end, { noremap = true, silent = true, desc = "Debug python class test" })
 

@@ -1,10 +1,35 @@
 return {
-  "rcarriga/nvim-dap-ui",
-  keys = { "<leader>rr", "<leader>db", "<leader>B" },
+  "mfussenegger/nvim-dap",
+  keys = {
+    -- stylua: ignore start
+    { "<leader>dr", function() require("dap").continue() end, desc = "Debug: run", },
+    { "<leader>ds", function() require("dap").terminate() end, desc = "Debug: stop", },
+    { "<leader>dS",
+      function()
+        require("dap").disconnect({ restart = false, terminateDebuggee = nil }, function()
+          require("dap").close()
+        end)
+      end,
+      desc = "Debug: disconnect ",
+    },
+    { "<F7>", function() require("dap").step_into { askForTargets = true } end, desc = "Debug: step into", },
+    { "<F8>", function() require("dap").step_over() end, desc = "Debug: step over", },
+    { vim.fn.has "win32" == 1 and "<S-F8>" or "<S-F8>", function() require("dap").step_out() end, desc = "Debug: step out", },
+    { "<F9>", function() require("dap").continue() end, desc = "Debug: continue" },
+    { "<leader>dh", function() require("dap").run_to_cursor() end, desc = "Debug: run to cursor", },
+    { "<leader>dl", function() require("dap").run_last() end, desc = "Debug: run last", },
+    { "<leader>dw", function() require("dap.ui.widgets").hover() end, desc = "Debug: widgets", },
+    { "<Leader>dE", function() require("dap").repl.toggle() end, desc = "Debug: toggle repl", },
+    { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "Debug: toggle breakpoint", },
+    { "<leader>do", function() require("dap").set_breakpoint(nil, nil, vim.fn.input "Log point message: ") end, desc = "Debug: set log breakpoint", },
+    { "<leader>dc", function() require("dap").set_breakpoint(vim.fn.input "Condition: ", nil, nil) end, desc = "Debug: set condition breakpoint", },
+    -- stylua: ignore end
+  },
   dependencies = {
-    "mfussenegger/nvim-dap",
+    "nvim-lua/plenary.nvim",
+    "rcarriga/nvim-dap-ui",
     "nvim-neotest/nvim-nio",
-    "theHamsta/nvim-dap-virtual-text",
+    { "theHamsta/nvim-dap-virtual-text", opts = {} },
     "mfussenegger/nvim-dap-python",
     {
       "mxsdev/nvim-dap-vscode-js",
@@ -19,7 +44,7 @@ return {
     -- dap client -launch/attach-> adapter(debugger) -launch/attach-> debuggee
     local dap, dapui = require "dap", require "dapui"
     -- load persistence module
-    require "dap_set.breakpoint_persistence"
+    local persistence = require "dap_set.breakpoint_persistence"
     -- load run module
     require "dap_set.run"
 
@@ -40,87 +65,19 @@ return {
     -- show the debug console
     dap.defaults.fallback.console = "internalConsole"
 
-    -- debug keymap
-    function opts(desc)
-      return { desc = desc, noremap = true, silent = true }
-    end
-
-    local js_based_languages = require "lib.js_based_languages"
-    -- 启动时,根据filetype去dap.configurations中选择debuggee配置(类似launch.json),然后根据配置的type去dap.adapters下找对应的adapter配置
-    vim.keymap.set("n", "<leader>dr", function()
-      -- 将launch.json中的配置写入 dap.configurations,相同filetype且配置name(注意是name)相同则会覆盖已有的配置
-      if vim.fn.filereadable ".vscode/launch.json" then
-        local dap_vscode = require "dap.ext.vscode"
-        if vim.bo.filetype == "python" then
-          dap_vscode.load_launchjs(nil, {
-            ["python"] = { "python" },
-          })
-        elseif vim.tbl_contains(js_based_languages, vim.bo.filetype) then
-          dap_vscode.load_launchjs(nil, {
-            -- js常用的adapters type
-            ["pwa-node"] = js_based_languages,
-            ["chrome"] = js_based_languages,
-            ["pwa-chrome"] = js_based_languages,
-          })
-        elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
-          dap_vscode.load_launchjs(nil, { codelldb = { "c", "cpp" } })
-        end
-      end
-      dap.continue()
-    end, opts "Debug run")
-
-    -- stylua: ignore start
-    vim.keymap.set("n", "<leader>ds", function() dap.terminate() end, opts "Debug stop")
-    vim.keymap.set("n", "<leader>dS", function()
-      dap.disconnect({ restart = false, terminateDebuggee = nil }, function()
-        dap.close()
-      end)
-    end, opts "Debug disconnect ")
-    vim.keymap.set("n", "<F7>", function() dap.step_into { askForTargets = true } end, opts "Debug step into")
-    vim.keymap.set("n", "<F8>", function() dap.step_over() end, opts "Debug step over")
-    vim.keymap.set("n", vim.fn.has "win32" == 1 and "<S-F8>" or "<S-F8>", function() dap.step_out() end, opts "Debug step out")
-    vim.keymap.set("n", "<F9>", function() dap.continue() end, opts "Debug continue")
-    vim.keymap.set("n", "<leader>dh", function() dap.run_to_cursor() end, opts "Debug run to cursor")
-    vim.keymap.set("n", "<leader>db", function() dap.toggle_breakpoint() end, opts "Debug toggle breakpoint")
-    vim.keymap.set("n", "<leader>B", function() toggle_breakpoints() end, opts "Debug toggle breakpoints")
-    vim.keymap.set("n", "<leader>dl", function() load_breakpoints() end, opts "Debug load breakpoints")
-    vim.keymap.set("n", "<leader>dp", function() store_breakpoints(false)   end, opts "Debug store breakpoints")
-    vim.keymap.set("n", "<leader>dP", function() store_breakpoints(true)   end, opts "Debug clear persistence  breakpoints")
-    vim.keymap.set("n", "<leader>do", function() dap.set_breakpoint(nil, nil, vim.fn.input "Log point message: ") end, opts "Debug set log breakpoint")
-    vim.keymap.set("n", "<leader>dc", function() dap.set_breakpoint(vim.fn.input "Condition: ", nil, nil) end, opts "Debug set condition breakpoint")
-    vim.keymap.set("n", "<leader>td", function() dapui.toggle() end, opts "Debug toggle dapui")
-    vim.keymap.set({ "n", "x" }, "<leader>de", function() dapui.eval() end, opts "Debug eval expression")
-    -- stylua: ignore start
-
     -- dapui setup
-    ---@diagnostic disable-next-line: missing-fields
-    dapui.setup {
-      controls = {
-        -- display controls in this element
-        element = "repl",
-        enabled = true,
-        icons = {
-          disconnect = "",
-          pause = "",
-          play = "",
-          run_last = "",
-          step_back = "",
-          step_into = "",
-          step_out = "",
-          step_over = "",
-          terminate = "",
-        },
-      },
-      mappings = {
-        edit = "e",
-        expand = { "<CR>", "<2-LeftMouse>" },
-        open = "o",
-        remove = "d",
-        repl = "r",
-        toggle = "t",
-      },
-    }
+    require("dapui").setup()
 
+    -- stylua: ignore start
+    vim.keymap.set("n", "<leader>B", function() persistence.toggle_breakpoints() end, { desc = "Debug: toggle breakpoints" })
+    vim.keymap.set("n", "<leader>dpl", function() persistence.load_breakpoints() end, { desc = "Debug: load breakpoints" })
+    vim.keymap.set("n", "<leader>dps", function() persistence.store_breakpoints(false) end, { desc = "Debug: store breakpoints" })
+    vim.keymap.set("n", "<leader>dpc", function() persistence.store_breakpoints(true) end, { desc = "Debug: clear persistence  breakpoints" })
+    vim.keymap.set("n", "<leader>td", function() require("dapui").toggle() end, { desc = "Debug: toggle dapui" })
+    vim.keymap.set({ "n", "v" }, "<leader>de", function() require("dapui").eval() end, { desc = "Debug: eval" })
+    -- stylua: ignore end
+
+    -- open and close dapui windows automatically
     dap.listeners.before.attach.dapui_config = function()
       dapui.open()
     end
@@ -133,8 +90,13 @@ return {
     dap.listeners.before.event_exited.dapui_config = function()
       dapui.close()
     end
-    -- virtual text setup
-    require("nvim-dap-virtual-text").setup {}
+
+    -- setup dap config by VsCode launch.json file
+    local json = require "plenary.json"
+    ---@diagnostic disable-next-line: duplicate-set-field
+    require("dap.ext.vscode").json_decode = function(str)
+      return vim.json.decode(json.json_strip_comments(str))
+    end
 
     -- adapter and debugee config
     -- python config. need VIRTUAL_ENV
@@ -142,7 +104,7 @@ return {
       require "dap_set.python"
     elseif
       -- js config
-      vim.tbl_contains(js_based_languages, vim.bo.filetype)
+      vim.tbl_contains(require "lib.js_based_languages", vim.bo.filetype)
     then
       require "dap_set.js"
     elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
