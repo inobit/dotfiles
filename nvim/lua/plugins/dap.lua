@@ -1,8 +1,27 @@
 return {
   "mfussenegger/nvim-dap",
   keys = {
+    {
+      "<leader>dr",
+      function()
+        -- adapter and debugee config
+        -- python config. need VIRTUAL_ENV
+        if vim.bo.filetype == "python" then
+          require "dap_set.python"
+        elseif
+          -- js config
+          vim.tbl_contains(require "lib.js_based_languages", vim.bo.filetype)
+        then
+          require "dap_set.js"
+        elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
+          require "dap_set.cpp"
+        end
+        -- run debug
+        require("dap").continue()
+      end,
+      desc = "Debug: run",
+    },
     -- stylua: ignore start
-    { "<leader>dr", function() require("dap").continue() end, desc = "Debug: run", },
     { "<leader>ds", function() require("dap").terminate() end, desc = "Debug: stop", },
     { "<leader>dS",
       function()
@@ -46,7 +65,7 @@ return {
     -- load persistence module
     local persistence = require "dap_set.breakpoint_persistence"
     -- load run module
-    require "dap_set.run"
+    -- require "dap_set.run"
 
     -- setup sign color
     vim.api.nvim_set_hl(0, "DapBreakpoint", { ctermbg = 0, fg = "#e51401" })
@@ -68,6 +87,27 @@ return {
     -- dapui setup
     require("dapui").setup()
 
+    -- dapui keymap
+    local windows = {
+      { "v", "1<C-W>w", "Scopes" },
+      { "b", "2<C-W>w", "Breakpoints" },
+      { "s", "3<C-W>w", "Stacks" },
+      { "w", "4<C-W>w", "Watches" },
+      { "h", "5<C-W>w", "App" },
+      { "r", "6<C-W>w", "REPL" },
+      { "c", "7<C-W>w", "Console" },
+    }
+    local function register_windows_navigation()
+      vim.iter(windows):each(function(win)
+        vim.keymap.set("n", "<leader><leader>" .. win[1], win[2], { desc = "Debug: goto " .. win[3] })
+      end)
+    end
+    local function unset_windows_navigation()
+      vim.iter(windows):each(function(win)
+        pcall(vim.keymap.del, "n", "<leader><leader>" .. win[1])
+      end)
+    end
+
     -- stylua: ignore start
     vim.keymap.set("n", "<leader>B", function() persistence.toggle_breakpoints() end, { desc = "Debug: toggle breakpoints" })
     vim.keymap.set("n", "<leader>dpl", function() persistence.load_breakpoints() end, { desc = "Debug: load breakpoints" })
@@ -79,15 +119,19 @@ return {
 
     -- open and close dapui windows automatically
     dap.listeners.before.attach.dapui_config = function()
+      register_windows_navigation()
       dapui.open()
     end
     dap.listeners.before.launch.dapui_config = function()
+      register_windows_navigation()
       dapui.open()
     end
     dap.listeners.before.event_terminated.dapui_config = function()
+      unset_windows_navigation()
       dapui.close()
     end
     dap.listeners.before.event_exited.dapui_config = function()
+      unset_windows_navigation()
       dapui.close()
     end
 
@@ -96,19 +140,6 @@ return {
     ---@diagnostic disable-next-line: duplicate-set-field
     require("dap.ext.vscode").json_decode = function(str)
       return vim.json.decode(json.json_strip_comments(str))
-    end
-
-    -- adapter and debugee config
-    -- python config. need VIRTUAL_ENV
-    if vim.bo.filetype == "python" then
-      require "dap_set.python"
-    elseif
-      -- js config
-      vim.tbl_contains(require "lib.js_based_languages", vim.bo.filetype)
-    then
-      require "dap_set.js"
-    elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
-      require "dap_set.cpp"
     end
   end,
 }
