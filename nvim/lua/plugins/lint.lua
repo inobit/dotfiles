@@ -144,6 +144,8 @@ return {
         return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
       end, names)
 
+      -- use for lualine
+      vim.g.lint_names = names
       -- Run linters.
       if #names > 0 then
         lint.try_lint(names)
