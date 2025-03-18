@@ -2,12 +2,7 @@ local function cc(command)
   local file = vim.api.nvim_buf_get_name(0)
   local _, _, basename, _ = string.find(file, "^(.*)%.%a+$")
   local output_filename = basename .. ".out"
-  return string.format(
-    command .. " %s -o %s && %s",
-    file,
-    output_filename,
-    output_filename
-  )
+  return string.format(command .. " %s -o %s && %s", file, output_filename, output_filename)
 end
 
 local commands = {
@@ -23,9 +18,7 @@ local commands = {
 }
 
 local function run(target_pane, command)
-  vim.cmd(
-    "silent! !tmux send -t " .. target_pane .. " '" .. command .. "' Enter"
-  )
+  vim.cmd("silent! !tmux send -t " .. target_pane .. " '" .. command .. "' Enter")
 end
 
 vim.keymap.set("n", "<leader>rr", function()

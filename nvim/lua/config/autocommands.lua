@@ -32,8 +32,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
     if
       layout[1] == "leaf"
       and layout[3] == nil
-      and vim.api.nvim_get_option_value("filetype", { buf = vim.api.nvim_win_get_buf(layout[2]) })
-        == "NvimTree"
+      and vim.api.nvim_get_option_value("filetype", { buf = vim.api.nvim_win_get_buf(layout[2]) }) == "NvimTree"
     then
       -- 提示保存
       vim.cmd "confirm quit"
@@ -96,6 +95,15 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = { "json", "json5", "jsonc", "markdown" },
   callback = function()
     vim.opt.conceallevel = 0
+  end,
+})
+
+-- auto load run module
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("run", { clear = true }),
+  pattern = { "python", "c", "cpp", "javascript" },
+  callback = function()
+    require "dap_set.run"
   end,
 })
 
