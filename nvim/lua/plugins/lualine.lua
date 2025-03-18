@@ -14,18 +14,13 @@ return {
     end
   end,
   config = function()
-    local function get_formatter()
-      local status, conform = pcall(require, "conform")
-      if status then
-        local formatter = conform.list_formatters(0)
-        if not vim.tbl_isempty(formatter) then
-          return formatter[1].name
-        end
-      end
-      return "None"
-    end
     require("lualine").setup {
       icons_enabled = true,
+      options = {
+        refresh = {
+          statusline = 300,
+        },
+      },
       sections = {
         lualine_b = {
           "branch",
@@ -40,11 +35,10 @@ return {
           -- stylua: ignore start
           {
             function() return "  " .. require("dap").status() end,
-            cond = function()
-              local status, dap = pcall(require, "dap")
-              return status and dap.status() ~= ""
+            cond = function() return package.loaded["dap"] and require("dap").status() ~= "" end,
+            color = function()
+              return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Debug", link = false }).fg) }
             end,
-            color = "Debug",
           },
           {
             function()
@@ -57,19 +51,24 @@ return {
             end,
           },
           {
-            get_formatter,
-            icon = {
-              "󰉠",
-              color = function()
-                return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Special", link = false }).fg) }
-              end,
-            },
+            function()
+              local formatters = require("conform").list_formatters()
+              local status = "None"
+              if #formatters > 0 then
+                status = table.concat(vim.iter(require("conform").list_formatters()):map(function(f) return f.name end):totable(), ", ")
+              end
+              return "󰉠 " .. status
+            end,
+            cond = function() return package.loaded["conform"] ~= nil end,
+            color = function()
+              return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Special", link = false }).fg) }
+            end,
           },
+          -- stylua: ignore end
           "encoding",
           "fileformat",
           "filetype",
         },
-        -- stylua: ignore end
       },
       extensions = { "quickfix", "nvim-tree", "toggleterm", "nvim-dap-ui", "mason", "lazy" },
     }
