@@ -38,7 +38,7 @@ return {
     { "<leader>dh", function() require("dap").run_to_cursor() end, desc = "Debug: run to cursor", },
     { "<leader>dl", function() require("dap").run_last() end, desc = "Debug: run last", },
     { "<leader>dw", function() require("dap.ui.widgets").hover() end, desc = "Debug: widgets", },
-    { "<Leader>dE", function() require("dap").repl.toggle() end, desc = "Debug: toggle repl", },
+    { "<leader>dE", function() require("dap").repl.toggle() end, desc = "Debug: toggle repl", },
     { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "Debug: toggle breakpoint", },
     { "<leader>do", function() require("dap").set_breakpoint(nil, nil, vim.fn.input "Log point message: ") end, desc = "Debug: set log breakpoint", },
     { "<leader>dc", function() require("dap").set_breakpoint(vim.fn.input "Condition: ", nil, nil) end, desc = "Debug: set condition breakpoint", },
@@ -85,7 +85,18 @@ return {
     dap.defaults.fallback.console = "internalConsole"
 
     -- dapui setup
-    require("dapui").setup()
+    ---@diagnostic disable-next-line: missing-fields
+    require("dapui").setup {
+      mappings = {
+        edit = "e",
+        expand = { "<CR>", "<2-LeftMouse>" },
+        open = "o",
+        remove = "d",
+        repl = "r",
+        --BUG: default is "t",but not work
+        toggle = "s",
+      },
+    }
 
     -- dapui keymap
     local windows = {
@@ -115,6 +126,8 @@ return {
     vim.keymap.set("n", "<leader>dpc", function() persistence.store_breakpoints(true) end, { desc = "Debug: clear persistence  breakpoints" })
     vim.keymap.set("n", "<leader>td", function() require("dapui").toggle() end, { desc = "Debug: toggle dapui" })
     vim.keymap.set({ "n", "v" }, "<leader>de", function() require("dapui").eval() end, { desc = "Debug: eval" })
+    vim.keymap.set({ "n", "v" }, "<leader>da", function() require("dapui").elements.watches.add() end, { desc = "Debug: add to watch" })
+    vim.keymap.set({ "n", "v" }, "<leader>dd", function() require("dapui").elements.watches.remove() end, { desc = "Debug: remove from watch" })
     -- stylua: ignore end
 
     -- open and close dapui windows automatically
