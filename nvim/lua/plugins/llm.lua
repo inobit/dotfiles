@@ -44,7 +44,7 @@ return {
       servers = {
         {
           server = "Qwen-SiliconFlow",
-          base_url = "https://api.siliconflow.cn/v1",
+          base_url = "https://api.siliconflow.cn/v1/chat/completions",
           model = "Qwen/Qwen2.5-Coder-7B-Instruct",
           stream = true,
           multi_round = true,
