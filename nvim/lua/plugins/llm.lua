@@ -18,22 +18,16 @@ return {
       { "<leader>mr", "<Cmd>LLM Rename<CR>", desc = "LLM: rename session" },
       { "<leader>mv", "<Cmd>LLM Servers<CR>", desc = "LLM: select server" },
       {
-        "<leader>tsz", function() require("inobit.llm.translate").translate_and_repalce "E2Z" end, mode = { "n", "v" }, desc = "LLM: translate and replace to ZH",
+        "<leader>ts", function() require("inobit.llm.translate").translate_in_buffer(true)  end, mode = { "n", "v" }, desc = "LLM: translate and replace",
       },
       {
-        "<leader>tse", function() require("inobit.llm.translate").translate_and_repalce "Z2E" end, mode = { "n", "v" }, desc = "LLM: translate and replace to EN",
+        "<leader>tc", function() require("inobit.llm.translate").translate_in_buffer(true, "Z2E_CAMEL") end, mode = { "n", "v" }, desc = "LLM: translate to VAR_CAMEL",
       },
       {
-        "<leader>tsc", function() require("inobit.llm.translate").translate_and_repalce "Z2E_CAMEL" end, mode = { "n", "v" }, desc = "LLM: translate to VAR_CAMEL",
+        "<leader>tu", function() require("inobit.llm.translate").translate_in_buffer(true, "Z2E_UNDERLINE") end, mode = { "n", "v" }, desc = "LLM: translate to VAR_UNDERLINE",
       },
       {
-        "<leader>tsu", function() require("inobit.llm.translate").translate_and_repalce "Z2E_UNDERLINE" end, mode = { "n", "v" }, desc = "LLM: translate to VAR_UNDERLINE",
-      },
-      {
-        "<leader>tpz", function() require("inobit.llm.translate").translate_and_print "E2Z" end, mode = { "n", "v" }, desc = "LLM: translate and print to ZH",
-      },
-      {
-        "<leader>tpe", function() require("inobit.llm.translate").translate_and_print "Z2E" end, mode = { "n", "v" }, desc = "LLM: translate and print to EN",
+        "<leader>tp", function() require("inobit.llm.translate").translate_in_buffer(false)  end, mode = { "n", "v" }, desc = "LLM: translate and print",
       },
       -- stylua: ignore end
     },
