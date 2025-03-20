@@ -91,9 +91,9 @@ return {
               format = function(diagnostic)
                 return string.format(
                   "%s%s.%s",
-                  diagnostic.source and ("[" .. diagnostic.source .. "] ") or "",
+                  (diagnostic.source and diagnostic.source ~= vim.NIL) and ("[" .. diagnostic.source .. "] ") or "",
                   diagnostic.message,
-                  diagnostic.code and (" (" .. diagnostic.code .. ")") or ""
+                  (diagnostic.code and diagnostic.code ~= vim.NIL) and (" (" .. diagnostic.code .. ")") or ""
                 )
               end,
             },
