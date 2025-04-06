@@ -6,22 +6,6 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPost", "BufWritePost", "BufNewFile" },
     dependencies = {
-      {
-        -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-        -- used for completion, annotations and signatures of Neovim apis
-        -- make sure to uninstall or disable neodev.nvim
-        "folke/lazydev.nvim",
-        ft = "lua", -- only load on lua files
-        opts = {
-          library = {
-            -- Load luvit types when the `vim.uv` word is found
-            { path = "luvit-meta/library", words = { "vim%.uv" } },
-            -- add plenary.nvim to workspace.library in test file
-            { path = "plenary.nvim", words = { 'describe%(%"' } },
-          },
-        },
-      },
-      { "Bilal2453/luvit-meta", lazy = true },
       -- install LSPs and related tools to stdpath for neovim
       { "williamboman/mason.nvim", version = "^1.10.0" },
       -- 这个扩展可以快速调用lspconfig来配置lsp,相当于mason和lspconfig的桥梁
