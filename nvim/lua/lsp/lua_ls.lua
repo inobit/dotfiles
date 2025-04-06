@@ -31,7 +31,12 @@ return {
       },
       workspace = {
         -- Make the server aware of Neovim runtime files
-        library = vim.api.nvim_get_runtime_file("", true),
+        library = {
+          vim.env.VIMRUNTIME,
+          -- vim.fn.expand "$VIMRUNTIME/lua",
+          -- vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
+          -- vim.fn.stdpath "data" .. "/lazy/lazy.nvim/lua/lazy",
+        },
       },
       -- Do not send telemetry data containing a randomized but unique identifier
       telemetry = {
