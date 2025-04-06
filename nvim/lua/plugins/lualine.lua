@@ -16,7 +16,11 @@ return {
   config = function()
     require("lualine").setup {
       icons_enabled = true,
+
       options = {
+        theme = "auto",
+        globalstatus = vim.o.laststatus == 3,
+        disabled_filetypes = { statusline = { "dashboard", "alpha", "ministarter", "snacks_dashboard" } },
         refresh = {
           statusline = 300,
         },

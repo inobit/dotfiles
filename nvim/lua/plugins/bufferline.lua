@@ -15,7 +15,7 @@ end
 return {
   "akinsho/bufferline.nvim",
   version = "*",
-  event = { "BufReadPost", "InsertEnter" },
+  event = "VeryLazy",
   keys = {
     {
       "<leader>l",
@@ -114,10 +114,10 @@ return {
       themable = false, -- allows highlight goups to be overriden i.e. sets highlights as default
       numbers = "none",
       close_command = function(n)
-        require("mini.bufremove").delete(n, false)
+        Snacks.bufdelete(n)
       end,
       right_mouse_command = function(n)
-        require("mini.bufremove").delete(n, false)
+        Snacks.bufdelete(n)
       end,
       --[[ close_command = "bdelete! %d", -- can be a string | function, | false see "Mouse actions"
         right_mouse_command = "bdelete! %d", -- can be a string | function | false, see "Mouse actions"
@@ -161,7 +161,7 @@ return {
       -- [focused and unfocused]. eg: { '|', '|' }
       separator_style = "slant",
       enforce_regular_tabs = true,
-      always_show_bufferline = true,
+      always_show_bufferline = false, -- when there is only one buffer, it will not be displayed.
       hover = {
         enabled = true,
         delay = 200,
