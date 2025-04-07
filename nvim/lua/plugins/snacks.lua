@@ -19,7 +19,7 @@ return {
     explorer = { enabled = false },
     indent = { enabled = true },
     input = { enabled = true },
-    picker = { enabled = true },
+    picker = { enabled = false },
     notifier = { enabled = false },
     quickfile = { enabled = true },
     scope = { enabled = true },

@@ -32,6 +32,8 @@ vim.opt.mouse = "a"
 -- 不需要显示模式，比如 --INSERT--
 vim.opt.showmode = false
 
+vim.opt.cindent = true
+
 -- clipboard config
 -- 系统剪切板
 vim.opt.clipboard = "unnamedplus"
@@ -93,7 +95,7 @@ vim.opt.inccommand = "split"
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 4
 
 -- tab使用空格
 vim.opt.expandtab = true
