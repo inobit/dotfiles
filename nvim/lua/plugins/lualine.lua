@@ -5,6 +5,7 @@ return {
     { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
   },
   init = function()
+    vim.g.lualine_laststatus = vim.o.laststatus
     if vim.fn.argc(-1) > 0 then
       -- set an empty statusline till lualine loads
       vim.o.statusline = " "
@@ -14,9 +15,9 @@ return {
     end
   end,
   config = function()
+    vim.o.laststatus = vim.g.lualine_laststatus
     require("lualine").setup {
       icons_enabled = true,
-
       options = {
         theme = "auto",
         globalstatus = vim.o.laststatus == 3,
