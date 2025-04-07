@@ -48,7 +48,7 @@ return {
           multi_round = true,
         },
       },
-      default_server = "test-server@test-model",
+      default_server = "SiliconFlow@Qwen/Qwen2.5-Coder-7B-Instruct",
       default_translate_server = "SiliconFlow@deepseek-ai/DeepSeek-V3",
     },
   },
