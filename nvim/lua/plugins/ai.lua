@@ -65,11 +65,11 @@ return {
       { "<leader>al", "<cmd>AvanteClear<cr>", desc = "avante: clear" },
     },
     opts = {
-      provider = "deepseek",
+      provider = "siliconflow",
       vendors = {
-        deepseek = {
+        siliconflow = {
           __inherited_from = "openai",
-          api_key_name = "DEEPSEEK_API_KEY",
+          api_key_name = "SILICONFLOW_API_KEY",
           endpoint = "https://api.siliconflow.cn/v1",
           model = "deepseek-ai/DeepSeek-R1",
           temperature = 0.6,
@@ -77,7 +77,7 @@ return {
         },
         qwen = {
           __inherited_from = "openai",
-          api_key_name = "DEEPSEEK_API_KEY", -- for free
+          api_key_name = "SILICONFLOW_API_KEY", -- for free
           endpoint = "https://api.siliconflow.cn/v1",
           model = "Qwen/Qwen2.5-Coder-7B-Instruct",
           temperature = 0.7,
