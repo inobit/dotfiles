@@ -13,7 +13,7 @@ return {
         -- Load luvit types when the `vim.uv` word is found
         { path = "luvit-meta/library", words = { "vim%.uv" } },
         -- add plenary.nvim to workspace.library in test file
-        { path = "plenary.nvim", words = { 'describe%(%"' } },
+        { path = "plenary.nvim", words = { 'describe%(%"', "Job" } },
         { path = "snacks.nvim", words = { "Snacks" } },
       },
     },
