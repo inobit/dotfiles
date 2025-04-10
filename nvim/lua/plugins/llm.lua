@@ -27,7 +27,7 @@ return {
     },
     cmd = { "LLM", "TS" },
     name = "inobit-llm.nvim",
-    main = "inobit/llm",
+    main = "inobit.llm",
     opts = {
       servers = {
         {
@@ -50,6 +50,7 @@ return {
       },
       default_server = "SiliconFlow@Qwen/Qwen2.5-Coder-7B-Instruct",
       default_translate_server = "SiliconFlow@deepseek-ai/DeepSeek-V3",
+      user_prompt = "~",
     },
   },
 }
