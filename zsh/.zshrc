@@ -114,8 +114,8 @@ export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
 # nvm config
 # place this after nvm initialization!
@@ -146,7 +146,46 @@ load-nvmrc
 # pnpm
 export PNPM_HOME="$HOME/.local/share/pnpm"
 case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
+*":$PNPM_HOME:"*) ;;
+*) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# wsl setup
+if [[ "$(uname -r)" == *"microsoft"* || "$(uname -r)" == *"wsl"* ]]; then
+  WSL_SSH_DIR="$HOME/.ssh"
+  WINDOWS_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+  WINDOWS_SSH_DIR="/mnt/c/Users/$WINDOWS_USER/.ssh"
+  # handle ssh key
+  if [ ! -d "$WSL_SSH_DIR" ] || [ -z "$(ls -A "$WSL_SSH_DIR")" ]; then
+    if [ -d "$WINDOWS_SSH_DIR" ]; then
+      mkdir -p "$WSL_SSH_DIR"
+      cp -r "$WINDOWS_SSH_DIR"/* "$WSL_SSH_DIR"/
+      chmod 700 "$WSL_SSH_DIR"
+      find "$WSL_SSH_DIR" -type f -exec grep -q "PRIVATE KEY" {} \; -exec chmod 600 {} \;
+      find "$WSL_SSH_DIR" -type f -name "*.pub" -exec chmod 644 {} \;
+      chmod 644 "$WSL_SSH_DIR"/{config,known_hosts,authorized_keys} 2>/dev/null
+    fi
+  fi
+  # auto start ssh-agent
+  if ! pgrep ssh-agent >/dev/null; then
+    rm -f $HOME/.ssh/ssh_auth_sock
+    eval "$(ssh-agent -s -a $HOME/.ssh/ssh_auth_sock)"
+  else
+    export SSH_AUTH_SOCK=$HOME/.ssh/ssh_auth_sock
+  fi
+  if [ ! -S "$SSH_AUTH_SOCK" ]; then
+    echo "[ERROR] ssh-agent socket file not found: $SSH_AUTH_SOCK"
+    # exit 1
+  else
+    find "$WSL_SSH_DIR" -type f -exec grep -q "PRIVATE KEY" {} \; -exec ssh-add -q {} \;
+  fi
+
+  # git config
+  git config --global core.autocrlf true
+
+  # change ls colors(777)
+  LS_COLORS=${LS_COLORS/:ow=*([^:]):/:ow=:}
+  # LS_COLORS=$LS_COLORS:'ow=30:'
+  export LS_COLORS
+fi
