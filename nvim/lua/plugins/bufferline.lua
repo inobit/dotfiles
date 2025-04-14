@@ -65,14 +65,14 @@ return {
     {
       "<leader>bb",
       function()
-        require("mini.bufremove").delete(0, false)
+        Snacks.bufdelete { force = false }
       end,
       desc = "Bufferline: Close current buffer",
     },
     {
       "<leader>bf",
       function()
-        require("mini.bufremove").delete(0, true)
+        Snacks.bufdelete { force = true }
       end,
       desc = "Bufferline: Force Close current buffer",
     },
@@ -105,8 +105,6 @@ return {
   },
   dependencies = {
     "nvim-tree/nvim-web-devicons",
-    -- nvim-tree和bufferline配合有bug,使用bd删除当前buffer时,会造成nvim-tree认为没有buffer了,会resize来占满整个屏幕.引入bufremove来解决
-    { "echasnovski/mini.bufremove", version = "*" },
   },
   opts = {
     options = {

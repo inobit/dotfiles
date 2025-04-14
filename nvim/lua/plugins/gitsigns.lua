@@ -50,9 +50,12 @@ return {
           gitsigns.nav_hunk "prev"
         end
       end, { desc = "Gitsigns: go to prev hunk" })
-        -- stylua: ignore start
-        -- Actions
-        -- reset is checkout stage to workspace
+      -- Actions
+      -- reset is checkout stage to workspace
+
+      -- stylua: ignore start
+        map("n", "]C", function() gitsigns.nav_hunk "last" end, { desc = "Gitsigns: go to last hunk" })
+        map("n", "[C", function() gitsigns.nav_hunk "first" end, { desc = "Gitsigns: go to first hunk" })
         map('n', '<leader>cs', gitsigns.stage_hunk,{ desc = "Gitsigns: stage hunk" })
         map('n', '<leader>cr', gitsigns.reset_hunk,{ desc = "Gitsigns: reset hunk" })
         map('v', '<leader>cs', function() gitsigns.stage_hunk { vim.fn.line('.'), vim.fn.line('v') } end,{ desc = "Gitsigns: stage hunk" })

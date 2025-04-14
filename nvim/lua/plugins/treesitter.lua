@@ -74,19 +74,19 @@ return { -- Highlight, edit, and navigate code
             query = "@function.inner",
             desc = "Select inner part of a function region",
           },
-          ["ac"] = {
+          ["as"] = {
             query = "@class.outer",
             desc = "Select inner part of a class region",
           },
-          ["ic"] = {
+          ["is"] = {
             query = "@class.inner",
             desc = "Select inner part of a class region",
           },
-          ["aC"] = {
+          ["ac"] = {
             query = "@comment.outer",
             desc = "Select inner part of a class region",
           },
-          ["iC"] = {
+          ["ic"] = {
             query = "@comment.inner",
             desc = "select inner part of a class region",
           },
@@ -117,16 +117,10 @@ return { -- Highlight, edit, and navigate code
       move = {
         enable = true,
         set_jumps = true,
-        goto_next_start = {
-          ["]f"] = "@function.outer",
-          ["]C"] = "@class.outer",
-        },
-        goto_next_end = { ["]F"] = "@function.outer" },
-        goto_previous_start = {
-          ["[f"] = "@function.outer",
-          ["[C"] = "@class.outer",
-        },
-        goto_previous_end = { ["[F"] = "@function.outer" },
+        goto_next_start = { ["]f"] = "@function.outer", ["]s"] = "@class.outer", ["]a"] = "@parameter.inner" },
+        goto_next_end = { ["]F"] = "@function.outer", ["]S"] = "@class.outer", ["]A"] = "@parameter.inner" },
+        goto_previous_start = { ["[f"] = "@function.outer", ["[s"] = "@class.outer", ["[a"] = "@parameter.inner" },
+        goto_previous_end = { ["[F"] = "@function.outer", ["[S"] = "@class.outer", ["[A"] = "@parameter.inner" },
       },
     },
     autotag = {
