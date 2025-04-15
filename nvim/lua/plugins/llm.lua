@@ -9,7 +9,7 @@ return {
       -- stylua: ignore start
       { "<leader>mc", "<Cmd>LLM Chat<CR>", desc = "LLM: chat start" },
       { "<leader>ms", "<Cmd>LLM Sessions<CR>", desc = "LLM: select session" },
-      { "<leader>mv", "<Cmd>LLM ChatServers<CR>", desc = "LLM: select chat server" },
+      { "<leader>ma", "<Cmd>LLM ChatServers<CR>", desc = "LLM: select chat server" },
       { "<leader>mt", "<Cmd>LLM TSServers<CR>", desc = "LLM: select translate server" },
       {
         "<leader>ts", function() require("inobit.llm.api").translate_in_buffer(true)  end, mode = { "n", "v" }, desc = "LLM: translate and replace",
@@ -28,29 +28,37 @@ return {
     cmd = { "LLM", "TS" },
     name = "inobit-llm.nvim",
     main = "inobit.llm",
-    opts = {
-      servers = {
-        {
-          server = "SiliconFlow",
-          base_url = "https://api.siliconflow.cn/v1/chat/completions",
-          api_key_name = "SILICONFLOW_API_KEY",
-          models = { "Qwen/Qwen2.5-Coder-7B-Instruct" },
-          stream = true,
-          multi_round = true,
-          user_role = "user",
+    opts = function()
+      local opts = {
+        servers = {
+          {
+            server = "SiliconFlow",
+            base_url = "https://api.siliconflow.cn/v1/chat/completions",
+            api_key_name = "SILICONFLOW_API_KEY",
+            models = { "Qwen/Qwen2.5-Coder-7B-Instruct" },
+            stream = true,
+            multi_round = true,
+            user_role = "user",
+          },
         },
-        {
-          server = "test-server",
-          base_url = "http://localhost:8000/ai_stream",
-          api_key_name = "TEST_API_KEY",
-          models = { "test-model" },
-          stream = true,
-          multi_round = true,
-        },
-      },
-      default_server = "SiliconFlow@Qwen/Qwen2.5-Coder-7B-Instruct",
-      default_translate_server = "SiliconFlow@deepseek-ai/DeepSeek-V3",
-      user_prompt = "~",
-    },
+        default_server = "SiliconFlow@Qwen/Qwen2.5-Coder-7B-Instruct",
+        default_translate_server = vim.g.my_deeplx and "DeepL@DeepLX" or "SiliconFlow@deepseek-ai/DeepSeek-V3",
+        user_prompt = "~",
+      }
+      if vim.g.my_deeplx then
+        table.insert(opts.servers, {
+          server = "DeepL",
+          server_type = "translate",
+          models = {
+            {
+              model = "DeepLX",
+              base_url = vim.g.my_deeplx_base_url,
+              api_key_name = "DEEPLX_API_KEY",
+            },
+          },
+        })
+      end
+      return opts
+    end,
   },
 }
