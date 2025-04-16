@@ -1,5 +1,4 @@
--- 复制的时候，高亮显示
---  See `:help vim.highlight.on_yank()`
+-- highlight when copying(:help vim.highlight.on_yank())
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
   group = vim.api.nvim_create_augroup("highlight_yank", { clear = true }),
@@ -7,24 +6,25 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     vim.highlight.on_yank()
   end,
 })
--- 修改时mark，达到lastchange的效果
+
+-- mark when modified to achieve the effect of lastchange
 vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedT", "TextChangedP", "TextChangedI" }, {
   desc = "last change",
   group = vim.api.nvim_create_augroup("textChange", { clear = true }),
   callback = function(event)
-    -- 需要排除浮动窗口
+    -- need to exclude floating windows
     local relative = vim.api.nvim_win_get_config(vim.api.nvim_get_current_win()).relative
-    -- 排除NvimTree(nofile) terminal prompt
+    -- exclude NvimTree(nofile) terminal prompt
     local buftype = vim.bo[event.buf].buftype
     if relative == "" and not vim.tbl_contains({ "nofile", "terminal", "prompt" }, buftype) then
       local x, y = unpack(vim.api.nvim_win_get_cursor(0))
-      -- 跨buffer需要使用大写name
+      -- Upper case names are required across buffers.
       vim.api.nvim_buf_set_mark(0, "Z", x, y, {})
     end
   end,
 })
 
--- 自动着色
+-- auto coloring
 vim.api.nvim_create_autocmd("BufEnter", {
   group = vim.api.nvim_create_augroup("Colorizer", {
     clear = true,
@@ -48,7 +48,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
   end,
 })
 
--- 取消自动添加comment leader
+-- cancel auto-add comment leader
 vim.api.nvim_create_autocmd("FileType", {
   command = "set formatoptions-=cro",
 })
@@ -71,7 +71,7 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
   end,
 })
 
--- json文件的隐藏级别
+-- hidden levels of json files
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("json_conceal", { clear = true }),
   pattern = { "json", "json5", "jsonc", "markdown" },
