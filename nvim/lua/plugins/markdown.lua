@@ -22,6 +22,15 @@ return {
       enabled = true,
       comment = { conceal = false },
     },
+    quote = {
+      repeat_linebreak = true,
+    },
+    win_options = {
+      showbreak = {
+        default = vim.opt.showbreak,
+        rendered = "  ",
+      },
+    },
   },
   ft = { "markdown", "norg", "rmd", "org", vim.g.inobit_filetype, "Avante" },
 }
