@@ -23,22 +23,7 @@ vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedT", "TextChangedP", "Te
     end
   end,
 })
--- 如果最后一个buffer是NvimTree则直接退出
-vim.api.nvim_create_autocmd("BufEnter", {
-  group = vim.api.nvim_create_augroup("NvimTreeClose", { clear = true }),
-  pattern = "NvimTree_*",
-  callback = function()
-    local layout = vim.api.nvim_call_function("winlayout", {})
-    if
-      layout[1] == "leaf"
-      and layout[3] == nil
-      and vim.api.nvim_get_option_value("filetype", { buf = vim.api.nvim_win_get_buf(layout[2]) }) == "NvimTree"
-    then
-      -- 提示保存
-      vim.cmd "confirm quit"
-    end
-  end,
-})
+
 -- 自动着色
 vim.api.nvim_create_autocmd("BufEnter", {
   group = vim.api.nvim_create_augroup("Colorizer", {
