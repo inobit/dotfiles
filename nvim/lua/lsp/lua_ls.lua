@@ -45,6 +45,9 @@ return {
       completion = {
         callSnippet = "Both",
       },
+      hover = {
+        previewFields = 50, -- how many fields to show for a table
+      },
       -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
       -- diagnostics = { disable = { 'missing-fields' } },
     },
