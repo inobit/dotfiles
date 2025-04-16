@@ -181,9 +181,6 @@ return {
           { name = "path" },
           { name = "buffer" },
         },
-        window = {
-          documentation = cmp.config.disable,
-        },
       })
       -- 加载friendly-snippets
       require("luasnip.loaders.from_vscode").lazy_load()
