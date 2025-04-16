@@ -68,23 +68,20 @@ vim.api.nvim_create_autocmd("FileType", {
   command = "set formatoptions-=cro",
 })
 
--- 保存buffer view状态
-local bufs_view = {}
-vim.api.nvim_create_autocmd({ "BufWinLeave", "BufLeave" }, {
+-- save winview
+vim.api.nvim_create_autocmd({ "BufWinLeave" }, {
   group = vim.api.nvim_create_augroup("view_control", { clear = false }),
   pattern = "*",
-  callback = function(event)
-    local view = vim.fn.winsaveview()
-    bufs_view[event.buf] = view
+  callback = function()
+    vim.b.winview = vim.fn.winsaveview()
   end,
 })
-vim.api.nvim_create_autocmd({ "BufWinEnter", "BufEnter" }, {
+vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
   group = vim.api.nvim_create_augroup("view_control", { clear = false }),
   pattern = "*",
-  callback = function(event)
-    local view = bufs_view[event.buf]
-    if view ~= nil then
-      vim.fn.winrestview(view)
+  callback = function()
+    if vim.b.winview ~= nil then
+      vim.fn.winrestview(vim.b.winview)
     end
   end,
 })
