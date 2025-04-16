@@ -14,6 +14,10 @@ return {
       "WhoIsSethDaniel/mason-tool-installer.nvim",
       -- 显示进度条,通知等
       { "j-hui/fidget.nvim", opts = {} },
+      -- signatures reinforce
+      {
+        "ray-x/lsp_signature.nvim",
+      },
     },
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -185,22 +189,18 @@ return {
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
             server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-            -- 配置lsp
+            -- enable signature
+            server.on_attach = function(_, bufnr)
+              require("lsp_signature").on_attach({
+                hint_enable = false,
+                handler_opts = { border = "none" },
+              }, bufnr)
+            end
+            -- setup lsp server
             require("lspconfig")[server_name].setup(server)
           end,
         },
       }
     end,
-  },
-  {
-    "ray-x/lsp_signature.nvim", -- signatures增强
-    event = "VeryLazy",
-    cond = false,
-    opts = {
-      floating_window = true, -- virtual hint enable
-      hint_prefix = " ",
-      hint_scheme = "String",
-      floating_window_above_cur_line = true,
-    },
   },
 }
