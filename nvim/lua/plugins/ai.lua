@@ -42,6 +42,12 @@ return {
       disable_inline_completion = vim.g.ai_cmp,
     },
   },
+  {
+    "luozhiya/fittencode.nvim",
+    opts = {
+      completion_mode = "source",
+    },
+  },
   -- avante
   {
     "yetone/avante.nvim",

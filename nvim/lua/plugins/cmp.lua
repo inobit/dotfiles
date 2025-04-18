@@ -73,8 +73,9 @@ return {
         { name = "buffer" },
       }
       if vim.g.ai_cmp then
-        table.insert(sources, 2, { name = "supermaven" })
-        table.insert(sources, 3, { name = "codeium" })
+        table.insert(sources, 2, { name = "fittencode" })
+        table.insert(sources, 3, { name = "supermaven" })
+        table.insert(sources, 4, { name = "codeium" })
       end
       -- 全局配置
       cmp.setup {
@@ -143,7 +144,7 @@ return {
             -- can also be a function to dynamically calculate max width such as
             -- maxwidth = function() return math.floor(0.45 * vim.o.columns) end,
             ellipsis_char = "...", -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
-            symbol_map = { Codeium = "", Supermaven = "" },
+            symbol_map = { Codeium = "", Supermaven = "", FittenCode = "" },
             show_labelDetails = true, -- show labelDetails in menu. Disabled by default
             -- The function below will be called before any actual modifications from lspkind
             -- so that you can provide more controls on popup customization. (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
