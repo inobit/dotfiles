@@ -62,21 +62,27 @@ return {
         return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
       end
       -- 构建sources
-      local sources = {
-        {
-          name = "lazydev",
-          group_index = 0, -- set group index to 0 to skip loading LuaLS completions
-        },
+      local default_sources = {
         { name = "nvim_lsp" },
         { name = "luasnip" },
         { name = "path" },
         { name = "buffer" },
       }
-      if vim.g.ai_cmp then
-        table.insert(sources, 2, { name = "fittencode" })
-        table.insert(sources, 3, { name = "supermaven" })
-        table.insert(sources, 4, { name = "codeium" })
-      end
+      local sources = {
+        {
+          name = "lazydev",
+          group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+        },
+      }
+      local ai_list = { "fittencode", "supermaven", "codeium" }
+      local filtered = vim.tbl_map(function(ai)
+        if ai ~= vim.g.ai_inline_completion_engine then
+          return { name = ai }
+        end
+      end, ai_list)
+      sources = vim.list_extend(sources, filtered)
+      sources = vim.list_extend(sources, default_sources)
+
       -- 全局配置
       cmp.setup {
         -- 配置snippet,推荐必须配置,用来和snip引擎作用

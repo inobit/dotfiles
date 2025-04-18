@@ -1,17 +1,20 @@
 return {
   {
     "Exafunction/codeium.nvim",
-    event = { "BufEnter" },
+    event = { "VeryLazy" },
     dependencies = {
       "nvim-lua/plenary.nvim",
       "hrsh7th/nvim-cmp",
     },
     opts = {
-      enable_cmp_source = vim.g.ai_cmp,
+      enable_cmp_source = "codeium" ~= vim.g.ai_inline_completion_engine,
       virtual_text = {
-        enabled = not vim.g.ai_cmp,
+        enabled = "codeium" == vim.g.ai_inline_completion_engine,
         key_bindings = {
-          accept = "<M-a>",
+          accept = "<M-y>",
+          accept_line = "<M-l>",
+          accept_word = "<M-j>",
+          clear = "<M-e>",
           next = "<M-]>",
           prev = "<M-[>",
         },
@@ -32,20 +35,39 @@ return {
   },
   {
     "supermaven-inc/supermaven-nvim",
+    event = { "VeryLazy" },
     opts = {
       keymaps = {
-        accept_suggestion = "<M-a>",
+        accept_suggestion = "<M-y>",
         clear_suggestion = "<M-e>",
         accept_word = "<M-l>",
       },
       -- ignore_filetypes = {},
-      disable_inline_completion = vim.g.ai_cmp,
+      disable_inline_completion = "supermaven" ~= vim.g.ai_inline_completion_engine,
     },
   },
   {
     "luozhiya/fittencode.nvim",
+    event = { "VeryLazy" },
     opts = {
-      completion_mode = "source",
+      inline_completion = {
+        enabled = "fittencode" == vim.g.ai_inline_completion_engine,
+      },
+      source_completion = {
+        enabled = "fittencode" ~= vim.g.ai_inline_completion_engine,
+        engine = "cmp",
+      },
+      keymaps = {
+        inline = {
+          ["<M-y>"] = "accept_all_suggestions",
+          ["<M-l>"] = "accept_line",
+          ["<M-j>"] = "accept_word",
+          ["<M-e>"] = "revoke_line",
+          ["<M-k>"] = "revoke_word",
+          ["<A-,>"] = "triggering_completion",
+        },
+      },
+      completion_mode = "fittencode" ~= vim.g.ai_inline_completion_engine and "source" or "inline",
     },
   },
   -- avante

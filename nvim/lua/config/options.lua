@@ -12,9 +12,6 @@ if vim.fn.has "win32" == 0 then
   vim.g.python3_host_prog = os.getenv "HOME" .. "/.nvim-venv/bin/python3"
 end
 
--- ai cmp
-vim.g.ai_cmp = true
-
 -- custom filetype
 vim.g.inobit_filetype = "inobit"
 
