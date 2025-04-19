@@ -182,7 +182,7 @@ if [[ "$(uname -r)" == *"microsoft"* || "$(uname -r)" == *"wsl"* ]]; then
   fi
 
   # git config
-  git config --global core.autocrlf true
+  # git config --global core.autocrlf true
 
   # change ls colors(777)
   LS_COLORS=${LS_COLORS/:ow=*([^:]):/:ow=:}
