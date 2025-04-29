@@ -14,8 +14,10 @@ return {
   -- capabilities = {},
   -- settings是针对lsp server本身的设置
   settings = {
-    -- 也可以直接Lua.completion
     Lua = {
+      format = {
+        enable = false,
+      },
       runtime = {
         -- Tell the language server which version of Lua you're using
         -- (most likely LuaJIT in the case of Neovim)
