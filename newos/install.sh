@@ -81,25 +81,30 @@ source "$HOME/.nvm/nvm.sh"
 nvm install 20
 nvm install 18
 
-echo "install pyenv"
-sudo apt install build-essential libssl-dev zlib1g-dev \
-  libbz2-dev libreadline-dev libsqlite3-dev curl git \
-  libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev -y
+# echo "install pyenv"
+# sudo apt install build-essential libssl-dev zlib1g-dev \
+#   libbz2-dev libreadline-dev libsqlite3-dev curl git \
+#   libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev -y
+#
+# if [[ ! -f ./.pyenv/bin/pyenv ]]; then
+#   curl https://pyenv.run | bash
+# fi
+#
+# python="3.12.3"
+# echo "install python $python"
+# if [[ ! -f ./.pyenv/versions/$python/bin/python ]]; then
+#   ./.pyenv/bin/pyenv install "$python"
+# fi
+#
+# echo "create nvim venv"
+# if [[ ! -d $HOME/.nvim-venv ]]; then
+#   ./.pyenv/versions/$python/bin/python -m venv "$HOME"/.nvim-venv
+#   chmod a+x "$HOME"/.nvim-venv/bin/activate
+# fi
 
-if [[ ! -f ./.pyenv/bin/pyenv ]]; then
-  curl https://pyenv.run | bash
-fi
-
-python="3.12.3"
-echo "install python $python"
-if [[ ! -f ./.pyenv/versions/$python/bin/python ]]; then
-  ./.pyenv/bin/pyenv install "$python"
-fi
-
-echo "create nvim venv"
-if [[ ! -d $HOME/.nvim-venv ]]; then
-  ./.pyenv/versions/$python/bin/python -m venv "$HOME"/.nvim-venv
-  chmod a+x "$HOME"/.nvim-venv/bin/activate
+echo "install uv"
+if [[ ! -f $HOME/.local/bin/uv ]]; then
+  curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
 echo "install vscode-js-debug"
@@ -114,11 +119,10 @@ if [[ ! -d $HOME/.dap-js/out ]]; then
   cd "$HOME"
 fi
 
-echo "nvim config python and vscode-js-debug"
+echo "nvim config vscode-js-debug"
 local_options="$HOME/documents/dotfiles/nvim/lua/config/local-options.lua"
 rm -f "$local_options"
 touch "$local_options"
-echo 'vim.g.python3_host_prog = os.getenv "HOME" .. "/.nvim-venv/bin/python3"' >>"$local_options"
 echo 'vim.g.vscode_js_debug_path = os.getenv "HOME" .. "/.dap-js"' >>"$local_options"
 
 read -r -p "Whether to install docker? y or n: " docker
@@ -173,8 +177,7 @@ ln -sf "$HOME"/documents/dotfiles/zsh/.zshrc "$HOME"/.zshrc
 
 echo "change to zsh"
 chsh -s /usr/bin/zsh
-/usr/bin/zsh
 
-echo "source .zshrc"
-# shellcheck disable=SC1091
-source "$HOME/.zshrc"
+echo "installation complete!"
+echo "switching to zsh shell now..."
+exec zsh
