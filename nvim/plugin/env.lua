@@ -51,10 +51,14 @@ local function setup_nvim_venv()
 
     vim.notify("pynvim installation successful", vim.log.levels.INFO)
 
-    return true, venv_path .. path_sep .. ".venv" .. path_sep .. "bin" .. path_sep .. "python3"
+    return true,
+      is_windows and venv_path .. path_sep .. ".venv" .. path_sep .. "Scripts" .. path_sep .. "python.exe"
+        or venv_path .. path_sep .. ".venv" .. path_sep .. "bin" .. path_sep .. "python3"
   else
     -- is exists
-    return true, venv_path .. path_sep .. ".venv" .. path_sep .. "bin" .. path_sep .. "python3"
+    return true,
+      is_windows and venv_path .. path_sep .. ".venv" .. path_sep .. "Scripts" .. path_sep .. "python.exe"
+        or venv_path .. path_sep .. ".venv" .. path_sep .. "bin" .. path_sep .. "python3"
   end
 end
 
