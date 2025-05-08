@@ -103,7 +103,7 @@ export EDITOR='nvim'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias setproxy="export ALL_PROXY=http://192.168.1.190:7890" alias unsetproxy="unset ALL_PROXY"
+alias setproxy="export ALL_PROXY=http://127.0.0.1:7890" alias unsetproxy="unset ALL_PROXY"
 alias vim="nvim"
 export no_proxy="127.0.0.1,localhost,::1"
 export TIME_STYLE="long-iso"
