@@ -108,11 +108,6 @@ alias vim="nvim"
 export no_proxy="127.0.0.1,localhost,::1"
 export TIME_STYLE="long-iso"
 
-# pyenv config
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
@@ -189,3 +184,11 @@ if [[ "$(uname -r)" == *"microsoft"* || "$(uname -r)" == *"wsl"* ]]; then
   # LS_COLORS=$LS_COLORS:'ow=30:'
   export LS_COLORS
 fi
+
+# add local bin to $PATH
+# needed for uv
+. "$HOME/.local/bin/env"
+
+# uv and uvx auto completion
+eval "$(uv generate-shell-completion zsh)"
+eval "$(uvx --generate-shell-completion zsh)"
