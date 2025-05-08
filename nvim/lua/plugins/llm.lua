@@ -53,9 +53,9 @@ return {
               { model = "google/gemini-2.5-flash-preview:thinking", temperature = 0 },
               { model = "google/gemini-2.0-flash-001", temperature = 0.6 },
               { model = "google/gemini-2.5-pro-exp-03-25", temperature = 0.6 },
+              { model = "google/gemini-flash-1.5-8b", max_tokens = 8192, temperature = 0.6 },
               { model = "deepseek/deepseek-chat-v3-0324:free", max_tokens = 8192, temperature = 0.6 },
               { model = "deepseek/deepseek-r1:free", max_tokens = 8192, temperature = 0.6 },
-              { model = "qwen/qwen3-235b-a22b:free", max_tokens = 8192, temperature = 0.6 },
             },
             max_tokens = 4096,
             stream = true,
@@ -64,8 +64,7 @@ return {
           },
         },
         default_server = "OpenRouter@deepseek/deepseek-chat-v3-0324:free",
-        default_translate_server = vim.g.my_deeplx and "DeepL@DeepLX"
-          or "OpenRouter@deepseek/deepseek-chat-v3-0324:free",
+        default_translate_server = vim.g.my_deeplx and "DeepL@DeepLX" or "OpenRouter@google/gemini-flash-1.5-8b",
         user_prompt = "~",
       }
       if vim.g.my_deeplx then
