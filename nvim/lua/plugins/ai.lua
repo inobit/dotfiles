@@ -93,7 +93,7 @@ return {
       { "<leader>al", "<cmd>AvanteClear<cr>", desc = "avante: clear" },
     },
     opts = {
-      provider = "openrouter-gemini2.5-flash-pre",
+      provider = "openrouter-gemini-2.5-flash-pre",
       vendors = {
         ["siliconflow-deepseek-v3"] = {
           __inherited_from = "openai",
@@ -115,7 +115,7 @@ return {
           __inherited_from = "openai",
           api_key_name = "SILICONFLOW_API_KEY",
           endpoint = "https://api.siliconflow.cn/v1",
-          model = "Qwen/Qwen2.5-Coder-32B-Instruct",
+          model = "Qwen/Qwen3-235B-A22B",
           temperature = 0,
           max_tokens = 4096,
           disable_tools = true,
@@ -136,7 +136,7 @@ return {
           temperature = 0,
           max_tokens = 4096,
         },
-        ["openrouter-gemini2.5-flash-pre"] = {
+        ["openrouter-gemini-2.5-flash-pre"] = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
           endpoint = "https://openrouter.ai/api/v1",
@@ -144,7 +144,7 @@ return {
           temperature = 0,
           max_tokens = 4096,
         },
-        ["openrouter-gemini2.5-flash-pre-thinking"] = {
+        ["openrouter-gemini-2.5-flash-pre-thinking"] = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
           endpoint = "https://openrouter.ai/api/v1",
@@ -152,11 +152,35 @@ return {
           temperature = 0,
           max_tokens = 4096,
         },
-        ["openrouter-deepseekv3"] = {
+        ["openrouter-gemini-2.5-pro-exp-03-25"] = {
+          __inherited_from = "openai",
+          api_key_name = "OPENROUTER_API_KEY",
+          endpoint = "https://openrouter.ai/api/v1",
+          model = "google/gemini-2.5-pro-exp-03-25",
+          temperature = 0,
+          max_tokens = 4096,
+        },
+        ["openrouter-gemini-2.5-pro-preview"] = {
+          __inherited_from = "openai",
+          api_key_name = "OPENROUTER_API_KEY",
+          endpoint = "https://openrouter.ai/api/v1",
+          model = "google/gemini-2.5-pro-preview",
+          temperature = 0,
+          max_tokens = 4096,
+        },
+        ["openrouter-deepseekv3:free"] = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
           endpoint = "https://openrouter.ai/api/v1",
           model = "deepseek/deepseek-chat-v3-0324:free",
+          temperature = 0,
+          max_tokens = 4096,
+        },
+        ["openrouter-deepseekv3"] = {
+          __inherited_from = "openai",
+          api_key_name = "OPENROUTER_API_KEY",
+          endpoint = "https://openrouter.ai/api/v1",
+          model = "deepseek/deepseek-chat-v3-0324",
           temperature = 0,
           max_tokens = 4096,
         },
@@ -168,11 +192,11 @@ return {
           temperature = 0,
           max_tokens = 4096,
         },
-        ["openrouter-qwen3"] = {
+        ["openrouter-openai/gpt-4o-mini"] = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
           endpoint = "https://openrouter.ai/api/v1",
-          model = "qwen/qwen3-235b-a22b:free",
+          model = "openai/gpt-4o-mini",
           temperature = 0,
           max_tokens = 4096,
         },
