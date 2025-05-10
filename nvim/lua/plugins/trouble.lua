@@ -2,8 +2,8 @@ return {
   "folke/trouble.nvim",
   opts = {
     modes = {
-      lsp = {
-        win = { position = "right" },
+      symbols = {
+        win = { position = "left" },
       },
     },
   }, -- for default options, refer to the configuration section for custom setup.

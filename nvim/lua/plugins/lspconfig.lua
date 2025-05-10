@@ -146,6 +146,7 @@ return {
         docker_compose_language_service = require "lsp.docker_compose_language_service",
         clangd = require "lsp.clangd",
         emmet_ls = require "lsp.emmetls",
+        marksman = {},
       }
       require("mason").setup()
       -- install lsp server

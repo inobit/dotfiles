@@ -13,6 +13,7 @@ return {
       vim = "indent",
       python = { "indent" },
       git = "",
+      markdown = { "treesitter", "indent" },
     }
     require("ufo").setup {
       provider_selector = function(_, filetype, _)
