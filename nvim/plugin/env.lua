@@ -69,5 +69,9 @@ end
 _, _, vim.g.python3_host_prog = setup_nvim_venv("nvim", "3.12")
 local _, mason_python_bin, _ = setup_nvim_venv("mason", "3.12")
 if mason_python_bin then
-  vim.env.PATH = mason_python_bin .. ":" .. vim.env.PATH
+  if vim.fn.has "win32" == 1 or vim.fn.has "win64" == 1 then
+    vim.env.PATH = mason_python_bin .. ";" .. vim.env.PATH
+  else
+    vim.env.PATH = mason_python_bin .. ":" .. vim.env.PATH
+  end
 end
