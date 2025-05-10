@@ -33,7 +33,7 @@ local function setup_nvim_venv(app, python_version)
       return false
     end
 
-    vim.notify("virtual environment created successfully" .. venv_path, vim.log.levels.INFO)
+    vim.notify("virtual environment created successfully: " .. venv_path, vim.log.levels.INFO)
 
     if app == "nvim" then
       -- install pynvim
