@@ -7,7 +7,7 @@ return {
     event = { "BufReadPost", "BufWritePost", "BufNewFile" },
     dependencies = {
       -- install LSPs and related tools to stdpath for neovim
-      { "williamboman/mason.nvim", version = "^1.10.0" },
+      { "williamboman/mason.nvim" },
       -- 这个扩展可以快速调用lspconfig来配置lsp,相当于mason和lspconfig的桥梁
       "williamboman/mason-lspconfig.nvim",
       -- 用来安装mason packages,虽然lspconfig也能auto install,但是只能install lsp server
