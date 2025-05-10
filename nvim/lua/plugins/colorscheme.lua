@@ -39,4 +39,20 @@ return { -- You can easily change to a different colorscheme.
       setTheme(theme)
     end,
   },
+  {
+    "EdenEast/nightfox.nvim",
+    priority = 1000,
+    cond = string.find(theme, "nightfox") ~= nil,
+    config = function()
+      setTheme(string.sub(theme, string.len "nightfox-" + 1))
+    end,
+  },
+  {
+    "rose-pine/neovim",
+    priority = 1000,
+    cond = string.find(theme, "rose") ~= nil,
+    config = function()
+      setTheme(theme)
+    end,
+  },
 }
