@@ -179,7 +179,7 @@ return {
         sources = cmp.config.sources({
           { name = "path" },
         }, {
-          { name = "cmdline", option = { ignore_cmds = { "Man" } } },
+          { name = "cmdline", keyword_pattern = [=[[^[:blank:]\!]*]=], option = { ignore_cmds = { "Man" } } },
         }),
       })
       -- 针对md help文件只使用path buffer
