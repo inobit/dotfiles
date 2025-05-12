@@ -93,7 +93,7 @@ return {
       { "<leader>al", "<cmd>AvanteClear<cr>", desc = "avante: clear" },
     },
     opts = {
-      provider = "openrouter-gemini-2.5-flash-pre",
+      provider = "openrouter-openai/gpt-4o-mini",
       vendors = {
         ["siliconflow-deepseek-v3"] = {
           __inherited_from = "openai",
@@ -189,6 +189,22 @@ return {
           api_key_name = "OPENROUTER_API_KEY",
           endpoint = "https://openrouter.ai/api/v1",
           model = "deepseek/deepseek-r1:free",
+          temperature = 0,
+          max_tokens = 4096,
+        },
+        ["openrouter-qwen3"] = {
+          __inherited_from = "openai",
+          api_key_name = "OPENROUTER_API_KEY",
+          endpoint = "https://openrouter.ai/api/v1",
+          model = "qwen/qwen3-235b-a22b",
+          temperature = 0,
+          max_tokens = 4096,
+        },
+        ["openrouter-qwen3:free"] = {
+          __inherited_from = "openai",
+          api_key_name = "OPENROUTER_API_KEY",
+          endpoint = "https://openrouter.ai/api/v1",
+          model = "qwen/qwen3-235b-a22b:free",
           temperature = 0,
           max_tokens = 4096,
         },

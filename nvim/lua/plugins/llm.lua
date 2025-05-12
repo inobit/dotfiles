@@ -63,6 +63,8 @@ return {
               { model = "deepseek/deepseek-chat-v3-0324", temperature = 0.6 },
               { model = "deepseek/deepseek-r1:free", max_tokens = 8192, temperature = 0.6 },
               { model = "openai/gpt-4o-mini", temperature = 0 },
+              { model = "qwen/qwen3-235b-a22b", temperature = 0.6 },
+              { model = "qwen/qwen3-235b-a22b:free", max_tokens = 8192, temperature = 0.6 },
             },
             max_tokens = 4096,
             stream = true,
