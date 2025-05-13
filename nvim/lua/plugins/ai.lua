@@ -40,7 +40,7 @@ return {
       keymaps = {
         accept_suggestion = "<M-y>",
         clear_suggestion = "<M-e>",
-        accept_word = "<M-l>",
+        accept_word = "<M-j>",
       },
       -- ignore_filetypes = {},
       disable_inline_completion = "supermaven" ~= vim.g.ai_inline_completion_engine,
@@ -58,14 +58,15 @@ return {
         engine = "cmp",
       },
       keymaps = {
-        inline = {
+        -- inline is disabled but inline keymaps are still available
+        inline = "fittencode" == vim.g.ai_inline_completion_engine and {
           ["<M-y>"] = "accept_all_suggestions",
           ["<M-l>"] = "accept_line",
           ["<M-j>"] = "accept_word",
           ["<M-e>"] = "revoke_line",
           ["<M-k>"] = "revoke_word",
           ["<A-,>"] = "triggering_completion",
-        },
+        } or nil,
       },
       completion_mode = "fittencode" ~= vim.g.ai_inline_completion_engine and "source" or "inline",
     },
