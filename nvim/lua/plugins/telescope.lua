@@ -96,6 +96,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "Telescope: Search Help" })
     vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "Telescope: Search Keymaps" })
     vim.keymap.set("n", "<leader>se", builtin.diagnostics, { desc = "Telescope: Search Diagnostics" })
+    vim.keymap.set("n", "<leader>sj", builtin.jumplist, { desc = "Telescope: Search Jumplist" })
 
     vim.keymap.set( "n", "<leader>fd", "<Cmd>Telescope file_browser path=%:p:h select_buffer=true<CR>",
       { desc = "Telescope: Search Files in current folder" }
