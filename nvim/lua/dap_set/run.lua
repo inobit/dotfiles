@@ -9,7 +9,7 @@ local commands = {
   clear = "clear",
   python = function()
     if vim.fn.executable "uv" == 1 then
-      return "uv run python " .. vim.api.nvim_buf_get_name(0)
+      return "uv run " .. vim.api.nvim_buf_get_name(0)
     else
       return "python -u " .. vim.api.nvim_buf_get_name(0)
     end
