@@ -1,0 +1,4 @@
+{
+  "keyMappings": "# Insert your preferred key mappings here.\nmapkey ' `\nunmap d\nunmap u\nmap <c-d> scrollPageDown\nmap <c-u> scrollPageUp\nunmap J\nunmap K\nunmap gT\nunmap gt\nmap <space>h previousTab\nmap <space>l nextTab\nunmap h\nunmap l\nmap zh scrollLeft\nmap zl scrollRight\nunmap T\nmap <space>sb Vomnibar.activateTabSelection\nmap gt visitPreviousTab\nunmap r\nmap R reload\nunmap f\nunmap F\nmap gd LinkHints.activateMode\nmap gx LinkHints.activateModeToOpenInNewTab\nunmap x\nunmap X\nmap <space>bb removeTab\nmap <space>br restoreTab\nunmap <a-p>\nmap <space>bp togglePinTab\nunmap yt\nmap <space>by duplicateTab",
+  "settingsVersion": "2.2.1"
+}
