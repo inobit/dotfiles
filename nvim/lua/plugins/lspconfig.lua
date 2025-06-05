@@ -1,18 +1,13 @@
 return {
   {
-    -- 快速配置lsp，虽然可以通过内置client api来手动配置,比如vim.lsp.start_client(...)
-    -- 但是较麻烦,lspconfig可以快速进行配置,甚至一键默认配置,实际上就是api的重新封装,并提供了常用Lsp server的默认配置
-    -- 主要功能包括启动对应的lsp server,并将相关配置传递过去,比如client的能力，lsp server本身支持的setting等等
     "neovim/nvim-lspconfig",
     event = { "BufReadPost", "BufWritePost", "BufNewFile" },
     dependencies = {
       -- install LSPs and related tools to stdpath for neovim
-      { "williamboman/mason.nvim" },
-      -- 这个扩展可以快速调用lspconfig来配置lsp,相当于mason和lspconfig的桥梁
-      "williamboman/mason-lspconfig.nvim",
-      -- 用来安装mason packages,虽然lspconfig也能auto install,但是只能install lsp server
+      { "mason-org/mason.nvim" },
+      "mason-org/mason-lspconfig.nvim",
       "WhoIsSethDaniel/mason-tool-installer.nvim",
-      -- 显示进度条,通知等
+      -- show progress bar, notification, etc.
       { "j-hui/fidget.nvim", opts = {} },
       -- signatures reinforce
       {
