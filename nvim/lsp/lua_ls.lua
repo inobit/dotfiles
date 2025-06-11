@@ -1,16 +1,6 @@
 return {
   cmd = { "lua-language-server" },
   filetypes = { "lua" },
-  root_dir = require("lspconfig").util.root_pattern(
-    ".luarc.json",
-    ".luarc.jsonc",
-    ".luacheckrc",
-    ".stylua.toml",
-    "stylua.toml",
-    "selene.toml",
-    "selene.yml",
-    ".git"
-  ),
   -- capabilities = {},
   -- settings是针对lsp server本身的设置
   settings = {

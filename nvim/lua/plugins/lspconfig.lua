@@ -4,8 +4,15 @@ return {
     event = { "BufReadPost", "BufWritePost", "BufNewFile" },
     dependencies = {
       -- install LSPs and related tools to stdpath for neovim
-      { "mason-org/mason.nvim" },
-      "mason-org/mason-lspconfig.nvim",
+      { "mason-org/mason.nvim", opts = {} },
+      {
+        "mason-org/mason-lspconfig.nvim",
+        opts = {
+          ensure_installed = {},
+          -- auto enable
+          automatic_enable = true,
+        },
+      },
       "WhoIsSethDaniel/mason-tool-installer.nvim",
       -- show progress bar, notification, etc.
       { "j-hui/fidget.nvim", opts = {} },
@@ -66,8 +73,12 @@ return {
 
           -- Diagnostic settings
           -- Diagnostic keymaps
-          map("]e", vim.diagnostic.goto_next, "Go to next [D]iagnostic message")
-          map("[e", vim.diagnostic.goto_prev, "Go to previous [D]iagnostic message")
+          map("]e", function()
+            vim.diagnostic.jump { count = 1 }
+          end, "Go to next [D]iagnostic message")
+          map("[e", function()
+            vim.diagnostic.jump { count = -1 }
+          end, "Go to previous [D]iagnostic message")
           -- 设置diagnostics 格式和标记
           vim.diagnostic.config {
             virtual_text = {
@@ -104,48 +115,27 @@ return {
           end
         end,
       })
-      -- LSP servers and clients are able to communicate to each other what features they support.
-      --  By default, Neovim doesn't support everything that is in the LSP Specification.
-      --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-      -- 获取默认能力，然后进行扩展,因为客户端并没有实现所有的lsp规范
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      -- plugin nvim-ufo: Neovim hasn't added foldingRange to default capabilities, users must add it manually
-      capabilities.textDocument.foldingRange = {
-        dynamicRegistration = false,
-        lineFoldingOnly = true,
-      }
-      -- 这里扩展了一个cmp_nvim_lsp的能力,告诉lsp server,当前客户端支持这个能力(实现了某些接口),这样服务端响应时就会携带对应的信息了,服务端是根据客户端的能力来响应的
-      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-      -- Enable the following language servers
-      --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
-      --
-      --  Add any additional override configuration in the following tables. Available keys are:
-      --  - cmd (table): Override the default command used to start the server
-      --  - filetypes (table): Override the default list of associated filetypes for the server
-      --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
-      --  - settings (table): Override the default settings passed when initializing the server.
-      --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
-      local servers = {
-        lua_ls = require "lsp.lua_ls",
-        pyright = require "lsp.pyright",
+
+      -- custom config is lsp/<name>.lua will be auto merged by vim.lsp
+      local lsp_servers = {
+        "lua_ls",
+        "pyright",
         -- tsserver rename to ts_ls
-        ts_ls = require "lsp.tsserver",
-        html = require "lsp.htmlls",
-        cssls = require "lsp.cssls",
-        jsonls = require "lsp.jsonls",
-        bashls = require "lsp.bashls",
-        dockerls = require "lsp.dockerls",
-        sqlls = require "lsp.sqlls",
-        yamlls = require "lsp.yamlls",
-        docker_compose_language_service = require "lsp.docker_compose_language_service",
-        clangd = require "lsp.clangd",
-        emmet_ls = require "lsp.emmetls",
-        marksman = {},
+        "ts_ls",
+        "html",
+        "cssls",
+        "jsonls",
+        "bashls",
+        "dockerls",
+        "sqlls",
+        "yamlls",
+        "docker_compose_language_service",
+        "clangd",
+        "emmet_ls",
+        "marksman",
       }
-      require("mason").setup()
       -- install lsp server
-      local ensure_installed = vim.tbl_keys(servers or {})
+      local ensure_installed = vim.list_extend({}, lsp_servers)
       -- install debugger adapter
       vim.list_extend(ensure_installed, { "codelldb" })
       -- install formatter
@@ -173,31 +163,32 @@ return {
         "sqlfluff", -- sql linter
         "yamllint", -- yaml linter
       })
+
+      -- install lsp,dap and tool
       require("mason-tool-installer").setup {
         ensure_installed = ensure_installed,
       }
-      require("mason-lspconfig").setup {
-        ensure_installed = {},
-        automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-            -- enable signature
-            server.on_attach = function(_, bufnr)
-              require("lsp_signature").on_attach({
-                hint_enable = false,
-                handler_opts = { border = "none" },
-              }, bufnr)
-            end
-            -- setup lsp server
-            require("lspconfig")[server_name].setup(server)
-          end,
-        },
+
+      -- lsp config
+      -- Configuration from the result of merging all tables returned by lsp/<name>.lua files in 'runtimepath' for a server of name.
+
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      -- plugin nvim-ufo: Neovim hasn't added foldingRange to default capabilities, users must add it manually
+      capabilities.textDocument.foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
       }
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+
+      vim.lsp.config("*", {
+        capabilities = capabilities,
+        on_attach = function(_, bufnr)
+          require("lsp_signature").on_attach({
+            hint_enable = false,
+            handler_opts = { border = "none" },
+          }, bufnr)
+        end,
+      })
     end,
   },
 }
