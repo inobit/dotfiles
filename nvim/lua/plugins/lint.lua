@@ -3,7 +3,7 @@ return {
   event = { "BufReadPost", "BufWritePost", "BufNewFile" },
   opts = {
     -- Event to trigger linters
-    events = { "BufWritePost", "BufReadPost", "InsertLeave" },
+    events = { "BufWritePost", "InsertLeave" },
     linters_by_ft = {
       python = { "ruff", "mypy" },
       javascript = { "eslint_d" },
