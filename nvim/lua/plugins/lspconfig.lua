@@ -1,11 +1,16 @@
 return {
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPost", "BufWritePost", "BufNewFile" },
+    -- event = { "BufReadPost", "BufWritePost", "BufNewFile" },
+    event = "VeryLazy",
     dependencies = {
       -- install LSPs and related tools to stdpath for neovim
       { "mason-org/mason.nvim", opts = {} },
       {
+        --BUG: When loading the buffer before the mason-lspconfig plugin, configure some LSP settings.
+        -- it fails to recognize the filetype, causing LSP to start failing, and Tree-sitter as well.
+        -- use "VeryLazy" or disable "automatic_enable" can avoid this
+        -- should vim.lsp.enable(<name>) be called in start?
         "mason-org/mason-lspconfig.nvim",
         opts = {
           ensure_installed = {},
