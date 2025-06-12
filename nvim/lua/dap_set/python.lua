@@ -9,19 +9,8 @@ vim.keymap.set("n", "<leader>dtc", function()
 end, { noremap = true, silent = true, desc = "Debug python class test" })
 
 -- dap_python config adapters and debuggee
-local function get_python_bin()
-  local path = os.getenv "virtual_env"
-    or os.getenv "VIRTUAL_ENV"
-    or vim.fn.getcwd() .. (vim.fn.has "win32" == 1 and "\\.venv" or "/.venv")
-  if path ~= nil and vim.fn.isdirectory(path) == 1 then
-    return path .. (vim.fn.has "win32" == 1 and "\\Scripts\\python.exe" or "/bin/python")
-  else
-    vim.notify("No python available", vim.log.levels.ERROR)
-  end
-end
-local pythonPath = get_python_bin()
----@diagnostic disable-next-line: missing-fields
-dap_python.setup(pythonPath, { pythonPath = pythonPath })
+dap_python.setup "uv"
+
 -- custom config
 table.insert(dap.configurations.python, {
   type = "python",
