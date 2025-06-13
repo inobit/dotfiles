@@ -1,9 +1,11 @@
 return {
   "mfussenegger/nvim-lint",
   event = { "BufReadPost", "BufWritePost", "BufNewFile" },
+  -- need mason add bin to PATH
+  dependencies = { "mason-org/mason.nvim" },
   opts = {
     -- Event to trigger linters
-    events = { "BufWritePost", "InsertLeave" },
+    events = { "BufWritePost", "BufReadPost", "InsertLeave" },
     linters_by_ft = {
       python = { "ruff", "mypy" },
       javascript = { "eslint_d" },

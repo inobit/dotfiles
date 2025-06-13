@@ -1,23 +1,47 @@
+-- enable lsp server right now
+local lsp_servers = {
+  "lua_ls",
+  "pyright",
+  -- tsserver rename to ts_ls
+  "ts_ls",
+  "html",
+  "cssls",
+  "jsonls",
+  "bashls",
+  "dockerls",
+  "sqlls",
+  "yamlls",
+  "docker_compose_language_service",
+  "clangd",
+  "emmet_ls",
+  "marksman",
+}
+
+-- mason-lspconfig is too slow
+for _, server in ipairs(lsp_servers) do
+  vim.lsp.enable(server)
+end
+
 return {
   {
     "neovim/nvim-lspconfig",
-    -- event = { "BufReadPost", "BufWritePost", "BufNewFile" },
-    event = "VeryLazy",
+    event = { "BufReadPost", "BufWritePost", "BufNewFile" },
+    -- event = "VeryLazy",
     dependencies = {
       -- install LSPs and related tools to stdpath for neovim
       { "mason-org/mason.nvim", opts = {} },
-      {
-        --BUG: When loading the buffer before the mason-lspconfig plugin, configure some LSP settings.
-        -- it fails to recognize the filetype, causing LSP to start failing, and Tree-sitter as well.
-        -- use "VeryLazy" or disable "automatic_enable" can avoid this
-        -- should vim.lsp.enable(<name>) be called in start?
-        "mason-org/mason-lspconfig.nvim",
-        opts = {
-          ensure_installed = {},
-          -- auto enable
-          automatic_enable = true,
-        },
-      },
+      -- {
+      --   --BUG: When loading the buffer before the mason-lspconfig plugin, configure some LSP settings.
+      --   -- it fails to recognize the filetype, causing LSP to start failing, and Tree-sitter as well.
+      --   -- use "VeryLazy" or disable "automatic_enable" can avoid this
+      --   -- should vim.lsp.enable(<name>) be called in start?
+      --   "mason-org/mason-lspconfig.nvim",
+      --   opts = {
+      --     ensure_installed = {},
+      --     -- auto enable
+      --     automatic_enable = true,
+      --   },
+      -- },
       "WhoIsSethDaniel/mason-tool-installer.nvim",
       -- show progress bar, notification, etc.
       { "j-hui/fidget.nvim", opts = {} },
@@ -125,24 +149,6 @@ return {
         end,
       })
 
-      -- custom config is lsp/<name>.lua will be auto merged by vim.lsp
-      local lsp_servers = {
-        "lua_ls",
-        "pyright",
-        -- tsserver rename to ts_ls
-        "ts_ls",
-        "html",
-        "cssls",
-        "jsonls",
-        "bashls",
-        "dockerls",
-        "sqlls",
-        "yamlls",
-        "docker_compose_language_service",
-        "clangd",
-        "emmet_ls",
-        "marksman",
-      }
       -- install lsp server
       local ensure_installed = vim.list_extend({}, lsp_servers)
       -- install debugger adapter
@@ -179,16 +185,10 @@ return {
       }
 
       -- lsp config
-      -- Configuration from the result of merging all tables returned by lsp/<name>.lua files in 'runtimepath' for a server of name.
-
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      -- plugin nvim-ufo: Neovim hasn't added foldingRange to default capabilities, users must add it manually
-      capabilities.textDocument.foldingRange = {
-        dynamicRegistration = false,
-        lineFoldingOnly = true,
-      }
       capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
+      -- Configuration from the result of merging all tables returned by lsp/<name>.lua files in 'runtimepath' for a server of name.
       vim.lsp.config("*", {
         capabilities = capabilities,
         on_attach = function(_, bufnr)
