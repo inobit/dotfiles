@@ -1,23 +1,5 @@
+local lsp_servers = require("plugins.mason.tools").lsp_servers
 -- enable lsp server right now
-local lsp_servers = {
-  "lua_ls",
-  "pyright",
-  -- tsserver rename to ts_ls
-  "ts_ls",
-  "html",
-  "cssls",
-  "jsonls",
-  "bashls",
-  "dockerls",
-  "sqlls",
-  "yamlls",
-  "docker_compose_language_service",
-  "clangd",
-  "emmet_ls",
-  "marksman",
-}
-
--- mason-lspconfig is too slow
 for _, server in ipairs(lsp_servers) do
   vim.lsp.enable(server)
 end
@@ -29,7 +11,7 @@ return {
     -- event = "VeryLazy",
     dependencies = {
       -- install LSPs and related tools to stdpath for neovim
-      { "mason-org/mason.nvim", opts = {} },
+      "mason-org/mason.nvim",
       -- {
       --   --BUG: When loading the buffer before the mason-lspconfig plugin, configure some LSP settings.
       --   -- it fails to recognize the filetype, causing LSP to start failing, and Tree-sitter as well.
@@ -42,13 +24,10 @@ return {
       --     automatic_enable = true,
       --   },
       -- },
-      "WhoIsSethDaniel/mason-tool-installer.nvim",
       -- show progress bar, notification, etc.
       { "j-hui/fidget.nvim", opts = {} },
       -- signatures reinforce
-      {
-        "ray-x/lsp_signature.nvim",
-      },
+      "ray-x/lsp_signature.nvim",
     },
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -148,41 +127,6 @@ return {
           end
         end,
       })
-
-      -- install lsp server
-      local ensure_installed = vim.list_extend({}, lsp_servers)
-      -- install debugger adapter
-      vim.list_extend(ensure_installed, { "codelldb" })
-      -- install formatter
-      vim.list_extend(ensure_installed, {
-        "stylua", -- lua formatter
-        "clang-format", -- c cpp formatter
-        "black", -- python formatter
-        "isort", -- python formatter
-        "prettier", -- html,css,js,ts,json formatter
-        "shfmt", -- shell formatter
-        "xmlformatter", -- xml formatter
-        "sql-formatter", --sql formatter
-        "yamlfmt", -- yaml formatter
-      })
-      -- install linter
-      vim.list_extend(ensure_installed, {
-        "ruff", -- python linter
-        "mypy", -- python linter
-        "eslint_d", -- js,ts linter
-        "htmlhint", -- html linter
-        "stylelint", -- css,scss,sass,less linter
-        "jsonlint", -- json linter
-        "shellcheck", -- shell linter
-        "hadolint", -- dockerfile linter
-        "sqlfluff", -- sql linter
-        "yamllint", -- yaml linter
-      })
-
-      -- install lsp,dap and tool
-      require("mason-tool-installer").setup {
-        ensure_installed = ensure_installed,
-      }
 
       -- lsp config
       local capabilities = vim.lsp.protocol.make_client_capabilities()
