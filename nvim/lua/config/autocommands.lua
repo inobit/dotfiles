@@ -98,3 +98,32 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.api.nvim_set_hl(0, "@markup.italic", { fg = "#4acfd3", bg = "", italic = true })
   end,
 })
+
+-- auto close when delete special buffers
+vim.api.nvim_create_autocmd("BufUnload", {
+  group = vim.api.nvim_create_augroup("SpecialBufDelete", { clear = true }),
+  pattern = "*",
+  callback = function(event)
+    local pattern = {
+      "PlenaryTestPopup",
+      "checkhealth",
+      "dbout",
+      "gitsigns-blame",
+      "grug-far",
+      "help",
+      "lspinfo",
+      "neotest-output",
+      "neotest-output-panel",
+      "neotest-summary",
+      "notify",
+      "qf",
+      "spectre_panel",
+      "startuptime",
+      "tsplayground",
+    }
+    -- close the window,tab
+    if vim.tbl_contains(pattern, vim.bo[event.buf].filetype) then
+      vim.cmd "close"
+    end
+  end,
+})
