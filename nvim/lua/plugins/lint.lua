@@ -85,6 +85,19 @@ return {
           return vim.fs.find({ "pyproject.toml", "ruff.toml", ".ruff.toml" }, { path = ctx.filename, upward = true })[1]
         end,
       },
+      mypy = {
+        getPythonPath = function()
+          return vim.b[vim.api.nvim_get_current_buf()].python_bin
+        end,
+        default_args = {
+          "--show-column-numbers",
+          "--show-error-end",
+          "--hide-error-context",
+          "--no-color-output",
+          "--no-error-summary",
+          -- "--no-pretty",
+        },
+      },
       sqlfluff = {
         condition = function(ctx)
           return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })[1]
@@ -97,6 +110,10 @@ return {
 
     local lint = require "lint"
     for name, linter in pairs(opts.linters) do
+      -- backup mypy default args
+      if name == "mypy" then
+        linter.default_args = vim.tbl_get(lint, "linters", "mypy", "args") or linter.default_args
+      end
       if type(linter) == "table" and type(lint.linters[name]) == "table" then
         ---@diagnostic disable-next-line: param-type-mismatch
         lint.linters[name] = vim.tbl_deep_extend("force", lint.linters[name], linter)
@@ -143,6 +160,7 @@ return {
         if not linter then
           print("Linter not found: " .. name, { title = "nvim-lint" })
         end
+        ---@diagnostic disable-next-line: undefined-field
         return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
       end, names)
 
@@ -150,6 +168,18 @@ return {
       vim.g.lint_names = names
       -- Run linters.
       if #names > 0 then
+        -- config mypy
+        if vim.tbl_contains(names, "mypy") then
+          local linter = lint.linters["mypy"]
+          ---@diagnostic disable-next-line: undefined-field
+          local pythonPath = linter.getPythonPath and linter.getPythonPath()
+          if pythonPath then
+            -- set python executable
+            ---@diagnostic disable-next-line: undefined-field
+            linter.args = vim.list_extend(vim.deepcopy(linter.default_args), { "--python-executable", pythonPath })
+          end
+        end
+
         lint.try_lint(names)
       end
     end

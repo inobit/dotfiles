@@ -11,6 +11,10 @@ end, { noremap = true, silent = true, desc = "Debug python class test" })
 -- dap_python config adapters and debuggee
 dap_python.setup "uv"
 
+dap_python.resolve_python = function()
+  return vim.b[vim.api.nvim_get_current_buf()].python_bin
+end
+
 -- custom config
 table.insert(dap.configurations.python, {
   type = "python",
