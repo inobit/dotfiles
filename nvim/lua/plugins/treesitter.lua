@@ -84,11 +84,11 @@ return { -- Highlight, edit, and navigate code
           },
           ["ac"] = {
             query = "@comment.outer",
-            desc = "Select inner part of a class region",
+            desc = "Select inner part of a comment region",
           },
           ["ic"] = {
             query = "@comment.inner",
-            desc = "select inner part of a class region",
+            desc = "select inner part of a comment region",
           },
         },
         -- you can choose the select mode (default is charwise 'v')
