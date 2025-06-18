@@ -10,14 +10,23 @@ if mason_python_bin then
   end
 end
 
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("get_python_bin", { clear = true }),
+  pattern = "python",
+  callback = function(event)
+    local bin = pylib.get_python_bin(event.buf)
+    if bin ~= nil then
+      vim.b[event.buf].python_bin = bin
+    end
+  end,
+})
+
 vim.api.nvim_create_autocmd("LspAttach", {
-  group = vim.api.nvim_create_augroup("find_python_bin", { clear = true }),
-  -- pattern = "python",
+  group = vim.api.nvim_create_augroup("set_lsp_python_bin", { clear = true }),
   callback = function(event)
     if vim.bo[event.buf].filetype == "python" then
-      local bin = pylib.get_python_bin()
-      if bin ~= nil then
-        pylib.set_lsp_python_path(event.buf, bin)
+      if vim.b[event.buf].python_bin then
+        pylib.set_lsp_python_path(event.buf, vim.b[event.buf].python_bin)
       end
     end
   end,

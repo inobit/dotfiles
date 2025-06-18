@@ -68,9 +68,14 @@ function M.setup_nvim_venv(app, python_version)
   end
 end
 
+---@param bufnr? number
 ---@return string | nil
-function M.get_python_bin()
-  local bin = vim.trim(vim.fn.system "uv python find")
+function M.get_python_bin(bufnr)
+  local cmd = "uv python find"
+  if bufnr then
+    cmd = string.format("%s --directory %s", cmd, vim.fn.fnamemodify(vim.fn.bufname(bufnr), ":p:h"))
+  end
+  local bin = vim.trim(vim.fn.system(cmd))
   if vim.v.shell_error ~= 0 then
     local path = os.getenv "virtual_env"
       or os.getenv "VIRTUAL_ENV"
