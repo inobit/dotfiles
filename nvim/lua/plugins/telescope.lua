@@ -67,6 +67,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
         },
         file_browser = {
           theme = "ivy",
+          no_ignore = true,
           mappings = {
             ["n"] = {
               ["a"] = fb_actions.create,
