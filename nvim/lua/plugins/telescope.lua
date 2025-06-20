@@ -111,16 +111,16 @@ return { -- Fuzzy Finder (files, lsp, etc)
       builtin.find_files { hidden = true, cwd = require("telescope.utils").buffer_dir() }
     end, { desc = "telescope: search files in current folder" })
 
-    local search_files = function(hidden)
-      local opts = { hidden = hidden, no_ignore = hidden }
+    local search_files = function(hidden,no_ignore)
+      local opts = { hidden = hidden, no_ignore = no_ignore }
       -- local cmd = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
       -- if vim.v.shell_error == 0 then
       --   opts.cwd = cmd
       -- end
       builtin.find_files(opts)
     end
-    vim.keymap.set("n", "<leader>sf", function() search_files(false) end, {desc = "Telescope: Search Files in CWD" })
-    vim.keymap.set("n", "<leader>sF", function() search_files(true) end, { desc = "Telescope: Search Files(including hidden and ignored) in CWD" })
+    vim.keymap.set("n", "<leader>sf", function() search_files(false, true) end, {desc = "Telescope: Search Files in CWD" })
+    vim.keymap.set("n", "<leader>sF", function() search_files(true, true) end, { desc = "Telescope: Search Files(including hidden and ignored) in CWD" })
 
     -- vim.keymap.set("n", "<leader>sf", builtin.find_files, {desc = "Telescope: Search Files in CWD" })
 
