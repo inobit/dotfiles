@@ -94,7 +94,7 @@ return {
       { "<leader>al", "<cmd>AvanteClear<cr>", desc = "avante: clear" },
     },
     opts = {
-      provider = "openrouter-openai/gpt-4o-mini",
+      provider = "openrouter-gemini-2.5-flash-pre",
       vendors = {
         ["siliconflow-deepseek-v3"] = {
           __inherited_from = "openai",
@@ -111,15 +111,6 @@ return {
           model = "deepseek-ai/DeepSeek-R1",
           temperature = 0,
           max_tokens = 4096,
-        },
-        ["siliconflow-qwen"] = {
-          __inherited_from = "openai",
-          api_key_name = "SILICONFLOW_API_KEY",
-          endpoint = "https://api.siliconflow.cn/v1",
-          model = "Qwen/Qwen3-235B-A22B",
-          temperature = 0,
-          max_tokens = 4096,
-          disable_tools = true,
         },
         ["openrouter-claude3.7"] = {
           __inherited_from = "openai",
@@ -145,19 +136,11 @@ return {
           temperature = 0,
           max_tokens = 4096,
         },
-        ["openrouter-gemini-2.5-flash-pre-thinking"] = {
+        ["openrouter-gemini-2.5-pro"] = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
           endpoint = "https://openrouter.ai/api/v1",
-          model = "google/gemini-2.5-flash-preview-05-20:thinking",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-gemini-2.5-pro-preview"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "google/gemini-2.5-pro-preview",
+          model = "google/gemini-2.5-pro",
           temperature = 0,
           max_tokens = 4096,
         },
@@ -182,22 +165,6 @@ return {
           api_key_name = "OPENROUTER_API_KEY",
           endpoint = "https://openrouter.ai/api/v1",
           model = "deepseek/deepseek-r1-0528:free",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-qwen3"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "qwen/qwen3-235b-a22b",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-qwen3:free"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "qwen/qwen3-235b-a22b:free",
           temperature = 0,
           max_tokens = 4096,
         },
