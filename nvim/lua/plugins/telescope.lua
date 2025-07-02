@@ -36,6 +36,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
       defaults = {
         -- 以nomarl mode进入picker
         initial_mode = "normal",
+        file_ignore_patterns = { "node_modules", "%.git", "%.cache", "%.idea", "%.vs", "%.vscode", "%__pycache__" },
         mappings = {
           -- i = { ['<c-enter>'] = 'to_fuzzy_refine' },
           n = {
@@ -52,6 +53,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
               ["<leader>bb"] = actions.delete_buffer,
             },
           },
+        },
+        live_grep = {
+          additional_args = { "--no-ignore" },
         },
       },
       extensions = {
@@ -128,6 +132,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set("n", "<leader>sb", builtin.buffers, { desc = "Telescope: Find existing buffers" })
     vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "Telescope: Search current Word" })
     vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "Telescope: Search by Grep" })
+    vim.keymap.set("n", "<leader>sG", function() builtin.live_grep({ additional_args = { "--hidden","--no-ignore" } }) end, { desc = "Telescope: Search by Grep(including hidden files)" })
     -- Slightly advanced example of overriding default behavior and theme
     vim.keymap.set("n", "<leader>ss", function()
       -- You can pass additional configuration to telescope to change theme, layout, etc.
