@@ -165,7 +165,7 @@ return {
       end, names)
 
       -- use for lualine
-      vim.g.lint_names = names
+      vim.b.lint_names = names
       -- Run linters.
       if #names > 0 then
         -- config mypy

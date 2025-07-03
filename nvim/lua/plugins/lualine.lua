@@ -58,9 +58,9 @@ return {
           {
             function()
               -- return "󰦕" .. table.concat(require("lint").get_running(), ", ")
-              return "󰦕 " .. table.concat(vim.g.lint_names, ", ")
+              return "󰦕 " .. table.concat(vim.b.lint_names, ", ")
             end,
-            cond = function() return vim.g.lint_names and #vim.g.lint_names > 0 end,
+            cond = function() return vim.b.lint_names and #vim.b.lint_names > 0 end,
             color = function()
               return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Statement", link = false }).fg) }
             end,
