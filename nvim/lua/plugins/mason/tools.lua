@@ -47,6 +47,7 @@ M.linters = {
   "hadolint", -- dockerfile linter
   "sqlfluff", -- sql linter
   "yamllint", -- yaml linter
+  "selene", -- lua linter
 }
 
 return M
