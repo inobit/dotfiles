@@ -112,7 +112,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     end,{desc = "Telescope: Search Files in CWD" })
 
     vim.keymap.set("n", "<leader>sd", function()
-      builtin.find_files { hidden = true, cwd = require("telescope.utils").buffer_dir() }
+      builtin.find_files { hidden = true, no_ignore = true, cwd = require("telescope.utils").buffer_dir() }
     end, { desc = "telescope: search files in current folder" })
 
     local search_files = function(hidden,no_ignore)
