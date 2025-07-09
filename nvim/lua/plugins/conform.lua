@@ -33,7 +33,7 @@ return { -- Autoformat
       xml = { "xmlformatter" },
       sql = { "sql_formatter" },
       yaml = { "yamlfmt" },
-      markdown = { "prettier" },
+      markdown = { "mdformat" },
     },
   },
   config = function(_, opts)

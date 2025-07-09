@@ -34,6 +34,7 @@ M.formatters = {
   "xmlformatter", -- xml formatter
   "sql-formatter", --sql formatter
   "yamlfmt", -- yaml formatter
+  "mdformat", -- markdown formatter
 }
 
 M.linters = {
