@@ -1,9 +1,3 @@
-local lsp_servers = require("plugins.mason.tools").lsp_servers
--- enable lsp server right now
-for _, server in ipairs(lsp_servers) do
-  vim.lsp.enable(server)
-end
-
 return {
   {
     "neovim/nvim-lspconfig",
@@ -12,23 +6,18 @@ return {
     dependencies = {
       -- install LSPs and related tools to stdpath for neovim
       "mason-org/mason.nvim",
-      -- {
-      --   --BUG: When loading the buffer before the mason-lspconfig plugin, configure some LSP settings.
-      --   -- it fails to recognize the filetype, causing LSP to start failing, and Tree-sitter as well.
-      --   -- use "VeryLazy" or disable "automatic_enable" can avoid this
-      --   -- should vim.lsp.enable(<name>) be called in start?
-      --   "mason-org/mason-lspconfig.nvim",
-      --   opts = {
-      --     ensure_installed = {},
-      --     -- auto enable
-      --     automatic_enable = true,
-      --   },
-      -- },
       -- show progress bar, notification, etc.
       { "j-hui/fidget.nvim", opts = {} },
       -- signatures reinforce
       "ray-x/lsp_signature.nvim",
     },
+    init = function()
+      local lsp_servers = require("plugins.mason.tools").lsp_servers
+      -- enable lsp server right now
+      for _, server in ipairs(lsp_servers) do
+        vim.lsp.enable(server)
+      end
+    end,
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("lspconfig", { clear = true }),
