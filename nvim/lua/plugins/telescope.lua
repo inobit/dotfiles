@@ -38,9 +38,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
         initial_mode = "normal",
         file_ignore_patterns = { "node_modules", "%.git", "%.cache", "%.idea", "%.vs", "%.vscode", "%__pycache__" },
         mappings = {
-          -- i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+          -- i = { ["<c-f>"] = actions.to_fuzzy_refine },
           n = {
-            ["<leader>q"] = actions.close,
+            ["q"] = actions.close,
           },
         },
       },

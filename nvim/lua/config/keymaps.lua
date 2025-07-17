@@ -12,7 +12,7 @@
 vim.keymap.set("i", "jj", "<Esc>")
 -- save key map
 vim.keymap.set("n", "<leader>w", "<Cmd>w<CR>", { desc = ":w" })
-vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { desc = ":q" })
+-- vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { desc = ":q" })
 
 -- use 0# register
 vim.keymap.set("n", "<leader>p", '"0p')
