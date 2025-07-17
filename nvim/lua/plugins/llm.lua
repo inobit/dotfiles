@@ -53,7 +53,7 @@ return {
             models = {
               { model = "anthropic/claude-3.7-sonnet", temperature = 0 },
               { model = "anthropic/claude-sonnet-4", temperature = 0 },
-              { model = "google/gemini-2.5-flash-preview-05-20", temperature = 0 },
+              { model = "google/gemini-2.5-flash", temperature = 0 },
               { model = "google/gemini-2.5-flash-lite-preview-06-17", temperature = 0 },
               { model = "google/gemini-2.5-pro", temperature = 0 },
               { model = "google/gemini-flash-1.5-8b", max_tokens = 8192, temperature = 0.6 },

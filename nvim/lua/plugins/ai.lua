@@ -94,7 +94,7 @@ return {
       { "<leader>al", "<cmd>AvanteClear<cr>", desc = "avante: clear" },
     },
     opts = {
-      provider = "openrouter-gemini-2.5-flash-pre",
+      provider = "openrouter-gemini-2.5-flash",
       vendors = {
         ["siliconflow-deepseek-v3"] = {
           __inherited_from = "openai",
@@ -128,11 +128,11 @@ return {
           temperature = 0,
           max_tokens = 4096,
         },
-        ["openrouter-gemini-2.5-flash-pre"] = {
+        ["openrouter-gemini-2.5-flash"] = {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
           endpoint = "https://openrouter.ai/api/v1",
-          model = "google/gemini-2.5-flash-preview-05-20",
+          model = "google/gemini-2.5-flash",
           temperature = 0,
           max_tokens = 4096,
         },
