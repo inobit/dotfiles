@@ -93,90 +93,51 @@ return {
       { "<leader>fa", "<cmd>AvanteFocus<cr>", desc = "avante: focus" },
       { "<leader>al", "<cmd>AvanteClear<cr>", desc = "avante: clear" },
     },
-    opts = {
-      provider = "openrouter-gemini-2.5-flash",
-      vendors = {
-        ["siliconflow-deepseek-v3"] = {
+    opts = function()
+      ---@param model string
+      ---@param temperature? number
+      ---@param max_tokens? number
+      ---@return table<string, any>
+      local function siliconflow_provider(model, temperature, max_tokens)
+        return {
           __inherited_from = "openai",
           api_key_name = "SILICONFLOW_API_KEY",
           endpoint = "https://api.siliconflow.cn/v1",
-          model = "deepseek-ai/DeepSeek-V3",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["siliconflow-deepseek-r1"] = {
-          __inherited_from = "openai",
-          api_key_name = "SILICONFLOW_API_KEY",
-          endpoint = "https://api.siliconflow.cn/v1",
-          model = "deepseek-ai/DeepSeek-R1",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-claude3.7"] = {
+          model = model,
+          extra_request_body = { temperature = temperature or 0.4, max_tokens = max_tokens or 8192 },
+        }
+      end
+
+      ---@param model string
+      ---@param temperature? number
+      ---@param max_tokens? number
+      ---@return table<string, any>
+      local function openrouter_provider(model, temperature, max_tokens)
+        return {
           __inherited_from = "openai",
           api_key_name = "OPENROUTER_API_KEY",
           endpoint = "https://openrouter.ai/api/v1",
-          model = "anthropic/claude-3.7-sonnet",
-          temperature = 0,
-          max_tokens = 4096,
+          model = model,
+          extra_request_body = { temperature = temperature or 0.4, max_tokens = max_tokens or 8192 },
+        }
+      end
+
+      opts = {
+        -- default provider
+        provider = "openrouter-gemini-2.5-flash",
+        providers = {
+          ["siliconflow-deepseek-v3"] = siliconflow_provider "deepseek-ai/DeepSeek-V3",
+          ["siliconflow-deepseek-r1"] = siliconflow_provider "deepseek-ai/DeepSeek-R1",
+          ["openrouter-claude4"] = openrouter_provider "anthropic/claude-sonnet-4",
+          ["openrouter-gemini-2.5-flash"] = openrouter_provider "google/gemini-2.5-flash",
+          ["openrouter-gemini-2.5-pro"] = openrouter_provider "google/gemini-2.5-pro",
+          ["openrouter-deepseekv3:free"] = openrouter_provider "deepseek/deepseek-chat-v3-0324:free",
+          ["openrouter-deepseekv3"] = openrouter_provider "deepseek/deepseek-chat-v3-0324",
+          ["openrouter-deepseek-r1"] = openrouter_provider "deepseek/deepseek-r1-0528:free",
+          ["openrouter-openai/gpt-4o-mini"] = openrouter_provider "openai/gpt-4o-mini",
         },
-        ["openrouter-claude4"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "anthropic/claude-sonnet-4",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-gemini-2.5-flash"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "google/gemini-2.5-flash",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-gemini-2.5-pro"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "google/gemini-2.5-pro",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-deepseekv3:free"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "deepseek/deepseek-chat-v3-0324:free",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-deepseekv3"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "deepseek/deepseek-chat-v3-0324",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-deepseek-r1"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "deepseek/deepseek-r1-0528:free",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-        ["openrouter-openai/gpt-4o-mini"] = {
-          __inherited_from = "openai",
-          api_key_name = "OPENROUTER_API_KEY",
-          endpoint = "https://openrouter.ai/api/v1",
-          model = "openai/gpt-4o-mini",
-          temperature = 0,
-          max_tokens = 4096,
-        },
-      },
-    },
+      }
+      return opts
+    end,
   },
 }
