@@ -26,6 +26,7 @@ local function run(target_pane, command)
 end
 
 vim.keymap.set("n", "<leader>rr", function()
+  vim.cmd "w"
   if vim.bo.filetype == "python" then
     run(vim.v.count == 0 and 2 or vim.v.count, commands.python())
   elseif vim.bo.filetype == "javascript" then
