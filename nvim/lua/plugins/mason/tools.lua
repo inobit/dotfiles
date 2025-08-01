@@ -7,7 +7,8 @@ M = {}
 
 M.lsp_servers = {
   "lua_ls",
-  "pyright",
+  "ruff", -- python lsp
+  "pyright", -- python lsp
   "ts_ls",
   "html",
   "cssls",
@@ -38,7 +39,7 @@ M.formatters = {
 }
 
 M.linters = {
-  "ruff", -- python linter
+  -- "ruff", -- python linter
   "mypy", -- python linter
   "eslint_d", -- js,ts linter
   "htmlhint", -- html linter

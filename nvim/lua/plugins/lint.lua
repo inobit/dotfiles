@@ -8,7 +8,10 @@ return {
     events = { "BufWritePost", "BufReadPost", "InsertLeave" },
     linters_by_ft = {
       lua = { "selene" },
-      python = { "ruff", "mypy" },
+      python = {
+        --[[ "ruff", ]]
+        "mypy",
+      },
       javascript = { "eslint_d" },
       javascriptreact = { "eslint_d" },
       typescript = { "eslint_d" },
