@@ -39,14 +39,27 @@ return {
         lualine_x = {
           -- stylua: ignore start
           {
-            function() return "󰗊 "..  require("inobit.llm.api").is_translating() end,
-            cond = function() return package.loaded["inobit.llm"] and require("inobit.llm.api").is_translating() ~= nil end,
-            color = function() return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Debug", link = false }).fg) } end,
-          },
-          {
             function() return "󰅾 " .. require("inobit.llm.api"):has_active_chats() .. "/" .. require("inobit.llm.api"):has_chats() end,
             cond = function() return package.loaded["inobit.llm"] and require("inobit.llm.api"):has_chats() > 0 end,
             color = function() return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "DiagnosticHint", link = false }).fg) } end,
+          },
+          {
+            function() return "󰗊 "..  require("inobit.llm.api").is_translating() end,
+            cond = function() return package.loaded["inobit.llm"] and require("inobit.llm.api").is_translating() ~= nil end,
+            color = function() return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "DiagnosticHint", link = false }).fg) } end,
+          },
+          {
+            function()
+              local lsps = vim
+                .iter(vim.lsp.get_clients { bufnr = vim.api.nvim_get_current_buf() })
+                :map(function(client)
+                  return client.name
+                end)
+                :totable()
+              return "  " .. table.concat(lsps, ", ")
+            end,
+            cond = function() return #vim.lsp.get_clients { bufnr = vim.api.nvim_get_current_buf() } > 0 end,
+            color = function() return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Define", link = false }).fg) } end,
           },
           {
             function() return "  " .. require("dap").status() end,
@@ -57,12 +70,11 @@ return {
           },
           {
             function()
-              -- return "󰦕" .. table.concat(require("lint").get_running(), ", ")
-              return "󰦕 " .. table.concat(vim.b.lint_names, ", ")
+              return " " .. table.concat(vim.b.lint_names, ", ")
             end,
             cond = function() return vim.b.lint_names and #vim.b.lint_names > 0 end,
             color = function()
-              return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Statement", link = false }).fg) }
+              return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Character", link = false }).fg) }
             end,
           },
           {
@@ -76,7 +88,7 @@ return {
             end,
             cond = function() return package.loaded["conform"] ~= nil end,
             color = function()
-              return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Special", link = false }).fg) }
+              return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "WarningMsg", link = false }).fg) }
             end,
           },
           -- stylua: ignore end
