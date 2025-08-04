@@ -79,14 +79,10 @@ return {
           },
           {
             function()
-              local formatters = require("conform").list_formatters()
-              local status = "None"
-              if #formatters > 0 then
-                status = table.concat(vim.iter(require("conform").list_formatters()):map(function(f) return f.name end):totable(), ", ")
-              end
+              local status = table.concat(vim.iter(require("conform").list_formatters()):map(function(f) return f.name end):totable(), ", ")
               return "󰉠 " .. status
             end,
-            cond = function() return package.loaded["conform"] ~= nil end,
+            cond = function() return package.loaded["conform"] ~= nil and #require("conform").list_formatters() > 0 end,
             color = function()
               return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "WarningMsg", link = false }).fg) }
             end,
