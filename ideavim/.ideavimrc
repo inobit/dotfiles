@@ -91,8 +91,10 @@ nmap <leader>rn <Action>(RenameElement)
 nmap <leader>rf <Action>(RenameFile)
 
 " new file
-nmap <leader>af <Action>(NewFile)
-nmap <leader>ac <Action>(NewClass)
+command! Fnew :action NewFile
+command! Cnew :action NewClass
+command! Dnew :action NewDir
+command! Connew :action Jdbc.OpenConsole.New
 
 " buffer navigation
 nmap <leader>h <Action>(PreviousTab)
@@ -120,16 +122,16 @@ nmap <leader>sp <Action>(SplitHorizontally)
 nmap <leader>vp <Action>(SplitVertically)
 
 " scroll
-nmap <leader>zh <Action>(EditorScrollLeft)
-nmap <leader>zl <Action>(EditorScrollRight)
+" nmap <leader>zh <Action>(EditorScrollLeft)
+" nmap <leader>zl <Action>(EditorScrollRight)
 
 " code fold
 nmap zc <Action>(CollapseRegion)
 nmap zC <Action>(CollapseRegionRecursively)
 nmap zo <Action>(ExpandRegion)
 nmap zO <Action>(ExpandRegionRecursively)
-nmap zM <Action>(CollapseAllRegions)
-nmap zR <Action>(ExpandAllRegions)
+nmap zm <Action>(CollapseAllRegions)
+nmap zr <Action>(ExpandAllRegions)
 
 " run/debug
 nmap <leader>dr <Action>(ChooseDebugConfiguration)
@@ -148,4 +150,5 @@ nmap <leader>rx <Action>(Console.Jdbc.Execute)
 vmap <leader>rx <Action>(Console.Jdbc.Execute)
 nmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
 vmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
+nmap <leader>fm <Action>(Console.Jdbc.ChooseSchema)
 
