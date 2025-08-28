@@ -126,12 +126,12 @@ nmap <leader>vp <Action>(SplitVertically)
 " nmap <leader>zl <Action>(EditorScrollRight)
 
 " code fold
-nmap zc <Action>(CollapseRegion)
-nmap zC <Action>(CollapseRegionRecursively)
-nmap zo <Action>(ExpandRegion)
-nmap zO <Action>(ExpandRegionRecursively)
-nmap zm <Action>(CollapseAllRegions)
-nmap zr <Action>(ExpandAllRegions)
+" nmap zc <Action>(CollapseRegion)
+" nmap zC <Action>(CollapseRegionRecursively)
+" nmap zo <Action>(ExpandRegion)
+" nmap zO <Action>(ExpandRegionRecursively)
+" nmap zm <Action>(CollapseAllRegions)
+" nmap zr <Action>(ExpandAllRegions)
 
 " run/debug
 nmap <leader>dr <Action>(ChooseDebugConfiguration)
