@@ -11,7 +11,7 @@ local vscode = require "vscode-neovim"
 map("n", "<leader>w", function() vscode.action "workbench.action.files.save" end, "vscode: save file")
 
 -- quit
-map("n", "<leader>q", function() vscode.action "workbench.action.closeActiveEditor" end, "vscode: close editor")
+-- map("n", "<leader>q", function() vscode.action "workbench.action.closeActiveEditor" end, "vscode: close editor")
 
 -- use 0# register
 map("n", "<leader>p", '"0p',"vscode: \"0 p")
@@ -103,8 +103,10 @@ map("n", "<leader>bh", function() vscode.action "workbench.action.closeEditorsTo
 map("n", "<leader>bl", function() vscode.action "workbench.action.closeEditorsToTheRight" end, "vscode: close right buffers")
 
 -- create file
-map("n", "<leader>af", function() vscode.action "explorer.newFile" end, "vscode: new file")
-map("n", "<leader>ad", function() vscode.action "explorer.newFolder" end, "vscode: new folder")
+-- map("n", "<leader>af", function() vscode.action "explorer.newFile" end, "vscode: new file")
+-- map("n", "<leader>ad", function() vscode.action "explorer.newFolder" end, "vscode: new folder")
+vim.api.nvim_create_user_command("Fnew", function() vscode.action "explorer.newFile" end, { desc = "Create a new file in VS Code Explorer" })
+vim.api.nvim_create_user_command("Dnew", function() vscode.action "explorer.newFolder" end, { desc = "Create a new folder in VS Code Explorer" })
 
 -- file search
 map("n", "<leader>sf", function() vscode.action "workbench.action.quickOpen" end, "vscode: search files")
@@ -124,13 +126,13 @@ map("n", "<leader>tt", function() vscode.action "workbench.action.terminal.toggl
 
 
 -- horizontal scroll
-map("n", "<leader>zh", function()
+map("n", "zh", function()
   for i = 1, 5 do
     vscode.action "scrollLeft"
   end
 end, "vscode: scroll left")
 
-map("n", "<leader>zl", function()
+map("n", "zl", function()
   for i = 1, 5 do
     vscode.action "scrollRight"
   end
@@ -170,6 +172,6 @@ map("n", "<leader>rr", function() vscode.action "code-runner.run" end, "vscode: 
 map("n", "<leader>rs", function() vscode.action "code-runner.stop" end, "vscode: code stop")
 
 -- translate
-map("x", "<leader><leader>e", function() vscode.action "extension.translateTextPreferred" end, "vscode: translate")
+map("x", "<leader>ts", function() vscode.action "extension.translateTextPreferred" end, "vscode: translate")
 
 -- stylua: ignore end
