@@ -10,7 +10,7 @@ return {
           require "dap_set.python"
         elseif
           -- js config
-          vim.tbl_contains(require "lib.js_based_languages", vim.bo.filetype)
+          vim.tbl_contains({ "typescript", "javascript", "typescriptreact", "javascriptreact" }, vim.bo.filetype)
         then
           require "dap_set.js"
         elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
@@ -50,6 +50,7 @@ return {
     "nvim-neotest/nvim-nio",
     { "theHamsta/nvim-dap-virtual-text", opts = {} },
     "mfussenegger/nvim-dap-python",
+    "mason-org/mason.nvim", -- install dap adapter
   },
   config = function()
     -- dap client -launch/attach-> adapter(debugger) -launch/attach-> debuggee

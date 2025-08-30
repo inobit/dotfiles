@@ -1,5 +1,8 @@
 local dap = require "dap"
 local Path = require "plenary.path"
+local vscode = require "dap.ext.vscode"
+
+local js_based_languages = { "typescript", "javascript", "typescriptreact", "javascriptreact" }
 
 -- adapter config
 local js_adapter_path = Path:new(
@@ -13,13 +16,19 @@ local js_adapter_path = Path:new(
 ).filename
 
 local adapters = {
-  "pwa-node",
-  "pwa-chrome",
-  "pwa-msedge",
+  "node",
+  "chrome",
+  "msedge",
 }
 
 for _, adapter in ipairs(adapters) do
-  dap.adapters[adapter] = {
+  local pwa_adapter = "pwa-" .. adapter
+
+  vscode.type_to_filetypes[adapter] = js_based_languages
+  vscode.type_to_filetypes[pwa_adapter] = js_based_languages
+
+  -- config pwa-node,pwa-chrome,pwa-msedge
+  dap.adapters[pwa_adapter] = {
     type = "server",
     host = "localhost",
     port = "${port}",
@@ -28,10 +37,22 @@ for _, adapter in ipairs(adapters) do
       args = { js_adapter_path, "${port}" },
     },
   }
+  -- support node, chrome, msedge (used by vscode)
+  if not dap.adapters[adapter] then
+    dap.adapters[adapter] = function(cb, config)
+      config.type = pwa_adapter
+      local nativeAdapter = dap.adapters[pwa_adapter]
+      if type(nativeAdapter) == "function" then
+        nativeAdapter(cb, config)
+      else
+        cb(nativeAdapter)
+      end
+    end
+  end
 end
 
 -- debuggee config
-local js_based_languages = require "lib.js_based_languages"
+
 for _, language in ipairs(js_based_languages) do
   dap.configurations[language] = {
     -- Debug single nodejs files
@@ -40,7 +61,7 @@ for _, language in ipairs(js_based_languages) do
       request = "launch",
       name = "Launch file",
       program = "${file}",
-      cwd = vim.fn.getcwd(),
+      cwd = "${workspaceFolder}",
       sourceMaps = true,
       protocol = "inspector",
       skipFiles = { "<node_internals>/**", "node_modules/**" },
@@ -51,7 +72,7 @@ for _, language in ipairs(js_based_languages) do
       request = "attach",
       name = "Attach",
       processId = require("dap.utils").pick_process,
-      cwd = vim.fn.getcwd(),
+      cwd = "${workspaceFolder}",
       sourceMaps = true,
     },
     -- Debug web applications (client side)
