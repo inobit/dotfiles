@@ -1,36 +1,34 @@
 local dap = require "dap"
+local Path = require "plenary.path"
+
 -- adapter config
----@diagnostic disable-next-line: missing-fields
-require("dap-vscode-js").setup {
-  -- Path of node executable. Defaults to $NODE_PATH, and then "node"
-  node_path = "node",
+local js_adapter_path = Path:new(
+  vim.fn.stdpath "data",
+  "mason",
+  "packages",
+  "js-debug-adapter",
+  "js-debug",
+  "src",
+  "dapDebugServer.js"
+).filename
 
-  -- Path to vscode-js-debug installation.
-  -- debugger_path = vim.fn.resolve(vim.fn.stdpath "data" .. "/lazy/vscode-js-debug"),
-  debugger_path = vim.g.vscode_js_debug_path or vim.fn.stdpath "data" .. "/lazy/vscode-js-debug",
-  -- debugger_path = vim.fn.resolve(vim.fn.stdpath "data" .. "/mason/packages/js-debug-adapter"),
-
-  -- Command to use to launch the debug server. Takes precedence over "node_path" and "debugger_path"
-  -- debugger_cmd = { "js-debug-adapter" },
-
-  -- which adapters to register in nvim-dap
-  adapters = {
-    "pwa-node",
-    "pwa-chrome",
-    "pwa-msedge",
-    "pwa-extensionHost",
-    "node-terminal",
-  },
-
-  -- Path for file logging
-  -- log_file_path = "(stdpath cache)/dap_vscode_js.log",
-
-  -- Logging level for output to file. Set to false to disable logging.
-  -- log_file_level = false,
-
-  -- Logging level for output to console. Set to false to disable console output.
-  -- log_console_level = vim.log.levels.ERROR,
+local adapters = {
+  "pwa-node",
+  "pwa-chrome",
+  "pwa-msedge",
 }
+
+for _, adapter in ipairs(adapters) do
+  dap.adapters[adapter] = {
+    type = "server",
+    host = "localhost",
+    port = "${port}",
+    executable = {
+      command = "node",
+      args = { js_adapter_path, "${port}" },
+    },
+  }
+end
 
 -- debuggee config
 local js_based_languages = require "lib.js_based_languages"
@@ -44,6 +42,8 @@ for _, language in ipairs(js_based_languages) do
       program = "${file}",
       cwd = vim.fn.getcwd(),
       sourceMaps = true,
+      protocol = "inspector",
+      skipFiles = { "<node_internals>/**", "node_modules/**" },
     },
     -- Debug nodejs processes (make sure to add --inspect when you run the process)
     {
@@ -74,7 +74,8 @@ for _, language in ipairs(js_based_languages) do
           end)
         end)
       end,
-      webRoot = vim.fn.getcwd(),
+      -- webRoot = vim.fn.getcwd(),
+      webRoot = "${workspaceFolder}",
       protocol = "inspector",
       sourceMaps = true,
       userDataDir = false,

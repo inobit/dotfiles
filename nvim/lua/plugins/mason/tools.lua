@@ -23,7 +23,7 @@ M.lsp_servers = {
   "marksman",
 }
 
-M.debugger_adapter = { "codelldb" }
+M.debugger_adapter = { "codelldb", "js-debug-adapter" }
 
 M.formatters = {
   "stylua", -- lua formatter

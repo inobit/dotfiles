@@ -50,14 +50,6 @@ return {
     "nvim-neotest/nvim-nio",
     { "theHamsta/nvim-dap-virtual-text", opts = {} },
     "mfussenegger/nvim-dap-python",
-    {
-      "mxsdev/nvim-dap-vscode-js",
-      --手动安装在 ~/.dap
-      --[[ dependencies = {
-        "microsoft/vscode-js-debug",
-        buid = "npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out",
-      }, ]]
-    },
   },
   config = function()
     -- dap client -launch/attach-> adapter(debugger) -launch/attach-> debuggee
