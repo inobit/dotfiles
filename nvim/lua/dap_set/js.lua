@@ -99,7 +99,7 @@ for _, language in ipairs(js_based_languages) do
       webRoot = "${workspaceFolder}",
       protocol = "inspector",
       sourceMaps = true,
-      userDataDir = false,
+      userDataDir = true,
     },
     {
       type = "pwa-node",
