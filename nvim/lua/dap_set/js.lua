@@ -101,6 +101,28 @@ for _, language in ipairs(js_based_languages) do
       sourceMaps = true,
       userDataDir = true,
     },
+
+    -- How to debug a remote server in local chrome
+    -- For example, in Debian:
+    -- 1. sudo apt install chromium
+    -- 2. Start remote debug mode: chromium --headless --remote-debugging-port=9222 --no-sandbox --remote-allow-origins='*' http://localhost:3000;
+    -- 3. In the local machine:
+    --    3.1 Set up port forwarding: ssh -N -L 922:localhost:9222 debian
+    --    3.2 Start remote debug mode: Start-Process "chrome.exe" -ArgumentList "--remote-debugging-port=9222", "--user-data-dir=your_tmp_path"
+    --    3.3 Open http://localhost:922 and get devtoolsFrontendUrl
+    --    3.4 Open http://localhost:9222/{devtoolsFrontendUrl}
+    --    3.5 You can see a nested window from the remote headless Chrome, and then open http://localhost:3000 in this window.
+    -- 4. In the remote machine, use the following configuration to start the debug session.
+    {
+      type = "pwa-chrome",
+      request = "attach",
+      name = "Attach to Chrome",
+      -- trace = true,
+      port = 9222,
+      webRoot = "${workspaceFolder}",
+      protocol = "inspector",
+      sourceMaps = true,
+    },
     {
       type = "pwa-node",
       request = "launch",
