@@ -71,7 +71,7 @@ return {
             user_role = "user",
           },
         },
-        default_server = "OpenRouter@deepseek/deepseek-chat-v3-0324:free",
+        default_server = "OpenRouter@google/gemini-2.5-flash",
         default_translate_server = vim.g.my_deeplx and "DeepL@DeepLX" or "OpenRouter@google/gemini-flash-1.5-8b",
         user_prompt = "~",
       }
