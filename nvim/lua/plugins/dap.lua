@@ -15,6 +15,8 @@ return {
           require "dap_set.js"
         elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
           require "dap_set.cpp"
+        elseif vim.bo.filetype == "java" then
+          require "dap_set.java"
         end
         -- run debug
         require("dap").continue()

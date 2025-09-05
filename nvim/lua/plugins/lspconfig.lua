@@ -15,8 +15,27 @@ return {
       local lsp_servers = require("plugins.mason.tools").lsp_servers
       -- enable lsp server right now
       for _, server in ipairs(lsp_servers) do
-        vim.lsp.enable(server)
+        vim.lsp.enable(server) -- jdtls is configured by nvim-java
       end
+
+      -- lsp config
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+
+      -- Configuration from the result of merging all tables returned by lsp/<name>.lua files in 'runtimepath' for a server of name.
+      vim.lsp.config("*", {
+        capabilities = capabilities,
+        on_attach = function(client, bufnr)
+          if client.name == "ruff" then
+            -- Disable hover in favor of Pyright
+            client.server_capabilities.hoverProvider = false
+          end
+          require("lsp_signature").on_attach({
+            hint_enable = false,
+            handler_opts = { border = "none" },
+          }, bufnr)
+        end,
+      })
     end,
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -114,25 +133,6 @@ return {
               callback = vim.lsp.buf.clear_references,
             })
           end
-        end,
-      })
-
-      -- lsp config
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
-      -- Configuration from the result of merging all tables returned by lsp/<name>.lua files in 'runtimepath' for a server of name.
-      vim.lsp.config("*", {
-        capabilities = capabilities,
-        on_attach = function(client, bufnr)
-          if client.name == "ruff" then
-            -- Disable hover in favor of Pyright
-            client.server_capabilities.hoverProvider = false
-          end
-          require("lsp_signature").on_attach({
-            hint_enable = false,
-            handler_opts = { border = "none" },
-          }, bufnr)
         end,
       })
     end,

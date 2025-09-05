@@ -34,6 +34,7 @@ return { -- Autoformat
       sql = { "sql_formatter" },
       yaml = { "yamlfmt" },
       markdown = { "mdformat" },
+      java = { "google-java-format" },
     },
   },
   config = function(_, opts)

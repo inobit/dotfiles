@@ -5,6 +5,7 @@
 ---@field linters string[]
 M = {}
 
+-- don't add jdtls here, it is configured by nvim-java
 M.lsp_servers = {
   "lua_ls",
   "ruff", -- python lsp
@@ -36,6 +37,7 @@ M.formatters = {
   "sql-formatter", --sql formatter
   "yamlfmt", -- yaml formatter
   "mdformat", -- markdown formatter
+  "google-java-format", -- java formatter
 }
 
 M.linters = {

@@ -39,6 +39,7 @@ return { -- Highlight, edit, and navigate code
       "gitattributes",
       "gitcommit",
       "gitignore",
+      "java",
     },
     -- Autoinstall languages that are not installed
     auto_install = true,
