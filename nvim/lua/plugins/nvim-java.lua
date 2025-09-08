@@ -4,9 +4,53 @@ return {
   dependencies = {
     "neovim/nvim-lspconfig",
   },
-  config = function()
-    require("java").setup()
-    require("lspconfig").jdtls.setup {}
+  opts = {
+    jdk = {
+      auto_install = false,
+      version = "21.0.1",
+    },
+  },
+  config = function(_, opts)
+    require("java").setup(opts)
+    require("lspconfig").jdtls.setup {
+      settings = {
+        configuration = {
+          runtimes = vim.g.java_runtimes,
+          updateBuildConfiguration = "interactive",
+        },
+        -- Enable downloading archives from eclipse automatically
+        eclipse = {
+          downloadSource = true,
+        },
+        -- Enable downloading archives from maven automatically
+        maven = {
+          downloadSources = true,
+        },
+        -- Enable method signature help
+        signatureHelp = {
+          enabled = true,
+        },
+        -- Use the fernflower decompiler when using the javap command to decompile byte code back to java code
+        contentProvider = {
+          preferred = "fernflower",
+        },
+        -- Setup automatical package import oranization on file save
+        saveActions = {
+          organizeImports = true,
+          cleanup = true,
+        },
+        -- enable code lens in the lsp
+        referencesCodeLens = {
+          enabled = true,
+        },
+        -- enable inlay hints for parameter names,
+        inlayHints = {
+          parameterNames = {
+            enabled = "all",
+          },
+        },
+      },
+    }
 
     vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(event)
