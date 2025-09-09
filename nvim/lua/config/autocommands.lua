@@ -1,7 +1,11 @@
+local function augroup(name)
+  return vim.api.nvim_create_augroup("inobit_" .. name, { clear = true })
+end
+
 -- highlight when copying(:help vim.highlight.on_yank())
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
-  group = vim.api.nvim_create_augroup("highlight_yank", { clear = true }),
+  group = augroup "highlight_yank",
   callback = function()
     vim.hl.on_yank()
   end,
@@ -10,7 +14,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 -- mark when modified to achieve the effect of lastchange
 vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedT", "TextChangedP", "TextChangedI" }, {
   desc = "last change",
-  group = vim.api.nvim_create_augroup("textChange", { clear = true }),
+  group = augroup "textChange",
   callback = function(event)
     -- need to exclude floating windows
     local relative = vim.api.nvim_win_get_config(vim.api.nvim_get_current_win()).relative
@@ -25,20 +29,18 @@ vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedT", "TextChangedP", "Te
 })
 
 -- auto coloring
-vim.api.nvim_create_autocmd("BufEnter", {
-  group = vim.api.nvim_create_augroup("Colorizer", {
-    clear = true,
-  }),
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup "auto_colorizer",
   pattern = {
-    "*.html",
-    "*.css",
-    "*.scss",
-    "*.less",
-    "*.sass",
-    "*.ts",
-    "*.js",
-    "*.tsx",
-    "*.jsx",
+    "html",
+    "css",
+    "scss",
+    "less",
+    "sass",
+    "ts",
+    "js",
+    "tsx",
+    "jsx",
   },
   callback = function()
     local status, colorizer = pcall(require, "colorizer")
@@ -55,14 +57,14 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- save winview
 vim.api.nvim_create_autocmd({ "BufWinLeave" }, {
-  group = vim.api.nvim_create_augroup("view_control", { clear = false }),
+  group = augroup "view_control",
   pattern = "*",
   callback = function()
     vim.b.winview = vim.fn.winsaveview()
   end,
 })
 vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-  group = vim.api.nvim_create_augroup("view_control", { clear = false }),
+  group = augroup "view_control",
   pattern = "*",
   callback = function()
     if vim.b.winview ~= nil then
@@ -73,16 +75,16 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
 
 -- hidden levels of json files
 vim.api.nvim_create_autocmd("FileType", {
-  group = vim.api.nvim_create_augroup("json_conceal", { clear = true }),
+  group = augroup "json_conceal",
   pattern = { "json", "json5", "jsonc", "markdown" },
   callback = function()
-    vim.opt.conceallevel = 0
+    vim.opt_local.conceallevel = 0
   end,
 })
 
 -- auto load run module
 vim.api.nvim_create_autocmd("FileType", {
-  group = vim.api.nvim_create_augroup("run", { clear = true }),
+  group = augroup "run",
   pattern = { "python", "c", "cpp", "javascript" },
   callback = function()
     require "dap_set.run"
@@ -91,7 +93,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- strong,italic highlight
 vim.api.nvim_create_autocmd("FileType", {
-  group = vim.api.nvim_create_augroup("md_highlight", { clear = true }),
+  group = augroup "md_highlight",
   pattern = "markdown",
   callback = function()
     vim.api.nvim_set_hl(0, "@markup.strong", { fg = "#ff6347", bg = "", bold = true })
@@ -99,31 +101,68 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- auto close when delete special buffers
-vim.api.nvim_create_autocmd("BufUnload", {
-  group = vim.api.nvim_create_augroup("SpecialBufDelete", { clear = true }),
-  pattern = "*",
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup "close_with_q",
+  pattern = {
+    "PlenaryTestPopup",
+    "checkhealth",
+    "dbout",
+    "gitsigns-blame",
+    "grug-far",
+    "help",
+    "lspinfo",
+    "neotest-output",
+    "neotest-output-panel",
+    "neotest-summary",
+    "notify",
+    "qf",
+    "spectre_panel",
+    "startuptime",
+    "tsplayground",
+  },
   callback = function(event)
-    local pattern = {
-      "PlenaryTestPopup",
-      "checkhealth",
-      "dbout",
-      "gitsigns-blame",
-      "grug-far",
-      "help",
-      "lspinfo",
-      "neotest-output",
-      "neotest-output-panel",
-      "neotest-summary",
-      "notify",
-      "qf",
-      "spectre_panel",
-      "startuptime",
-      "tsplayground",
-    }
-    -- close the window,tab
-    if vim.tbl_contains(pattern, vim.bo[event.buf].filetype) then
-      vim.cmd "close"
+    vim.bo[event.buf].buflisted = false
+    vim.schedule(function()
+      vim.keymap.set("n", "q", function()
+        vim.cmd "close"
+        pcall(vim.api.nvim_buf_delete, event.buf, { force = true })
+      end, {
+        buffer = event.buf,
+        silent = true,
+        desc = "Quit buffer",
+      })
+    end)
+  end,
+})
+
+-- Auto create dir when saving a file, in case some intermediate directory does not exist(very useful for java development)
+vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+  group = augroup "auto_create_dir",
+  callback = function(event)
+    if event.match:match "^%w%w+:[\\/][\\/]" then
+      return
     end
+    local file = vim.uv.fs_realpath(event.match) or event.match
+    vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
+  end,
+})
+
+-- Check if we need to reload the file when it changed
+vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+  group = augroup "checktime",
+  callback = function()
+    if vim.o.buftype ~= "nofile" then
+      vim.cmd "checktime"
+    end
+  end,
+})
+
+-- resize splits if window got resized
+vim.api.nvim_create_autocmd({ "VimResized" }, {
+  group = augroup "resize_splits",
+  callback = function()
+    local current_tab = vim.fn.tabpagenr()
+    vim.cmd "tabdo wincmd ="
+    vim.cmd("tabnext " .. current_tab)
   end,
 })
