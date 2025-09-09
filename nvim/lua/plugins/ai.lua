@@ -1,7 +1,7 @@
 return {
   {
     "Exafunction/codeium.nvim",
-    event = { "VeryLazy" },
+    event = { "InsertEnter" },
     dependencies = {
       "nvim-lua/plenary.nvim",
       "hrsh7th/nvim-cmp",
@@ -35,7 +35,7 @@ return {
   },
   {
     "supermaven-inc/supermaven-nvim",
-    event = { "VeryLazy" },
+    event = { "InsertEnter" },
     opts = {
       keymaps = {
         accept_suggestion = "<M-y>",
@@ -48,7 +48,7 @@ return {
   },
   {
     "luozhiya/fittencode.nvim",
-    event = { "VeryLazy" },
+    event = { "InsertEnter" },
     opts = {
       inline_completion = {
         enabled = "fittencode" == vim.g.ai_inline_completion_engine,
@@ -74,7 +74,7 @@ return {
   -- avante
   {
     "yetone/avante.nvim",
-    event = "VeryLazy",
+    -- event = "VeryLazy",
     version = false, -- Set this to "*" to always pull the latest release version, or set it to false to update to the latest code changes.
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
     -- build = "make",
