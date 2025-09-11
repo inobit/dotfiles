@@ -9,25 +9,31 @@ if [[ -n $proxy ]]; then
 	export no_proxy="127.0.0.1,localhost,::1"
 	if grep -q 'ID=debian' /etc/os-release || grep -q 'ID=ubuntu' /etc/os-release; then
 		test -f /etc/apt/apt.conf || sudo touch /etc/apt/apt.conf
-		echo "Acquire::http::Proxy $proxy" >>/etc/apt/apt.conf
+		if grep -q '^Acquire' /etc/apt/apt.conf; then
+			sudo sed -i '/^Acquire/d' /etc/apt/apt.conf
+		fi
+		echo "Acquire::http::Proxy $proxy;" >>/etc/apt/apt.conf
 	fi
+
 fi
 
-echo "config ssh"
-if [[ -d $HOME/.ssh ]]; then
-	eval "$(ssh-agent)"
-	for possiblekey in "${HOME}"/.ssh/*; do
-		if grep -q PRIVATE "$possiblekey"; then
-			ssh-add "$possiblekey"
-		fi
-	done
+read -r -p "Whether to config ssh agent? y or n: " config_ssh_agent
+if [[ $config_ssh_agent = "y" ]]; then
+	if [[ -d $HOME/.ssh ]]; then
+		eval "$(ssh-agent)"
+		for possiblekey in "${HOME}"/.ssh/*; do
+			if grep -q PRIVATE "$possiblekey"; then
+				ssh-add "$possiblekey"
+			fi
+		done
+	fi
 fi
 
 echo "update system"
 sudo apt update && sudo apt upgrade -y
 
 echo "install tools"
-sudo apt install make gcc ripgrep unzip git xclip curl wget -y
+sudo apt install make gcc ripgrep fd-find unzip git xclip curl wget -y
 
 echo "pull dotfiles"
 if [[ ! -d $HOME/documents/dotfiles ]]; then
@@ -38,21 +44,30 @@ fi
 echo "install nvim"
 if ! which nvim >/dev/null 2>&1; then
 	sudo rm -rf /opt/nvim-linux64
-	curl -LO https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux64.tar.gz
-	sudo tar -xzf nvim-linux64.tar.gz -C /opt
-	sudo ln -sf /opt/nvim-linux64/bin/nvim /usr/bin/nvim
+	curl -fSsL -o nvim-linux-x86_64.tar.gz https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-x86_64.tar.gz
+	sudo tar -xzf nvim-linux-x86_64.tar.gz -C /opt
+	sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/bin/nvim
 fi
 
 echo "ln nvim config"
 test -d "$HOME"/.config || mkdir -p ~/.config
 ln -sf "$HOME"/documents/dotfiles/nvim ~/.config/nvim
 
+echo "install tree-sitter"
+if [[ ! -f $HOME/.local/bin/tree-sitter ]]; then
+	mkdir -p "$HOME"/.local/bin
+	curl -fSsLO https://github.com/tree-sitter/tree-sitter/releases/download/v0.25.9/tree-sitter-linux-x64.gz
+	gunzip tree-sitter-linux-x64.gz
+	chmod a+x tree-sitter-linux-x64
+	mv tree-sitter-linux-x64 "$HOME"/.local/bin/tree-sitter
+fi
+
 echo "install tmux"
 if ! which tmux >/dev/null 2>&1; then
 	sudo apt install libevent-dev ncurses-dev build-essential bison pkg-config -y
 	# sudo apt install tmux
 	if [[ ! -f ./tmux-3.4.tar.gz ]]; then
-		curl -LO https://github.com/tmux/tmux/releases/download/3.4/tmux-3.4.tar.gz
+		curl -fSsLO https://github.com/tmux/tmux/releases/download/3.4/tmux-3.4.tar.gz
 	fi
 	test -d ./tmux-3.4 && rm -rf ./tmux-3.4
 	tar -zxf tmux-3.4.tar.gz
@@ -80,6 +95,11 @@ echo "install node 20 18"
 source "$HOME/.nvm/nvm.sh"
 nvm install 20
 nvm install 18
+
+echo "install pnpm"
+if [[ ! -d $HOME/.local/share/pnpm ]]; then
+	curl -fsSL https://get.pnpm.io/install.sh | sh -
+fi
 
 echo "install uv"
 if [[ ! -f $HOME/.local/bin/uv ]]; then
@@ -133,8 +153,8 @@ if [[ ! -d $HOME/.oh-my-zsh/custom/plugins/zsh-completions ]]; then
 	echo "install zsh-autocomplete"
 	git clone --depth 1 git@github.com:zsh-users/zsh-completions.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-completions
 fi
-echo "ln .zshrc"
-ln -sf "$HOME"/documents/dotfiles/zsh/.zshrc "$HOME"/.myzshrc
+echo "copy .zshrc"
+cpoy "$HOME"/documents/dotfiles/zsh/.zshrc "$HOME"/.zshrc
 
 echo "change to zsh"
 chsh -s /usr/bin/zsh
