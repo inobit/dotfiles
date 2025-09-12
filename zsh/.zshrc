@@ -74,6 +74,7 @@ ZSH_THEME="robbyrussell"
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete)
 
 fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
+autoload -U compinit && compinit
 
 source $ZSH/oh-my-zsh.sh
 
@@ -105,7 +106,8 @@ export EDITOR='nvim'
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias setproxy="export ALL_PROXY=http://127.0.0.1:7890" alias unsetproxy="unset ALL_PROXY"
 alias vim="nvim"
-export no_proxy="127.0.0.1,localhost,::1"
+alias fd="fdfind"
+export NO_PROXY="127.0.0.1,localhost,::1"
 export TIME_STYLE="long-iso"
 
 export NVM_DIR="$HOME/.nvm"
