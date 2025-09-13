@@ -148,7 +148,6 @@ return {
       local helpers = require "null-ls.helpers"
       local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
       null_ls.setup {
-        debug = true,
         update_in_insert = true,
         debounce = 150,
         -- register sources
@@ -202,7 +201,7 @@ return {
               "typescript",
               "javascriptreact",
               "typescriptreact",
-              -- "html",
+              "html",
               "css",
               "scss",
               "sass",
