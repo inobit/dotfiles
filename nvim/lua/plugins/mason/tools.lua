@@ -1,11 +1,8 @@
 ---@class mason.Tools
----@field lsp_servers string[]
----@field debugger_adapter string[]
----@field formatters string[]
----@field linters string[]
 M = {}
 
 -- don't add jdtls here, it is configured by nvim-java
+---@type string[]
 M.lsp_servers = {
   "lua_ls",
   "ruff", -- python lsp
@@ -14,7 +11,7 @@ M.lsp_servers = {
   "html",
   "cssls",
   "jsonls",
-  "bashls",
+  "bashls", -- If shellcheck is installed, bash-language-server will automatically call it to provide linting
   "dockerls",
   "sqlls",
   "yamlls",
@@ -22,10 +19,13 @@ M.lsp_servers = {
   "clangd",
   "emmet_ls",
   "marksman",
+  "eslint", --vsocde eslint, package name is eslint-lsp, need install eslint (global or local)
 }
 
+---@type string[]
 M.debugger_adapter = { "codelldb", "js-debug-adapter" }
 
+---@type string[]
 M.formatters = {
   "stylua", -- lua formatter
   "clang-format", -- c cpp formatter
@@ -40,13 +40,13 @@ M.formatters = {
   "google-java-format", -- java formatter
 }
 
+---@type string[]
 M.linters = {
-  -- "ruff", -- python linter
+  -- "ruff", -- python linter(lsp)
   "mypy", -- python linter
-  "eslint_d", -- js,ts linter
+  -- "eslint_d", -- use eslint-lsp
   "htmlhint", -- html linter
   "stylelint", -- css,scss,sass,less linter
-  "jsonlint", -- json linter
   "shellcheck", -- shell linter
   "hadolint", -- dockerfile linter
   "sqlfluff", -- sql linter

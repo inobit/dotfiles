@@ -97,6 +97,7 @@ return {
           end, "Go to previous [D]iagnostic message")
           -- 设置diagnostics 格式和标记
           vim.diagnostic.config {
+            update_in_insert = true,
             virtual_text = {
               format = function(diagnostic)
                 return string.format(
@@ -135,6 +136,251 @@ return {
           end
         end,
       })
+    end,
+  },
+  -- Generic lsp server that maximizes the use of neovim's lsp capabilities
+  {
+    "nvimtools/none-ls.nvim",
+    event = { "BufReadPost", "BufWritePost", "BufNewFile" },
+    dependencies = { "nvim-lua/plenary.nvim", "mason-org/mason.nvim" },
+    config = function()
+      local null_ls = require "null-ls"
+      local helpers = require "null-ls.helpers"
+      local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+      null_ls.setup {
+        debug = true,
+        update_in_insert = true,
+        debounce = 150,
+        -- register sources
+        sources = {
+          -- formatters
+          -- lua
+          null_ls.builtins.formatting.stylua,
+          -- c,cpp
+          null_ls.builtins.formatting.clang_format.with {
+            extra_args = function()
+              -- clang-format global config
+              local styles = vim.json.encode {
+                BasedOnStyle = "LLVM",
+                IndentPPDirectives = "AfterHash",
+                IndentWidth = 4,
+                AllowShortBlocksOnASingleLine = true,
+                AllowShortCaseLabelsOnASingleLine = true,
+                -- AllowShortIfStatementsOnASingleLine = true,
+                AllowShortFunctionsOnASingleLine = "All",
+                AlignAfterOpenBracket = "Align",
+                BreakBeforeBraces = "Custom",
+                BraceWrapping = {
+                  AfterClass = true,
+                  AfterControlStatement = true,
+                  AfterEnum = true,
+                  AfterFunction = true,
+                  AfterNamespace = true,
+                  AfterStruct = true,
+                  AfterUnion = true,
+                  AfterExternBlock = true,
+                  SplitEmptyFunction = false,
+                  SplitEmptyRecord = false,
+                  SplitEmptyNamespace = false,
+                },
+              }
+              styles = styles:gsub('"', ""):gsub(":", ": ")
+              return {
+                -- use .clang-format file
+                -- "-style=file",
+                -- use command line arguments
+                "-style=" .. styles,
+              }
+            end,
+          },
+          -- python
+          null_ls.builtins.formatting.black,
+          -- javascript,typescript,javascriptreact,typescriptreact,html,css,scss,sass,less,json,jsonc,json5
+          null_ls.builtins.formatting.prettier.with {
+            filetypes = {
+              "javascript",
+              "typescript",
+              "javascriptreact",
+              "typescriptreact",
+              -- "html",
+              "css",
+              "scss",
+              "sass",
+              "less",
+              "json",
+              "jsonc",
+              "json5",
+            },
+          },
+          -- sh, bash
+          null_ls.builtins.formatting.shfmt.with { filetypes = { "sh", "bash" } },
+          -- sql
+          null_ls.builtins.formatting.sql_formatter.with {
+            extra_args = function()
+              return {
+                "-c",
+                vim.json.encode {
+                  language = "mysql",
+                  tabWidth = 2,
+                  keywordCase = "upper",
+                  dataTypeCase = "upper",
+                  functionCase = "upper",
+                  linesBetweenQueries = 2,
+                  paramTypes = { named = { ":" } },
+                },
+              }
+            end,
+          },
+          -- yaml
+          null_ls.builtins.formatting.yamlfmt,
+          -- markdown
+          null_ls.builtins.formatting.mdformat,
+          -- java
+          null_ls.builtins.formatting.google_java_format,
+          -- xml(manual register)
+          {
+            name = "xmlformatter",
+            method = null_ls.methods.FORMATTING,
+            filetypes = { "xml" },
+            generator = null_ls.formatter {
+              command = "xmlformat",
+              args = { "-" },
+              to_stdin = true,
+            },
+          },
+          -- linters
+          -- lua
+          null_ls.builtins.diagnostics.selene.with {
+            condition = function(utils)
+              return utils.root_has_file "selene.toml"
+            end,
+          },
+          -- python
+          null_ls.builtins.diagnostics.mypy.with {
+            extra_args = function(_)
+              return { "--python-executable", vim.b.python_bin }
+            end,
+          },
+          -- html
+          {
+            name = "htmlhint",
+            method = null_ls.methods.DIAGNOSTICS,
+            filetypes = { "html" },
+            generator = null_ls.generator {
+              command = "htmlhint",
+              args = {
+                -- "global config"
+                "--rules",
+                "doctype-first,\
+                attr-lowercase,attr-no-duplication,attr-no-unnecessary-whitespace,attr-sorted,\
+                attr-unsafe-chars,attr-value-double-quotes,attr-value-no-duplication,\
+                tag-no-obsolete,tag-pair,tagname-lowercase,tagname-specialchars,\
+                id-class-ad-disabled,id-unique,id-class-value=dash",
+                "-f",
+                "json",
+                "$FILENAME",
+              },
+              to_stdin = false,
+              -- htmlhint did't supports stdin
+              to_temp_file = true,
+              check_exit_code = function(code)
+                return code <= 1
+              end,
+              format = "raw",
+              on_output = function(params, done)
+                -- Self-parsing to handle configuration file parsing errors
+                local status, response = pcall(vim.json.decode, params.output)
+                if status then
+                  if #response > 0 then
+                    params.output = response[1].messages -- lint single file
+                    for _, message in ipairs(params.output) do
+                      message.rule_id = message.rule.id
+                      message.rule_link = message.rule.link
+                    end
+                    local h = helpers.diagnostics.from_json {
+                      attributes = {
+                        row = "line",
+                        code = "rule_id",
+                        severity = "type",
+                      },
+                    }
+                    done(h(params))
+                  else
+                    -- no diagnostics
+                    --WARN: Cannot be omitted, otherwise the diagnostics will not be refreshed.
+                    done()
+                  end
+                else
+                  -- handle configuration file parsing errors
+                  local error = vim.trim(params.output):match "[%w%s.,:/]+"
+                  vim.notify("htmlhint: " .. error, vim.log.levels.WARN)
+                  done()
+                end
+              end,
+            },
+          },
+          -- css,scss,sass,less
+          null_ls.builtins.diagnostics.stylelint.with {
+            condition = function(utils)
+              return utils.root_has_file {
+                "stylelint.config.js",
+                ".stylelintrc.js",
+                "stylelint.config.mjs",
+                ".stylelintrc.mjs",
+                "stylelint.config.cjs",
+                ".stylelintrc.cjs",
+                ".stylelintrc.json",
+                ".stylelintrc.yml",
+                ".stylelintrc.yaml",
+                ".stylelintrc",
+              }
+            end,
+          },
+          -- eslint_d is replaced by eslint-lsp
+          -- shellcheck is called by bashls
+          -- dockerfile
+          null_ls.builtins.diagnostics.hadolint,
+          -- sql
+          null_ls.builtins.diagnostics.sqlfluff.with {
+            condition = function(utils)
+              return utils.root_has_file { ".sqlfluff" }
+            end,
+          },
+          -- yaml
+          null_ls.builtins.diagnostics.yamllint.with {
+            condition = function(utils)
+              return utils.root_has_file { ".yamllint", ".yamllint.yaml", ".yamllint.yml" }
+            end,
+          },
+        },
+        on_attach = function(client, bufnr)
+          if client.supports_method "textDocument/formatting" then
+            vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              group = augroup,
+              buffer = bufnr,
+              callback = function()
+                vim.lsp.buf.format { async = false }
+              end,
+            })
+          end
+          -- get active sources name for lualine
+          local sources = require("null-ls.sources").get_available(vim.bo.filetype)
+          local formatters = {}
+          local linters = {}
+          for _, source in ipairs(sources) do
+            if vim.tbl_contains(vim.tbl_keys(source.methods), null_ls.methods.FORMATTING) then
+              table.insert(formatters, source.name)
+            end
+            if vim.tbl_contains(vim.tbl_keys(source.methods), null_ls.methods.DIAGNOSTICS) then
+              vim.b.linters = vim.b.linters or {}
+              table.insert(linters, source.name)
+            end
+          end
+          vim.b.formatters = formatters
+          vim.b.linters = linters
+        end,
+      }
     end,
   },
 }

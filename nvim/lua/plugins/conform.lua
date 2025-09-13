@@ -1,6 +1,7 @@
 return { -- Autoformat
   "stevearc/conform.nvim",
   event = { "BufReadPost", "BufWritePost", "BufNewFile" },
+  cond = false,
   -- need mason add bin to PATH
   dependencies = { "mason-org/mason.nvim" },
   opts = {

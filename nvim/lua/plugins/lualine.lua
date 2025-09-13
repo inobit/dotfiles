@@ -79,10 +79,20 @@ return {
           },
           {
             function()
-              local status = table.concat(vim.iter(require("conform").list_formatters()):map(function(f) return f.name end):totable(), ", ")
+              local status = table.concat(vim.b.linters, ", ")
+              return " " .. status
+            end,
+            cond = function() return vim.b.linters and #vim.b.linters > 0 end,
+            color = function()
+              return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Character", link = false }).fg) }
+            end,
+          },
+          {
+            function()
+              local status = table.concat(vim.b.formatters, ", ")
               return "󰉠 " .. status
             end,
-            cond = function() return package.loaded["conform"] ~= nil and #require("conform").list_formatters() > 0 end,
+            cond = function() return vim.b.formatters and #vim.b.formatters > 0 end,
             color = function()
               return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "WarningMsg", link = false }).fg) }
             end,
