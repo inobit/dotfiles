@@ -2,6 +2,8 @@
 
 set -e
 
+cd "$HOME"
+
 # config locale
 echo "set locale"
 locale_file="/etc/locale.gen"
@@ -45,7 +47,7 @@ echo "update system"
 sudo apt update && sudo apt upgrade -y
 
 echo "install tools"
-sudo apt install make gcc ripgrep fd-find unzip git xclip curl wget -y
+sudo apt install make gcc ripgrep fd-find unzip git xclip curl wget jq -y
 
 # config firewall
 read -r -p "Whether to config iptables? y or n: " config_iptables
@@ -86,8 +88,8 @@ if ! which nvim >/dev/null 2>&1; then
 fi
 
 echo "ln nvim config"
-test -d "$HOME"/.config || mkdir -p ~/.config
-ln -sf "$HOME"/documents/dotfiles/nvim ~/.config/nvim
+test -d "$HOME"/.config || mkdir -p "$HOME"/.config
+ln -sf "$HOME"/documents/dotfiles/nvim "$HOME"/.config/nvim
 
 echo "install tree-sitter"
 if [[ ! -f $HOME/.local/bin/tree-sitter ]]; then
@@ -114,7 +116,7 @@ if ! which tmux >/dev/null 2>&1; then
 fi
 
 echo "config tmux"
-test -d "$HOME"/.config/tmux || mkdir -p ~/.config/tmux
+test -d "$HOME"/.config/tmux || mkdir -p "$HOME"/.config/tmux
 ln -sf "$HOME"/documents/dotfiles/tmux/tmux.conf "$HOME"/.config/tmux/tmux.conf
 if [[ ! -d $HOME/.tmux/plugins/tpm ]]; then
 	git clone https://github.com/tmux-plugins/tpm "$HOME"/.tmux/plugins/tpm
@@ -123,7 +125,9 @@ fi
 
 echo "install nvm"
 if [[ ! -d $HOME/.nvm ]]; then
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+	# get latest release version
+	version=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r '.tag_name')
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/"$version"/install.sh | bash
 fi
 
 echo "install node 20 18"
@@ -131,6 +135,7 @@ echo "install node 20 18"
 source "$HOME/.nvm/nvm.sh"
 nvm install 18
 nvm install 20
+nvm alias default 20
 
 echo "install pnpm"
 if [[ ! -d $HOME/.local/share/pnpm ]]; then
@@ -142,7 +147,7 @@ if [[ ! -f $HOME/.local/bin/uv ]]; then
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
-read -r -p "Whether to install docker? y or n: " docker
+read -r -p "Whether to install docker(os must be debian)? y or n: " docker
 if [[ $docker = "y" ]]; then
 	# uninstall all conflicting packages
 	for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
