@@ -104,11 +104,15 @@ export EDITOR='nvim'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias setproxy="export ALL_PROXY=http://127.0.0.1:7890" alias unsetproxy="unset ALL_PROXY"
+alias setproxy="export ALL_PROXY=http://127.0.0.1:7890" 
+alias unsetproxy="unset ALL_PROXY"
 alias vim="nvim"
 alias fd="fdfind"
 export NO_PROXY="127.0.0.1,localhost,::1"
 export TIME_STYLE="long-iso"
+
+# use GPG_TTY to allow using pinentry-tty
+export GPG_TTY=$(tty)
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
@@ -194,3 +198,9 @@ fi
 # uv and uvx auto completion
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
+
+
+# java ENV
+# export MAVEN_HOME="/opt/mavens/apache-maven-3.9.11/"
+# export JAVA_HOME="/opt/jdks/jdk-21.0.1/"
+# export PATH="$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH"
