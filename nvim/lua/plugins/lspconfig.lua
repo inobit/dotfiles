@@ -368,11 +368,11 @@ return {
           local formatters = {}
           local linters = {}
           for _, source in ipairs(sources) do
-            if vim.tbl_contains(vim.tbl_keys(source.methods), null_ls.methods.FORMATTING) then
+            local methods = vim.tbl_keys(source.methods)
+            if vim.tbl_contains(methods, null_ls.methods.FORMATTING) then
               table.insert(formatters, source.name)
             end
-            if vim.tbl_contains(vim.tbl_keys(source.methods), null_ls.methods.DIAGNOSTICS) then
-              vim.b.linters = vim.b.linters or {}
+            if vim.tbl_contains(methods, null_ls.methods.DIAGNOSTICS) then
               table.insert(linters, source.name)
             end
           end
