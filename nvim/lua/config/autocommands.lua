@@ -28,28 +28,6 @@ vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedT", "TextChangedP", "Te
   end,
 })
 
--- auto coloring
-vim.api.nvim_create_autocmd("FileType", {
-  group = augroup "auto_colorizer",
-  pattern = {
-    "html",
-    "css",
-    "scss",
-    "less",
-    "sass",
-    "ts",
-    "js",
-    "tsx",
-    "jsx",
-  },
-  callback = function()
-    local status, colorizer = pcall(require, "colorizer")
-    if status then
-      colorizer.attach_to_buffer(0)
-    end
-  end,
-})
-
 -- cancel auto-add comment leader
 vim.api.nvim_create_autocmd("FileType", {
   command = "set formatoptions-=cro",
