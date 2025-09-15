@@ -57,10 +57,6 @@ vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move focus to the lower window"
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move focus to the upper window" })
 -- stylua: ignore end
 
--- 分屏
-vim.keymap.set("n", "<leader>sp", "<C-w>s", { desc = "horizontal split" })
-vim.keymap.set("n", "<leader>vp", "<C-w>v", { desc = "vertical split" })
-
 -- resize
 vim.keymap.set("n", "<C-Up>", "<Cmd>resize +2<CR>")
 vim.keymap.set("n", "<C-Down>", "<Cmd>resize -2<CR>")
@@ -82,11 +78,14 @@ vim.keymap.set("c", "<C-f>", "<Right>")
 vim.keymap.set("c", "<C-b>", "<Left>")
 vim.keymap.set("c", "<A-b>", "<S-Left>")
 vim.keymap.set("c", "<A-f>", "<S-Right>")
--- cmdline下粘贴,使用系统clip
+-- register, paste under cmdline, use system clip
 vim.keymap.set("c", "<C-q>", "<C-R>+")
 
+-- execute
 vim.keymap.set("n", "<leader><leader>x", "<Cmd>source %<CR>", { desc = "execute current file" })
-vim.keymap.set("n", "<leader><leader>X", "<Cmd>source $MYVIMRC<CR>", { desc = "execute current file" })
+vim.keymap.set("n", "<leader><leader>X", "<Cmd>source $MYVIMRC<CR>", { desc = "execute $MYVIMRC file" })
+vim.keymap.set("n", "<leader>X", ":.lua<CR>", { desc = "execute current lua line" })
+vim.keymap.set("v", "<leader>X", ":lua<CR>", { desc = "execute selected lua block" })
 vim.keymap.set("n", "<leader><leader>t", "<Cmd>PlenaryBustedFile %<CR>", { desc = "run test" })
 
 -- show messages

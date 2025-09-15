@@ -95,9 +95,9 @@ return {
 
     -- dapui keymap
     local windows = {
-      { "v", "1<C-W>w", "Scopes" },
+      { "s", "1<C-W>w", "Scopes" },
       { "b", "2<C-W>w", "Breakpoints" },
-      { "s", "3<C-W>w", "Stacks" },
+      { "t", "3<C-W>w", "Stacks" },
       { "w", "4<C-W>w", "Watches" },
       { "h", "5<C-W>w", "App" },
       { "r", "6<C-W>w", "REPL" },
@@ -105,12 +105,12 @@ return {
     }
     local function register_windows_navigation()
       vim.iter(windows):each(function(win)
-        vim.keymap.set("n", "<leader><leader>" .. win[1], win[2], { desc = "Debug: goto " .. win[3] })
+        vim.keymap.set("n", "<leader>g" .. win[1], win[2], { desc = "Debug: goto " .. win[3] })
       end)
     end
     local function unset_windows_navigation()
       vim.iter(windows):each(function(win)
-        pcall(vim.keymap.del, "n", "<leader><leader>" .. win[1])
+        pcall(vim.keymap.del, "n", "<leader>g" .. win[1])
       end)
     end
 
