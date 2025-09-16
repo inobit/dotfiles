@@ -28,7 +28,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
     --  - Insert mode: <c-/>
     --  - Normal mode: ?
     local actions = require "telescope.actions"
+    local state = require "telescope.actions.state"
     local fb_actions = require("telescope").extensions.file_browser.actions
+    local path = require "plenary.path"
     require("telescope").setup {
       -- You can put your default mappings / updates / etc. in here
       --  All the info you're looking for is in `:help telescope.setup()`
@@ -74,14 +76,25 @@ return { -- Fuzzy Finder (files, lsp, etc)
           no_ignore = true,
           mappings = {
             ["n"] = {
-              ["a"] = fb_actions.create,
               c = false,
-              ["o"] = fb_actions.open_dir,
-              ["p"] = fb_actions.goto_parent_dir,
+              ["a"] = fb_actions.create,
+              ["o"] = function(prompt_bufnr)
+                local entry = state.get_selected_entry()
+                if path.is_path(entry.Path) then
+                  if entry.Path:is_dir() then
+                    fb_actions.open_dir(prompt_bufnr)
+                  else
+                    actions.select_default(prompt_bufnr)
+                  end
+                end
+              end,
               g = false,
-              ["~"] = fb_actions.goto_home_dir,
+              ["-"] = fb_actions.goto_parent_dir,
+              ["_"] = fb_actions.goto_cwd,
+              ["`"] = fb_actions.change_cwd,
               e = false,
-              ["<C-CR>"] = fb_actions.open,
+              ["~"] = fb_actions.goto_home_dir,
+              ["gx"] = fb_actions.open, --for example: xdg-open, explorer
             },
           },
         },
@@ -132,7 +145,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set("n", "<leader>sb", builtin.buffers, { desc = "Telescope: Find existing buffers" })
     vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "Telescope: Search current Word" })
     vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "Telescope: Search by Grep" })
-    vim.keymap.set("n", "<leader>sG", function() builtin.live_grep({ additional_args = { "--hidden","--no-ignore" } }) end, { desc = "Telescope: Search by Grep(including hidden files)" })
+    vim.keymap.set("n", "<leader>sG", function() builtin.live_grep({ additional_args = { "--hidden","--no-ignore" } }) end, { desc = "Telescope: Search by Grep(including hidden and ignored files)" })
+    vim.keymap.set("n", "<leader>s.", require "lib.telescope.multigrep", { desc = "Telescope: Search by Grep(multigrep)" })
+    vim.keymap.set("n", "<leader>s>", function() require "lib.telescope.multigrep" { hidden = true, no_ignore = true } end, { desc = "Telescope: Search by Grep(multigrep including hidden and ignored files)" })
     -- Slightly advanced example of overriding default behavior and theme
     vim.keymap.set("n", "<leader>ss", function()
       -- You can pass additional configuration to telescope to change theme, layout, etc.
