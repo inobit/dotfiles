@@ -89,20 +89,17 @@ function M.get_python_bin(bufnr)
   return bin
 end
 
----@param bufnr number
+---@param client vim.lsp.Client
 ---@param path string
-function M.set_lsp_python_path(bufnr, path)
-  local clients = vim.lsp.get_clients {
-    bufnr = bufnr,
-    name = "pyright",
-  }
-  for _, client in ipairs(clients) do
+function M.set_pyright_python_path(client, path)
+  if client.name == "pyright" then
     if client.settings then
-      client.settings.python = vim.tbl_deep_extend("force", client.settings.python, { pythonPath = path })
+      client.settings.python =
+        vim.tbl_deep_extend("force", client.settings.python --[[@as table]], { pythonPath = path })
     else
       client.config.settings = vim.tbl_deep_extend("force", client.config.settings, { python = { pythonPath = path } })
     end
-    client.notify("workspace/didChangeConfiguration", { settings = nil })
+    client:notify("workspace/didChangeConfiguration", { settings = nil })
   end
 end
 

@@ -65,7 +65,7 @@ vim.api.nvim_create_autocmd("FileType", {
   group = augroup "run",
   pattern = { "python", "c", "cpp", "javascript" },
   callback = function()
-    require "dap_set.run"
+    require "lib.run"
   end,
 })
 

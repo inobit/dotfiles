@@ -7,16 +7,16 @@ return {
         -- adapter and debugee config
         -- python config. need VIRTUAL_ENV
         if vim.bo.filetype == "python" then
-          require "dap_set.python"
+          require "lib.dap.python"
         elseif
           -- js config
           vim.tbl_contains({ "typescript", "javascript", "typescriptreact", "javascriptreact" }, vim.bo.filetype)
         then
-          require "dap_set.js"
+          require "lib.dap.js"
         elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
-          require "dap_set.cpp"
+          require "lib.dap.cpp"
         elseif vim.bo.filetype == "java" then
-          require "dap_set.java"
+          require "lib.dap.java"
         end
         -- run debug
         require("dap").continue()
@@ -58,9 +58,9 @@ return {
     -- dap client -launch/attach-> adapter(debugger) -launch/attach-> debuggee
     local dap, dapui = require "dap", require "dapui"
     -- load persistence module
-    local persistence = require "dap_set.breakpoint_persistence"
+    local persistence = require "lib.dap.breakpoint_persistence"
     -- load run module
-    -- require "dap_set.run"
+    -- require "lib.dap.run"
 
     -- setup sign color
     vim.api.nvim_set_hl(0, "DapBreakpoint", { ctermbg = 0, fg = "#e51401" })
