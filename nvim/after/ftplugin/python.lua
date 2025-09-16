@@ -10,3 +10,16 @@ vim.lsp.config("pyright", {
     require("lib.python").set_pyright_python_path(client, vim.b.python_bin)
   end,
 })
+
+---@return string
+local function python_command_generator()
+  local command
+  if vim.fn.executable "uv" == 1 then
+    command = "uv run " .. vim.fn.expand "%"
+  else
+    command = "python -u " .. vim.fn.expand "%"
+  end
+  return command
+end
+
+require("lib.run").register_run_keymap(python_command_generator, "<leader>rr")

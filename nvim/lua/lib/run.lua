@@ -1,43 +1,29 @@
-local function cc(command)
-  local file = vim.api.nvim_buf_get_name(0)
-  local _, _, basename, _ = string.find(file, "^(.*)%.%a+$")
-  local output_filename = basename .. ".out"
-  return string.format(command .. " %s -o %s && %s", file, output_filename, output_filename)
-end
+local M = {}
 
-local commands = {
-  clear = "clear",
-  python = function()
-    if vim.fn.executable "uv" == 1 then
-      return "uv run " .. vim.api.nvim_buf_get_name(0)
-    else
-      return "python -u " .. vim.api.nvim_buf_get_name(0)
+---@param command string
+---@param target_pane? number
+function M.run(command, target_pane)
+  if vim.env.TMUX then
+    if target_pane == nil then
+      target_pane = vim.v.count == 0 and 2 or vim.v.count
     end
-  end,
-  js = function()
-    return "node " .. vim.api.nvim_buf_get_name(0)
-  end,
-  c = cc,
-  cpp = cc,
-}
-
-local function run(target_pane, command)
-  vim.cmd("silent! !tmux send -t " .. target_pane .. " '" .. command .. "' Enter")
+    vim.cmd("silent! !tmux send -t " .. target_pane .. " '" .. command .. "' Enter")
+  else
+    vim.cmd("!" .. command)
+  end
 end
 
-vim.keymap.set("n", "<leader>rr", function()
-  vim.cmd "w"
-  if vim.bo.filetype == "python" then
-    run(vim.v.count == 0 and 2 or vim.v.count, commands.python())
-  elseif vim.bo.filetype == "javascript" then
-    run(vim.v.count == 0 and 2 or vim.v.count, commands.js())
-  elseif vim.bo.filetype == "c" then
-    run(vim.v.count == 0 and 2 or vim.v.count, commands.c "cc -g -Wall")
-  elseif vim.bo.filetype == "cpp" then
-    run(vim.v.count == 0 and 2 or vim.v.count, commands.cpp "g++ -g -Wall")
-  end
-end, { desc = "run code", silent = true, noremap = true })
+---@param command string | fun(): string
+---@param lhs string?
+function M.register_run_keymap(command, lhs)
+  lhs = lhs or "<leader>rr"
+  local buffer = vim.api.nvim_get_current_buf()
+  vim.keymap.set("n", lhs, function()
+    if type(command) == "function" then
+      command = command()
+    end
+    M.run(command)
+  end, { buffer = buffer, desc = "Run: " .. vim.fn.expand "%:e", silent = true, noremap = true })
+end
 
-vim.keymap.set("n", "<leader>cl", function()
-  run(vim.v.count == 0 and 2 or vim.v.count, commands.clear)
-end, { desc = "clear print", silent = true, noremap = true })
+return M

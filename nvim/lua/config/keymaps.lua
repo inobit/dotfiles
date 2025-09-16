@@ -95,3 +95,9 @@ vim.keymap.set("n", "<leader><leader>m", function()
   row = row - 1
   vim.api.nvim_buf_set_text(0, row, col, row, col, lines)
 end, { desc = "show messages in current cursor" })
+
+if vim.env.TMUX then
+  vim.keymap.set("n", "<C-l>", function()
+    require("lib.run").run "clear"
+  end, { desc = "clear print", silent = true, noremap = true })
+end
