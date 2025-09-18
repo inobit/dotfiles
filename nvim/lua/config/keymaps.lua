@@ -58,10 +58,10 @@ vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move focus to the upper window"
 -- stylua: ignore end
 
 -- resize
-vim.keymap.set("n", "<C-Up>", "<Cmd>resize +2<CR>")
-vim.keymap.set("n", "<C-Down>", "<Cmd>resize -2<CR>")
-vim.keymap.set("n", "<C-Left>", "<Cmd>vertical resize -2<CR>")
-vim.keymap.set("n", "<C-Right>", "<Cmd>vertical resize +2<CR>")
+vim.keymap.set("n", "<C-M-K>", "<Cmd>resize +2<CR>")
+vim.keymap.set("n", "<C-M-J>", "<Cmd>resize -2<CR>")
+vim.keymap.set("n", "<C-M-H>", "<Cmd>vertical resize -2<CR>")
+vim.keymap.set("n", "<C-M-L>", "<Cmd>vertical resize +2<CR>")
 
 vim.keymap.set("n", "]T", "<Cmd>tabnext<CR>", { desc = "next tab" })
 vim.keymap.set("n", "[T", "<Cmd>tabprevious<CR>", { desc = "previous tab" })
