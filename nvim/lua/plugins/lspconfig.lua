@@ -359,7 +359,10 @@ return {
               group = augroup,
               buffer = bufnr,
               callback = function()
+                -- make sure the buffer buflisted option is not changed
+                local buflisted = vim.api.nvim_get_option_value("buflisted", { buf = bufnr })
                 vim.lsp.buf.format { async = false }
+                vim.api.nvim_set_option_value("buflisted", buflisted, { buf = bufnr })
               end,
             })
           end
