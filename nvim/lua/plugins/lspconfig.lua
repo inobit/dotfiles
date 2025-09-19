@@ -351,6 +351,46 @@ return {
               return utils.root_has_file { ".yamllint", ".yamllint.yaml", ".yamllint.yml" }
             end,
           },
+          -- hover
+          {
+            name = "dbee_hover",
+            method = null_ls.methods.HOVER,
+            filetypes = { "dbee" },
+            generator = {
+              fn = function(params, done)
+                local status, _ = pcall(require, "dbee")
+                if status then
+                  local json =
+                    require("lib.dbee").get_selected_row_in_json(params.bufnr, params.lsp_params.position.line)
+                  if json then
+                    json = "```json" .. json .. "```"
+                    done { json }
+                  else
+                    done()
+                  end
+                else
+                  done()
+                end
+              end,
+              async = true,
+            },
+          },
+          -- action
+          {
+            name = "dbee_action",
+            method = null_ls.methods.CODE_ACTION,
+            filetypes = { "dbee" },
+            call_run = function()
+              local status, _ = pcall(require, "dbee")
+              return status
+            end,
+            generator = {
+              fn = function(params)
+                local actions = require("lib.dbee").code_actions(params.bufnr, params.range.row)
+                return actions
+              end,
+            },
+          },
         },
         on_attach = function(client, bufnr)
           if client.supports_method "textDocument/formatting" then

@@ -189,6 +189,13 @@ return {
           { name = "buffer" },
         },
       })
+      -- sql
+      cmp.setup.filetype({ "sql", "mysql", "plsql" }, {
+        sources = {
+          { name = "cmp-dbee" },
+          { name = "buffer" },
+        },
+      })
       -- 加载friendly-snippets
       require("luasnip.loaders.from_vscode").lazy_load()
     end,

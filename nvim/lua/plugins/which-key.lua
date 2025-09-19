@@ -13,6 +13,11 @@ return { -- Useful plugin to show you pending keybinds.
         { "<leader>r", group = "rename" },
         { "<leader>s", group = "search" },
         { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+        {
+          "<leader>y",
+          group = "dbee-yank",
+          icon = { icon = "", color = "green" },
+        },
         { "[", group = "prev" },
         { "]", group = "next" },
       },
