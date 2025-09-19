@@ -82,8 +82,6 @@ vim.keymap.set("c", "<A-f>", "<S-Right>")
 vim.keymap.set("c", "<C-q>", "<C-R>+")
 
 -- execute
-vim.keymap.set("n", "<leader><leader>x", "<Cmd>source %<CR>", { desc = "execute current file" })
-vim.keymap.set("n", "<leader><leader>X", "<Cmd>source $MYVIMRC<CR>", { desc = "execute $MYVIMRC file" })
 vim.keymap.set("n", "<leader>X", ":.lua<CR>", { desc = "execute current lua line" })
 vim.keymap.set("v", "<leader>X", ":lua<CR>", { desc = "execute selected lua block" })
 vim.keymap.set("n", "<leader><leader>t", "<Cmd>PlenaryBustedFile %<CR>", { desc = "run test" })

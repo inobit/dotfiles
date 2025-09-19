@@ -30,4 +30,8 @@ require("lazy").setup {
     },
   },
   dev = { path = vim.g.local_plugins or "~/projects" },
+  change_detection = {
+    enabled = false,
+    notify = false,
+  },
 }
