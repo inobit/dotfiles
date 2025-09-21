@@ -212,7 +212,7 @@ return {
             },
           },
           -- sh, bash
-          null_ls.builtins.formatting.shfmt.with { filetypes = { "sh", "bash" } },
+          null_ls.builtins.formatting.shfmt.with { filetypes = { "sh", "bash", "zsh" } },
           -- sql
           null_ls.builtins.formatting.sql_formatter.with {
             extra_args = function()
