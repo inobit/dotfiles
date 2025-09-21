@@ -93,6 +93,10 @@ source $ZSH/oh-my-zsh.sh
 # fi
 export EDITOR='nvim'
 
+# Use nvim as manpager `:h Man`
+export MANPAGER='nvim +Man!'
+export MANWIDTH=999
+
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
@@ -104,10 +108,12 @@ export EDITOR='nvim'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias setproxy="export ALL_PROXY=http://127.0.0.1:7890" 
+alias setproxy="export ALL_PROXY=http://127.0.0.1:7890"
 alias unsetproxy="unset ALL_PROXY"
 alias vim="nvim"
 alias fd="fdfind"
+alias bat="batcat"
+alias cat="bat --paging=never"
 export NO_PROXY="127.0.0.1,localhost,::1"
 export TIME_STYLE="long-iso"
 
@@ -123,22 +129,22 @@ export NVM_DIR="$HOME/.nvm"
 autoload -U add-zsh-hook
 
 load-nvmrc() {
-  local nvmrc_path
-  nvmrc_path="$(nvm_find_nvmrc)"
+	local nvmrc_path
+	nvmrc_path="$(nvm_find_nvmrc)"
 
-  if [ -n "$nvmrc_path" ]; then
-    local nvmrc_node_version
-    nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+	if [ -n "$nvmrc_path" ]; then
+		local nvmrc_node_version
+		nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
 
-    if [ "$nvmrc_node_version" = "N/A" ]; then
-      nvm install
-    elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
-      nvm use
-    fi
-  elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
-    echo "Reverting to nvm default version"
-    nvm use default
-  fi
+		if [ "$nvmrc_node_version" = "N/A" ]; then
+			nvm install
+		elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
+			nvm use
+		fi
+	elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
+		echo "Reverting to nvm default version"
+		nvm use default
+	fi
 }
 
 add-zsh-hook chpwd load-nvmrc
@@ -154,41 +160,41 @@ esac
 
 # wsl setup
 if [[ "$(uname -r)" == *"microsoft"* || "$(uname -r)" == *"wsl"* ]]; then
-  WSL_SSH_DIR="$HOME/.ssh"
-  WINDOWS_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
-  WINDOWS_SSH_DIR="/mnt/c/Users/$WINDOWS_USER/.ssh"
-  # handle ssh key
-  if [ ! -d "$WSL_SSH_DIR" ] || [ -z "$(ls -A "$WSL_SSH_DIR")" ]; then
-    if [ -d "$WINDOWS_SSH_DIR" ]; then
-      mkdir -p "$WSL_SSH_DIR"
-      cp -r "$WINDOWS_SSH_DIR"/* "$WSL_SSH_DIR"/
-      chmod 700 "$WSL_SSH_DIR"
-      find "$WSL_SSH_DIR" -type f -exec grep -q "PRIVATE KEY" {} \; -exec chmod 600 {} \;
-      find "$WSL_SSH_DIR" -type f -name "*.pub" -exec chmod 644 {} \;
-      chmod 644 "$WSL_SSH_DIR"/{config,known_hosts,authorized_keys} 2>/dev/null
-    fi
-  fi
-  # auto start ssh-agent
-  if ! pgrep ssh-agent >/dev/null; then
-    rm -f $HOME/.ssh/ssh_auth_sock
-    eval "$(ssh-agent -s -a $HOME/.ssh/ssh_auth_sock)"
-  else
-    export SSH_AUTH_SOCK=$HOME/.ssh/ssh_auth_sock
-  fi
-  if [ ! -S "$SSH_AUTH_SOCK" ]; then
-    echo "[ERROR] ssh-agent socket file not found: $SSH_AUTH_SOCK"
-    # exit 1
-  else
-    find "$WSL_SSH_DIR" -type f -exec grep -q "PRIVATE KEY" {} \; -exec ssh-add -q {} \;
-  fi
+	WSL_SSH_DIR="$HOME/.ssh"
+	WINDOWS_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+	WINDOWS_SSH_DIR="/mnt/c/Users/$WINDOWS_USER/.ssh"
+	# handle ssh key
+	if [ ! -d "$WSL_SSH_DIR" ] || [ -z "$(ls -A "$WSL_SSH_DIR")" ]; then
+		if [ -d "$WINDOWS_SSH_DIR" ]; then
+			mkdir -p "$WSL_SSH_DIR"
+			cp -r "$WINDOWS_SSH_DIR"/* "$WSL_SSH_DIR"/
+			chmod 700 "$WSL_SSH_DIR"
+			find "$WSL_SSH_DIR" -type f -exec grep -q "PRIVATE KEY" {} \; -exec chmod 600 {} \;
+			find "$WSL_SSH_DIR" -type f -name "*.pub" -exec chmod 644 {} \;
+			chmod 644 "$WSL_SSH_DIR"/{config,known_hosts,authorized_keys} 2>/dev/null
+		fi
+	fi
+	# auto start ssh-agent
+	if ! pgrep ssh-agent >/dev/null; then
+		rm -f $HOME/.ssh/ssh_auth_sock
+		eval "$(ssh-agent -s -a $HOME/.ssh/ssh_auth_sock)"
+	else
+		export SSH_AUTH_SOCK=$HOME/.ssh/ssh_auth_sock
+	fi
+	if [ ! -S "$SSH_AUTH_SOCK" ]; then
+		echo "[ERROR] ssh-agent socket file not found: $SSH_AUTH_SOCK"
+		# exit 1
+	else
+		find "$WSL_SSH_DIR" -type f -exec grep -q "PRIVATE KEY" {} \; -exec ssh-add -q {} \;
+	fi
 
-  # git config
-  # git config --global core.autocrlf true
+	# git config
+	# git config --global core.autocrlf true
 
-  # change ls colors(777)
-  LS_COLORS=${LS_COLORS/:ow=*([^:]):/:ow=:}
-  # LS_COLORS=$LS_COLORS:'ow=30:'
-  export LS_COLORS
+	# change ls colors(777)
+	LS_COLORS=${LS_COLORS/:ow=*([^:]):/:ow=:}
+	# LS_COLORS=$LS_COLORS:'ow=30:'
+	export LS_COLORS
 fi
 
 # add local bin to $PATH
@@ -199,8 +205,11 @@ fi
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
 
-
 # java ENV
 # export MAVEN_HOME="/opt/mavens/apache-maven-3.9.11/"
 # export JAVA_HOME="/opt/jdks/jdk-21.0.1/"
 # export PATH="$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH"
+
+# fzf
+source <(fzf --zsh)
+export FZF_DEFAULT_OPTS='--height 60% --tmux bottom,60% --layout reverse --border --preview "$HOME/.fzf/fzf_preview_handler.sh {}"'
