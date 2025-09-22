@@ -91,11 +91,6 @@ source $ZSH/oh-my-zsh.sh
 # else
 #   export EDITOR='mvim'
 # fi
-export EDITOR='nvim'
-
-# Use nvim as manpager `:h Man`
-export MANPAGER='nvim +Man!'
-export MANWIDTH=999
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -108,14 +103,6 @@ export MANWIDTH=999
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias setproxy="export ALL_PROXY=http://127.0.0.1:7890"
-alias unsetproxy="unset ALL_PROXY"
-alias vim="nvim"
-alias fd="fdfind"
-alias bat="batcat"
-alias cat="bat --paging=never"
-export NO_PROXY="127.0.0.1,localhost,::1"
-export TIME_STYLE="long-iso"
 
 # use GPG_TTY to allow using pinentry-tty
 export GPG_TTY=$(tty)
@@ -197,10 +184,6 @@ if [[ "$(uname -r)" == *"microsoft"* || "$(uname -r)" == *"wsl"* ]]; then
 	export LS_COLORS
 fi
 
-# add local bin to $PATH
-# needed for uv
-. "$HOME/.local/bin/env"
-
 # uv and uvx auto completion
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
@@ -208,7 +191,15 @@ eval "$(uvx --generate-shell-completion zsh)"
 # java ENV
 # export MAVEN_HOME="/opt/mavens/apache-maven-3.9.11/"
 # export JAVA_HOME="/opt/jdks/jdk-21.0.1/"
-# export PATH="$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH"
+# case ":$PATH:" in
+# *":$MAVEN_HOME:"*) ;;
+# *) export PATH="$MAVEN_HOME:$PATH" ;;
+# esac
+#
+# case ":$PATH:" in
+# *":$JAVA_HOME:"*) ;;
+# *) export PATH="$JAVA_HOME:$PATH" ;;
+# esac
 
 # fzf
 source <(fzf --zsh)
