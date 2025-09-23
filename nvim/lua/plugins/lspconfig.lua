@@ -375,6 +375,22 @@ return {
               async = true,
             },
           },
+          {
+            name = "man_hover",
+            method = null_ls.methods.HOVER,
+            filetypes = { "man" },
+            generator = {
+              fn = function(_, done)
+                local status, api = pcall(require, "inobit.llm.api")
+                if status then
+                  api.translate_in_lsp(done)
+                else
+                  done()
+                end
+              end,
+              async = true,
+            },
+          },
           -- action
           {
             name = "dbee_action",
