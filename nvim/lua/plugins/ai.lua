@@ -98,6 +98,7 @@ return {
       ---@param temperature? number
       ---@param max_tokens? number
       ---@return table<string, any>
+      ---@diagnostic disable-next-line: unused-function
       local function siliconflow_provider(model, temperature, max_tokens)
         return {
           __inherited_from = "openai",
@@ -124,17 +125,12 @@ return {
 
       opts = {
         -- default provider
-        provider = "openrouter-gemini-2.5-flash",
+        provider = "openrouter-grok-code-fast",
         providers = {
-          ["siliconflow-deepseek-v3"] = siliconflow_provider "deepseek-ai/DeepSeek-V3",
-          ["siliconflow-deepseek-r1"] = siliconflow_provider "deepseek-ai/DeepSeek-R1",
           ["openrouter-claude4"] = openrouter_provider "anthropic/claude-sonnet-4",
           ["openrouter-gemini-2.5-flash"] = openrouter_provider "google/gemini-2.5-flash",
           ["openrouter-gemini-2.5-pro"] = openrouter_provider "google/gemini-2.5-pro",
-          ["openrouter-deepseekv3:free"] = openrouter_provider "deepseek/deepseek-chat-v3-0324:free",
-          ["openrouter-deepseekv3"] = openrouter_provider "deepseek/deepseek-chat-v3-0324",
-          ["openrouter-deepseek-r1"] = openrouter_provider "deepseek/deepseek-r1-0528:free",
-          ["openrouter-openai/gpt-4o-mini"] = openrouter_provider "openai/gpt-4o-mini",
+          ["openrouter-grok-code-fast"] = openrouter_provider "x-ai/grok-code-fast-1",
         },
       }
       return opts
