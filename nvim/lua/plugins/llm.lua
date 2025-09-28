@@ -65,7 +65,7 @@ return {
             user_role = "user",
           },
         },
-        default_server = "x-ai/grok-4-fast:free",
+        default_server = "OpenRouter@x-ai/grok-4-fast:free",
         default_translate_server = vim.g.my_deeplx and "DeepL@DeepLX" or "OpenRouter@google/gemini-2.0-flash-001",
         user_prompt = "~",
       }
