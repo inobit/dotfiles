@@ -8,7 +8,10 @@ return {
       -- Install tries to automatically detect the install method.
       -- if it fails, try calling it with one of these parameters:
       --    "curl", "wget", "bitsadmin", "go"
-      require("dbee").install "curl"
+      if not vim.fn.has "win32" then
+        require("dbee").install "curl"
+      end
+      -- windows manual install
     end,
     keys = {
       {
@@ -125,10 +128,10 @@ return {
       -- show current connection in winbar
       local show_current_connection = require("lib.dbee").show_current_connection
       api.core.register_event_listener("current_connection_changed", function()
-        show_current_connection()
+        -- show_current_connection()
       end)
       api.ui.editor_register_event_listener("current_note_changed", function()
-        show_current_connection()
+        -- show_current_connection()
       end)
     end,
   },
