@@ -119,7 +119,7 @@ return {
     vim.keymap.set("n", "<leader>dpl", function() persistence.load_breakpoints() end, { desc = "Debug: load breakpoints" })
     vim.keymap.set("n", "<leader>dps", function() persistence.store_breakpoints(false) end, { desc = "Debug: store breakpoints" })
     vim.keymap.set("n", "<leader>dpc", function() persistence.store_breakpoints(true) end, { desc = "Debug: clear persistence  breakpoints" })
-    vim.keymap.set("n", "<leader>td", function() require("dapui").toggle() end, { desc = "Debug: toggle dapui" })
+    vim.keymap.set("n", "<leader>dt", function() require("dapui").toggle() end, { desc = "Debug: toggle dapui" })
     vim.keymap.set({ "n", "v" }, "<leader>de", function() require("dapui").eval() end, { desc = "Debug: eval" })
     vim.keymap.set({ "n", "v" }, "<leader>da", function() require("dapui").elements.watches.add() end, { desc = "Debug: add to watch" })
     vim.keymap.set({ "n", "v" }, "<leader>dd", function() require("dapui").elements.watches.remove() end, { desc = "Debug: remove from watch" })

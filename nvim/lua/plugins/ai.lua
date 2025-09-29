@@ -89,8 +89,8 @@ return {
       "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
     },
     keys = {
-      { "<leader>ta", "<cmd>AvanteToggle<cr>", desc = "avante: toggle" },
-      { "<leader>fa", "<cmd>AvanteFocus<cr>", desc = "avante: focus" },
+      { "<leader>at", "<cmd>AvanteToggle<cr>", desc = "avante: toggle" },
+      { "<leader>af", "<cmd>AvanteFocus<cr>", desc = "avante: focus" },
       { "<leader>al", "<cmd>AvanteClear<cr>", desc = "avante: clear" },
     },
     opts = function()

@@ -15,7 +15,7 @@ return {
     end,
     keys = {
       {
-        "<leader>te",
+        "<leader>Dt",
         function()
           if require("dbee").is_open() then
             local bufnr = require("dbee.api").ui.editor_get_current_note().bufnr

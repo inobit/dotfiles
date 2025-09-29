@@ -116,10 +116,10 @@ map("n", "<leader>ss", function() vscode.action "actions.find" end, "vscode: fin
 map("n", "<leader>sx", function() vscode.action "editor.action.startFindReplaceAction" end, "vscode: find and replace in current file")
 
 -- toggle explore
-map("n", "<leader>te", function() vscode.action "workbench.action.toggleSidebarVisibility" end, "vscode: toggle side bar")
-map("n", "<leader>fe", function() vscode.action "workbench.view.explorer" end, "vscode: fouce explorer")
+map("n", "<leader>et", function() vscode.action "workbench.action.toggleSidebarVisibility" end, "vscode: toggle side bar")
+map("n", "<leader>ef", function() vscode.action "workbench.view.explorer" end, "vscode: fouce explorer")
 -- copilot view
-map("n", "<leader>fa", function() vscode.action "codeium.openChatView" end, "vscode: fouce AI")
+map("n", "<leader>af", function() vscode.action "codeium.openChatView" end, "vscode: fouce AI")
 
 -- toggle terminal
 map("n", "<leader>tt", function() vscode.action "workbench.action.terminal.toggleTerminal" end, "vscode: fouce")

@@ -9,13 +9,13 @@ return {
   config = function()
     vim.keymap.set(
       "n",
-      "<leader>fe",
+      "<leader>ef",
       "<cmd>NvimTreeFocus<CR>",
       { noremap = true, silent = true, desc = "NvimTree: focus explore" }
     )
     vim.keymap.set(
       "n",
-      "<leader>te",
+      "<leader>et",
       "<cmd>NvimTreeToggle<CR>",
       { noremap = true, silent = true, desc = "NvimTree: toggle explore" }
     )
@@ -39,8 +39,8 @@ return {
         vim.keymap.set("n", "S", api.node.open.horizontal, opts "Open: horizontal Split")
         vim.keymap.set("n", "]e", api.node.navigate.diagnostics.next, opts "Next Diagnostic")
         vim.keymap.set("n", "[e", api.node.navigate.diagnostics.prev, opts "Prev Diagnostic")
-        vim.keymap.set("n", "<leader>t", api.tree.change_root_to_node, opts "Change cwd")
-        vim.keymap.set("n", "<leader>p", api.tree.change_root_to_parent, opts "Goto parent dir")
+        vim.keymap.set("n", "`", api.tree.change_root_to_node, opts "Change cwd")
+        vim.keymap.set("n", "-", api.tree.change_root_to_parent, opts "Goto parent dir")
 
         -- disable highlight group NvimTreeSpecialFile underline
         local color = vim.api.nvim_get_hl(0, {
