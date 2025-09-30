@@ -54,7 +54,7 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
 -- hidden levels of json files
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "json_conceal",
-  pattern = { "json", "json5", "jsonc", "markdown" },
+  pattern = { "json", "json5", "jsonc" },
   callback = function()
     vim.opt_local.conceallevel = 0
   end,

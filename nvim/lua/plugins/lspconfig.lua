@@ -209,6 +209,7 @@ return {
               "json",
               "jsonc",
               "json5",
+              "markdown",
             },
           },
           -- sh, bash
@@ -233,7 +234,7 @@ return {
           -- yaml
           null_ls.builtins.formatting.yamlfmt,
           -- markdown
-          null_ls.builtins.formatting.mdformat,
+          -- null_ls.builtins.formatting.mdformat,
           -- java
           null_ls.builtins.formatting.google_java_format,
           -- xml(manual register)
