@@ -136,6 +136,7 @@ return {
     end,
   },
   {
+    --TODO: This plugin is hard to use
     "MattiasMTS/cmp-dbee",
     -- cond = false,
     dependencies = {
