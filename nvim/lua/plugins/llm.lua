@@ -56,7 +56,6 @@ return {
               { model = "google/gemini-2.5-flash-lite", temperature = 0.4 },
               { model = "google/gemini-2.5-pro", temperature = 0.4 },
               { model = "google/gemini-2.0-flash-001", max_tokens = 8192, temperature = 0.6 },
-              { model = "x-ai/grok-4-fast:free", max_tokens = 8192, temperature = 0.6 },
               { model = "x-ai/grok-code-fast-1", max_tokens = 8192, temperature = 0.6 },
             },
             max_tokens = 4096,
@@ -65,7 +64,7 @@ return {
             user_role = "user",
           },
         },
-        default_server = "OpenRouter@x-ai/grok-4-fast:free",
+        default_server = "OpenRouter@x-ai/grok-code-fast-1",
         default_translate_server = vim.g.my_deeplx and "DeepL@DeepLX" or "OpenRouter@google/gemini-2.0-flash-001",
         user_prompt = "~",
       }
