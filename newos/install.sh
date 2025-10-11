@@ -28,6 +28,9 @@ export EDITOR='nvim'
 export MANPAGER='nvim +Man!'
 export MANWIDTH=999
 
+# history control
+export HISTCONTROL=ignoreboth
+
 alias setproxy="export ALL_PROXY=http://127.0.0.1:7890"
 alias unsetproxy="unset ALL_PROXY"
 alias vim="nvim"
