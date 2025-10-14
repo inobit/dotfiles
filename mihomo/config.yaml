@@ -4,7 +4,6 @@ allow-lan: true
 mode: rule
 global-client-fingerprint: chrome # 设置全局客户端指纹为 Chrome，使 Clash 在建立连接时模拟 Chrome 浏览器的 TLS 指纹，增强隐私性和绕过某些网站的指纹检测
 # geo config
-
 geodata-mode: true
 geodata-loader: memconservative
 geo-auto-update: true
@@ -17,14 +16,13 @@ geox-url:
 log-level: info
 ipv6: true
 external-controller: 0.0.0.0:9090
-secret: mihomo
+secret: <secret>
 unified-delay: true
 external-controller-cors:
   allow-origins:
     - "*"
   allow-private-network: true
 # dns config
-
 dns:
   enable: true
   ipv6: true
@@ -33,6 +31,7 @@ dns:
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - "rule-set:private"
+    - "rule-set:direct"
     - "geosite:connectivity-check"
     - "geosite:private"
     - "rule-set:fake-ip-filter"
@@ -79,11 +78,9 @@ dns:
     - 1.1.1.1 # Cloudflare DNS备用
     - 8.8.8.8 # Google DNS备用
 # tun config
-
 tun:
   enable: true
   # stack: mixed # system/gvisor/mixed
-
   stack: mixed
   auto-route: true
   auto-redirect: true
@@ -612,8 +609,9 @@ rules:
   - DOMAIN-SUFFIX,diagrams.org,DIRECT
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
-  - RULE-SET,private,DIRECT
   - RULE-SET,reject,广告拦截
+  - RULE-SET,private,DIRECT
+  - RULE-SET,direct,DIRECT
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
   - RULE-SET,gemini,Claude
