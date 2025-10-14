@@ -194,7 +194,7 @@ return {
           },
           -- python
           null_ls.builtins.formatting.black,
-          -- javascript,typescript,javascriptreact,typescriptreact,html,css,scss,sass,less,json,jsonc,json5
+          -- javascript,typescript,javascriptreact,typescriptreact,html,css,scss,sass,less,json,jsonc,json5,markdown,yaml
           null_ls.builtins.formatting.prettier.with {
             filetypes = {
               "javascript",
@@ -210,6 +210,7 @@ return {
               "jsonc",
               "json5",
               "markdown",
+              "yaml",
             },
           },
           -- sh, bash
@@ -231,10 +232,6 @@ return {
               }
             end,
           },
-          -- yaml
-          null_ls.builtins.formatting.yamlfmt,
-          -- markdown
-          -- null_ls.builtins.formatting.mdformat,
           -- java
           null_ls.builtins.formatting.google_java_format,
           -- xml(manual register)

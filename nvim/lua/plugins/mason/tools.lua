@@ -31,11 +31,10 @@ M.formatters = {
   "clang-format", -- c cpp formatter
   "black", -- python formatter
   "isort", -- python formatter
-  "prettier", -- html,css,js,ts,json formatter
+  "prettier", -- html,css,js,ts,json,markdown,yaml formatter
   "shfmt", -- shell formatter
   "xmlformatter", -- xml formatter
   "sql-formatter", --sql formatter
-  "yamlfmt", -- yaml formatter
   "mdformat", -- markdown formatter
   "google-java-format", -- java formatter
 }
