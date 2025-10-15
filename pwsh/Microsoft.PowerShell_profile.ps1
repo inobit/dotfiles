@@ -69,3 +69,7 @@ $env:Path = "$env:USERPROFILE\.local\bin;" + $env:Path
 # uv registe auto complete
 (& uv generate-shell-completion powershell) | Out-String | Invoke-Expression
 (& uvx --generate-shell-completion powershell) | Out-String | Invoke-Expression
+
+if (Get-Command -Name mihomosh -ErrorAction SilentlyContinue) {
+  (& mihomosh shell-completion powershell) | Out-String | Invoke-Expression
+}
