@@ -1,0 +1,15 @@
+<service>
+  <id>mihomo</id>
+  <name>mihomo service</name>
+  <description>mihomo service</description>
+  <workingdirectory>%BASE%</workingdirectory>
+  <executable>%BASE%\mihomo.exe</executable>
+  <arguments>-d %BASE%</arguments>
+  <startmode>Automatic</startmode>
+  <logpath>%BASE%\logs</logpath>
+  <log mode="roll-by-size-time">
+    <sizeThreshold>4096</sizeThreshold>
+    <pattern>yyyyMMdd</pattern>
+    <autoRollAtTime>00:00:00</autoRollAtTime>
+  </log>
+</service>

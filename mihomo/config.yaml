@@ -93,6 +93,23 @@ tun:
   gso: false # 启用通用分段卸载（提升性能）(enable this option causes the network disconnect, tested on the debain12 virtual machine )
   gso-max-size: 65536
   udp-timeout: 300 # UDP 会话保持时间
+# 流量嗅探，对于redir-host情况（真实ip),嗅探域名
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  force-domain:
+    - "+.v2ex.com"
+  # 嗅探结果跳过
+  skip-domain:
+    - "+.baidu.com"
+    - "+.bilibili.com"
 profile:
   store-selected: true
   store-fake-ip: true
@@ -110,18 +127,42 @@ proxy-providers:
         - "mihomo/1.18.3"
     health-check:
       enable: true
-      url: https://cp.cloudflare.com/generate_204
+      url: https://cp.cloudflare.com
       interval: 86400
       timeout: 5000
       lazy: true
       expected-status: 204
+proxy-group-anchor:
+  url-test: &url-test
+    type: url-test
+    include-all: true
+    hidden: true
+    url: https://cp.cloudflare.com
+    interval: 86400
+  std-groups: &std-groups
+    - 🇭🇰️ 香港
+    - 🇭🇰️ 香港➰
+    - 🇹🇼 台湾
+    - 🇹🇼 台湾➰
+    - 🇯🇵 日本
+    - 🇯🇵 日本➰
+    - 🇸🇬 新加坡
+    - 🇸🇬 新加坡➰
+    - 🇺🇸 美国
+    - 🇺🇸 美国✔️
+    - 🇺🇸 美国➰
+    - 🇬🇧 英国
+    - 🇬🇧 英国➰
+    - 自建
+    - DIRECT
+    - 🧭 master自动选择
 proxy-groups:
   - name: 代理模式
     type: select
     icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png
     proxies:
-      - DIRECT
       - PROXY
+      - DIRECT
   - name: 自建
     type: select
     icon: https://www.clashverge.dev/assets/icons/link.svg
@@ -130,464 +171,208 @@ proxy-groups:
   - name: Master
     type: select
     icon: https://www.clashverge.dev/assets/icons/speed.svg
-    proxies:
-      - 🧭 master自动选择
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
     include-all: true
     filter: (?i)^master
   - name: 🧭 master自动选择
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇭🇰️ 香港
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(港|Hong\sKong).*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇭🇰️ 香港➰
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(港|Hong\sKong)[^|]*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇹🇼 台湾
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(台|Taiwan).*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇹🇼 台湾➰
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(台|Taiwan)[^|]*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇯🇵 日本
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(日|Japan).*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇯🇵 日本➰
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(日|Japan)[^|]*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇸🇬 新加坡
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(新|Singapore).*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇸🇬 新加坡➰
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(新|Singapore).*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇺🇸 美国
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(美|USA).*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇺🇸 美国✔️
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(美|USA).*(原生).*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇺🇸 美国➰
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(美|USA)[^|]*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇬🇧 英国
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(英|UK).*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: 🇬🇧 英国➰
-    type: url-test
-    include-all: true
+    <<: *url-test
     filter: (?i)^master.*(英|UK)[^|]*$
-    hidden: true
-    url: http://www.gstatic.com/generate_204
-    interval: 86400
   - name: Microsoft
     type: select
     icon: https://www.clashverge.dev/assets/icons/microsoft.svg
-    proxies:
-      - DIRECT
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
   - name: Steam
     type: select
     icon: https://www.clashverge.dev/assets/icons/steam.svg
-    proxies:
-      - DIRECT
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
   - name: Video
     type: select
     icon: https://www.clashverge.dev/assets/icons/netflix.svg
-    proxies:
-      - DIRECT
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
   - name: Github
     type: select
     icon: https://www.clashverge.dev/assets/icons/github.svg
-    proxies:
-      - DIRECT
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
   - name: Google
     type: select
     icon: https://www.clashverge.dev/assets/icons/google.svg
-    proxies:
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
   - name: Spotify
     type: select
     icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Spotify.png
-    proxies:
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
   - name: Twitter
     type: select
     icon: https://www.clashverge.dev/assets/icons/twitter.svg
-    proxies:
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
   - name: Claude
     type: select
     icon: https://www.clashverge.dev/assets/icons/claude.svg
-    proxies:
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
   - name: Chatgpt
     type: select
     icon: https://www.clashverge.dev/assets/icons/chatgpt.svg
-    proxies:
-      - 🇭🇰️ 香港
-      - 🇭🇰️ 香港➰
-      - 🇹🇼 台湾
-      - 🇹🇼 台湾➰
-      - 🇯🇵 日本
-      - 🇯🇵 日本➰
-      - 🇸🇬 新加坡
-      - 🇸🇬 新加坡➰
-      - 🇺🇸 美国
-      - 🇺🇸 美国✔️
-      - 🇺🇸 美国➰
-      - 🇬🇧 英国
-      - 🇬🇧 英国➰
-      - 自建
+    proxies: *std-groups
   - name: 广告拦截
     type: select
     icon: https://www.clashverge.dev/assets/icons/block.svg
     proxies:
-      - DIRECT
       - REJECT
+      - DIRECT
       - PROXY
   - name: PROXY
     type: select
     icon: https://www.clashverge.dev/assets/icons/adjust.svg
     proxies:
-      - DIRECT
-      - 自建
       - Master
-rule-providers:
-  fake-ip-filter:
+      - 自建
+      - DIRECT
+rule-anchor:
+  domian: &domian
     type: http
     behavior: domain
+    interval: 86400
+  classical: &classical
+    type: http
+    behavior: classical
+    interval: 86400
+  ip: &ip
+    type: http
+    behavior: ipcidr
+    interval: 86400
+rule-providers:
+  fake-ip-filter:
+    <<: *domian
     format: text
     url: https://cdn.jsdelivr.net/gh/juewuy/ShellCrash@dev/public/fake_ip_filter.list
     path: ./ruleset/fake_ip_filter.list
-    interval: 86400
   steam:
-    type: http
-    proxy: PROXY
-    behavior: classical
+    <<: *classical
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Steam/Steam.yaml
     path: ./ruleset/steam.yaml
-    interval: 86400
   spotify:
-    type: http
-    proxy: PROXY
-    behavior: classical
+    <<: *classical
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Spotify/Spotify.yaml
     path: ./ruleset/spotify.yaml
-    interval: 86400
   twitter:
-    type: http
-    proxy: PROXY
-    behavior: classical
+    <<: *classical
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Twitter/Twitter.yaml
     path: ./ruleset/twitter.yaml
-    interval: 86400
   github:
-    type: http
-    proxy: PROXY
-    behavior: classical
+    <<: *classical
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/GitHub/GitHub.yaml
     path: ./ruleset/github.yaml
-    interval: 86400
   microsoft:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Microsoft/Microsoft.yaml
     path: ./ruleset/microsoft.yaml
-    interval: 86400
   openai:
-    type: http
-    proxy: PROXY
-    behavior: classical
+    <<: *classical
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/OpenAI/OpenAI.yaml
     path: ./ruleset/openai.yaml
-    interval: 86400
   claude:
-    type: http
-    proxy: PROXY
-    behavior: classical
+    <<: *classical
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Claude/Claude.yaml
     path: ./ruleset/claude.yaml
-    interval: 86400
   reject:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt
     path: ./ruleset/reject.yaml
-    interval: 86400
   icloud:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt
     path: ./ruleset/icloud.yaml
-    interval: 86400
   apple:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt
     path: ./ruleset/apple.yaml
-    interval: 86400
   gemini:
-    type: http
-    proxy: PROXY
-    behavior: classical
+    <<: *classical
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Gemini/Gemini.yaml
     path: ./ruleset/gemini.yaml
-    interval: 86400
   google:
-    type: http
-    proxy: PROXY
-    behavior: classical
+    <<: *classical
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Google/Google.yaml
     path: ./ruleset/google.yaml
-    interval: 86400
   proxy:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt
     path: ./ruleset/proxy.yaml
-    interval: 86400
   direct:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt
     path: ./ruleset/direct.yaml
-    interval: 86400
   private:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
     path: ./ruleset/private.yaml
-    interval: 86400
   gfw:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt
     path: ./ruleset/gfw.yaml
-    interval: 86400
   greatfire:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/greatfire.txt
     path: ./ruleset/greatfire.yaml
-    interval: 86400
   tld-not-cn:
-    type: http
-    proxy: PROXY
-    behavior: domain
+    <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt
     path: ./ruleset/tld-not-cn.yaml
-    interval: 86400
   telegramcidr:
-    type: http
-    proxy: PROXY
-    behavior: ipcidr
+    <<: *ip
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt
     path: ./ruleset/telegramcidr.yaml
-    interval: 86400
   cncidr:
-    type: http
-    proxy: PROXY
-    behavior: ipcidr
+    <<: *ip
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt
     path: ./ruleset/cncidr.yaml
-    interval: 86400
   lancidr:
-    type: http
-    proxy: PROXY
-    behavior: ipcidr
+    <<: *ip
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt
     path: ./ruleset/lancidr.yaml
-    interval: 86400
   applications:
-    type: http
-    proxy: PROXY
-    behavior: classical
+    <<: *classical
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
     path: ./ruleset/applications.yaml
-    interval: 86400
 rules:
   - DOMAIN-SUFFIX,olevod.com,Video
   - DOMAIN-SUFFIX,olelive.com,Video
@@ -611,7 +396,6 @@ rules:
   - DOMAIN,yacd.haishan.me,DIRECT
   - RULE-SET,reject,广告拦截
   - RULE-SET,private,DIRECT
-  - RULE-SET,direct,DIRECT
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
   - RULE-SET,gemini,Claude
@@ -624,10 +408,11 @@ rules:
   - DOMAIN-SUFFIX,openrouter.ai,Claude
   - RULE-SET,claude,Claude
   - RULE-SET,microsoft,Microsoft
+  - RULE-SET,telegramcidr,PROXY
   - RULE-SET,tld-not-cn,PROXY
   - RULE-SET,gfw,PROXY
   - RULE-SET,greatfire,PROXY
-  - RULE-SET,telegramcidr,PROXY
+  - RULE-SET,direct,DIRECT
   - RULE-SET,lancidr,DIRECT
   - RULE-SET,cncidr,DIRECT
   - GEOIP,LAN,DIRECT
