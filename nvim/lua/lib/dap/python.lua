@@ -15,6 +15,45 @@ dap_python.resolve_python = function()
   return vim.b.python_bin
 end
 
+local function resolve_script_python_path(script)
+  local cmd = { "uv", "sync", "--script", script }
+  local dry = { "--dry-run", "--output-format", "json" }
+  local result = vim.system(vim.iter({ cmd, dry }):flatten():totable(), { text = true }):wait()
+  local json = vim.json.decode(result.stdout:match "%b{}")
+  local python = json.sync.environment.python.path
+  if vim.fn.executable(python) ~= 1 then
+    vim.system(cmd):wait()
+  end
+  return python
+end
+
+dap.adapters.uv_script = function(cb, config)
+  local script = type(config.program) == "function" and config.program() or config.program
+  local script_python_path = resolve_script_python_path(script)
+  cb {
+    type = "executable",
+    command = "uv",
+    args = {
+      "run",
+      "--with",
+      "debugpy",
+      "--python",
+      script_python_path,
+      "python",
+      "-m",
+      "debugpy.adapter",
+    },
+  }
+end
+
+table.insert(dap.configurations.python, {
+  type = "uv_script",
+  request = "launch",
+  name = "file:script",
+  program = "${file}",
+  --args = {} -- args to program if needed
+})
+
 -- custom config
 table.insert(dap.configurations.python, {
   type = "python",
