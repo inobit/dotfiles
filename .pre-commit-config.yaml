@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: cleanup-script
         name: Run cleanup script
-        entry: ./scripts/cleanup.sh
-        language: script
+        entry: uv run ./.pre-commit-scripts/run-cleanup.py
+        language: system
         pass_filenames: true
         stages: [pre-commit]
