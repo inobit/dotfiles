@@ -9,4 +9,9 @@ for file in "$@"; do
 		git add "$file"
 		echo "$file has been cleaned"
 	fi
+
+	if [[ "$file" == "mihomo/loon.conf" ]]; then
+		sed -i -E '/^\s*\[Remote Proxy\]/{n;s/^[^\=]*\=[^\,]*/<subscription name> \= <subscription url>/;}' "$file"
+		git add "$file"
+	fi
 done
