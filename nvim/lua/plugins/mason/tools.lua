@@ -35,7 +35,6 @@ M.formatters = {
   "shfmt", -- shell formatter
   "xmlformatter", -- xml formatter
   "sql-formatter", --sql formatter
-  "mdformat", -- markdown formatter
   "google-java-format", -- java formatter
 }
 
