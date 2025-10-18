@@ -25,16 +25,6 @@ return {
       -- Configuration from the result of merging all tables returned by lsp/<name>.lua files in 'runtimepath' for a server of name.
       vim.lsp.config("*", {
         capabilities = capabilities,
-        on_attach = function(client, bufnr)
-          if client.name == "ruff" then
-            -- Disable hover in favor of Pyright
-            client.server_capabilities.hoverProvider = false
-          end
-          require("lsp_signature").on_attach({
-            hint_enable = false,
-            handler_opts = { border = "none" },
-          }, bufnr)
-        end,
       })
     end,
     config = function()
@@ -134,6 +124,10 @@ return {
               callback = vim.lsp.buf.clear_references,
             })
           end
+          require("lsp_signature").on_attach({
+            hint_enable = false,
+            handler_opts = { border = "none" },
+          }, event.buf)
         end,
       })
     end,
