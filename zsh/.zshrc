@@ -204,3 +204,7 @@ eval "$(uvx --generate-shell-completion zsh)"
 # fzf
 source <(fzf --zsh)
 export FZF_DEFAULT_OPTS='--height 60% --tmux bottom,60% --layout reverse --border --preview "$HOME/.fzf/fzf_preview_handler.sh {}"'
+
+if [[ -d $HOME/.cargo ]]; then
+	. "$HOME/.cargo/env"
+fi

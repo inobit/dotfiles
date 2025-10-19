@@ -189,6 +189,11 @@ if [[ ! -f $HOME/.local/bin/uv ]]; then
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
+echo "install rust environment"
+if [[ ! -d $HOME/.rustup ]]; then
+	curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+fi
+
 read -r -p "Whether to install docker(os must be debian)? y or n: " docker
 if [[ $docker = "y" ]]; then
 	# uninstall all conflicting packages
