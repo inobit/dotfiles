@@ -153,3 +153,17 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.bo[event.buf].buflisted = false
   end,
 })
+
+-- Automatically mark the buffer as modified if the file is deleted
+vim.api.nvim_create_autocmd("FileChangedShell", {
+  group = augroup "file_modified",
+  pattern = "*",
+  callback = function(event)
+    -- check if file exists
+    local file_exists = vim.uv.fs_stat(vim.api.nvim_buf_get_name(event.buf))
+    if not file_exists then
+      -- Mark the buffer as modified to prevent the 'no longer available' error.
+      vim.bo[event.buf].modified = true
+    end
+  end,
+})
