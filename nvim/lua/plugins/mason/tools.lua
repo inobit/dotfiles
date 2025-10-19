@@ -20,6 +20,8 @@ M.lsp_servers = {
   "emmet_ls",
   "marksman",
   "eslint", --vsocde eslint, package name is eslint-lsp, need install eslint (global or local)
+  "rust_analyzer", -- rust lsp
+  "bacon_ls", -- a lsp server wrapper for rust bacon
 }
 
 ---@type string[]
@@ -36,6 +38,7 @@ M.formatters = {
   "xmlformatter", -- xml formatter
   "sql-formatter", --sql formatter
   "google-java-format", -- java formatter
+  --  "rustfmt", -- , rustfmt should now be installed via rustup.
 }
 
 ---@type string[]
@@ -50,6 +53,7 @@ M.linters = {
   "sqlfluff", -- sql linter
   "yamllint", -- yaml linter
   "selene", -- lua linter
+  "bacon", -- rust linter ,used by bacon-ls
 }
 
 return M

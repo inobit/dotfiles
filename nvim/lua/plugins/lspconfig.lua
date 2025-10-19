@@ -124,6 +124,19 @@ return {
               callback = vim.lsp.buf.clear_references,
             })
           end
+          -- rust_analyzer on_attach has been set by nvim-lspconfig，and duplicate registrations are not allowed
+          if client.name == "rust_analyzer" and client.supports_method "textDocument/formatting" then
+            local group = vim.api.nvim_create_augroup("inobit_rust_analyzer_formatter", { clear = false }) -- don't clear autocmds
+            vim.api.nvim_clear_autocmds { group = group, buffer = event.buf }
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              group = group,
+              buffer = event.buf,
+              desc = "Format Rust with rust-analyzer on save",
+              callback = function()
+                vim.lsp.buf.format { async = false }
+              end,
+            })
+          end
           require("lsp_signature").on_attach({
             hint_enable = false,
             handler_opts = { border = "none" },

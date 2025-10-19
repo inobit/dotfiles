@@ -40,6 +40,8 @@ return { -- Highlight, edit, and navigate code
       "gitcommit",
       "gitignore",
       "java",
+      "rust",
+      "ron", --rust object notation
     },
     -- Autoinstall languages that are not installed
     auto_install = true,

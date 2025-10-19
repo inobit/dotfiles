@@ -14,14 +14,18 @@ dap.adapters["codelldb"] = {
   },
 }
 -- end
-for _, lang in ipairs { "c", "cpp" } do
+for _, lang in ipairs { "c", "cpp", "rust" } do
+  local opts = { executables = true }
+  if lang == "rust" then
+    opts.path = "target"
+  end
   dap.configurations[lang] = {
     {
       type = "codelldb",
       request = "launch",
       name = "Launch file",
       program = function()
-        return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+        return require("dap.utils").pick_file(opts)
       end,
       cwd = "${workspaceFolder}",
     },

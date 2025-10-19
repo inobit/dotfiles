@@ -13,8 +13,8 @@ return {
           vim.tbl_contains({ "typescript", "javascript", "typescriptreact", "javascriptreact" }, vim.bo.filetype)
         then
           require "lib.dap.js"
-        elseif vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
-          require "lib.dap.cpp"
+        elseif vim.tbl_contains({ "c", "cpp", "rust" }, vim.bo.filetype) then
+          require "lib.dap.codelldb"
         elseif vim.bo.filetype == "java" then
           require "lib.dap.java"
         end
