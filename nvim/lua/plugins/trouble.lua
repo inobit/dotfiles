@@ -4,6 +4,36 @@ return {
     modes = {
       symbols = {
         win = { position = "left" },
+        filter = {
+          any = {
+            { ft = "help" },
+            {
+              ft = "markdown",
+              -- remove File, is used by obsidian-ls
+              ["not"] = { kind = "File" },
+            },
+            {
+              -- not show too much levels
+              kind = {
+                "Class",
+                "Constructor",
+                "Enum",
+                "Field",
+                "Function",
+                "Interface",
+                "Method",
+                "Module",
+                "Namespace",
+                "Package",
+                "Property",
+                "Struct",
+                "Trait",
+              },
+              -- remove Package since luals uses it for control flow structures
+              ["not"] = { ft = "lua", kind = "Package" },
+            },
+          },
+        },
       },
     },
   }, -- for default options, refer to the configuration section for custom setup.
