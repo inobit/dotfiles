@@ -32,7 +32,7 @@ return {
       },
       legacy_commands = false,
       callbacks = {
-        enter_note = function(_, note)
+        enter_note = function(note)
           -- stylua: ignore start
           vim.keymap.set("n", "]s", function() require("obsidian.api").nav_link "next" end, { buffer = note.bufnr, desc = "Obsidian: Go to next link", })
           vim.keymap.set("n", "[s", function() require("obsidian.api").nav_link "prev" end, { buffer = note.bufnr, desc = "Obsidian: Go to previous link", })
