@@ -31,6 +31,9 @@ return {
         },
       },
       legacy_commands = false,
+      ui = {
+        enable = false,
+      },
       callbacks = {
         enter_note = function(note)
           -- stylua: ignore start
