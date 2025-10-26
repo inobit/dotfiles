@@ -35,14 +35,14 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- save winview
 vim.api.nvim_create_autocmd({ "BufWinLeave" }, {
-  group = augroup "view_control",
+  group = augroup "view_control_save",
   pattern = "*",
   callback = function()
     vim.b.winview = vim.fn.winsaveview()
   end,
 })
 vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-  group = augroup "view_control",
+  group = augroup "view_control_restore",
   pattern = "*",
   callback = function()
     if vim.b.winview ~= nil then
