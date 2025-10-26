@@ -200,7 +200,11 @@ return {
             end,
           },
           -- python
-          null_ls.builtins.formatting.black,
+          null_ls.builtins.formatting.black.with {
+            extra_args = function()
+              return { "--line-length", vim.bo.textwidth == 0 and 80 or vim.bo.textwidth }
+            end,
+          },
           -- javascript,typescript,javascriptreact,typescriptreact,html,css,scss,sass,less,json,jsonc,json5,markdown,yaml
           null_ls.builtins.formatting.prettier.with {
             filetypes = {
