@@ -5,6 +5,14 @@ return { -- Highlight, edit, and navigate code
   dependencies = {
     "nvim-treesitter/nvim-treesitter-textobjects",
     "windwp/nvim-ts-autotag",
+    {
+      "andymass/vim-matchup",
+      opts = {
+        treesitter = {
+          stopline = 500,
+        },
+      },
+    },
   },
   opts = {
     ensure_installed = {
