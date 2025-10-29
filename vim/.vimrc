@@ -111,8 +111,6 @@ nnoremap <C-Right> :vertical resize +2<CR>
 nnoremap ]t :tabnext<CR>
 nnoremap [t :tabprevious<CR>
 
-nnoremap <leader>l :bnext<CR>
-nnoremap <leader>h :bprevious<CR>
 
 " Stay in indent mode
 vnoremap < <gv

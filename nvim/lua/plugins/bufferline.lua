@@ -18,7 +18,7 @@ return {
   event = "VeryLazy",
   keys = {
     {
-      "<leader>l",
+      "]b",
       function()
         if vim.v.count == 0 then
           vim.cmd "BufferLineCycleNext"
@@ -29,7 +29,7 @@ return {
       desc = "Bufferline: [v:count] Next buffer",
     },
     {
-      "<leader>h",
+      "[b",
       function()
         if vim.v.count == 0 then
           vim.cmd "BufferLineCyclePrev"
@@ -40,7 +40,7 @@ return {
       desc = "Bufferline: [v:count] Prev buffer",
     },
     {
-      "<leader>L",
+      "]B",
       function()
         if vim.v.count == 0 then
           vim.cmd "BufferLineMoveNext"
@@ -51,7 +51,7 @@ return {
       desc = "Bufferline: [v:count] Move buffer next",
     },
     {
-      "<leader>H",
+      "[B",
       function()
         if vim.v.count == 0 then
           vim.cmd "BufferLineMovePrev"

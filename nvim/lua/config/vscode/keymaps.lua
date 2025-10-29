@@ -68,28 +68,28 @@ map("n", "[c", function() vscode.action "workbench.action.editor.nextChange" end
 map("n", "]c", function() vscode.action "workbench.action.editor.previousChange" end, "vscode: previous git hunk")
 
 -- buffer navigation
-map("n", "<leader>h", function()
+map("n", "[b", function()
   local count = vim.v.count == 0 and 1 or vim.v.count
   for i = 1, count do
     vscode.action "workbench.action.previousEditor"
   end
 end, "vscode: go to previous editor")
 
-map("n", "<leader>l", function()
+map("n", "]b", function()
   local count = vim.v.count == 0 and 1 or vim.v.count
   for i = 1, count do
     vscode.action "workbench.action.nextEditor"
   end
 end, "vscode: go to preview editor")
 
-map("n", "<leader>H", function()
+map("n", "[B", function()
   local count = vim.v.count == 0 and 1 or vim.v.count
   for i = 1, count do
     vscode.action "workbench.action.moveEditorLeftInGroup"
   end
 end, "vscode: move editor left")
 
-map("n", "<leader>L", function()
+map("n", "]B", function()
   local count = vim.v.count == 0 and 1 or vim.v.count
   for i = 1, count do
     vscode.action "workbench.action.moveEditorRightInGroup"

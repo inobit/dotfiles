@@ -86,18 +86,18 @@ map S* :surround_star<CR>
 
 " tab control
 exmap tabnext obcommand workspace:next-tab
-nmap <Space>l :tabnext<CR>
+nmap ]b :tabnext<CR>
 exmap tabprev obcommand workspace:previous-tab
-nmap <Space>h :tabprev<CR>
+nmap [b :tabprev<CR>
 exmap tabclose obcommand workspace:close
 nmap <Space>bb :tabclose<CR>
 exmap tabcloseothers obcommand workspace:close-others
 nmap <Space>bo :tabcloseothers<CR>
 
 exmap tabhistory obcommand app:go-back
-nmap [b :tabhistory<CR>
+nmap <Space>H :tabhistory<CR>
 exmap tabforward obcommand app:go-forward
-nmap ]b :tabforward<CR>
+nmap <Space>L :tabforward<CR>
 
 " link
 exmap gotolink obcommand editor:follow-link

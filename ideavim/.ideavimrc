@@ -97,8 +97,8 @@ command! Dnew :action NewDir
 command! Connew :action Jdbc.OpenConsole.New
 
 " buffer navigation
-nmap <leader>h <Action>(PreviousTab)
-nmap <leader>l <Action>(NextTab)
+nmap [b <Action>(PreviousTab)
+nmap ]b <Action>(NextTab)
 nmap <leader>bb <Action>(CloseEditor)
 nmap <leader>bo <Action>(CloseAllEditorsButActive)
 nmap <leader>ba <Action>(CloseAllEditors)
