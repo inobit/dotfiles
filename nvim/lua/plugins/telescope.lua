@@ -116,13 +116,18 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set("n", "<leader>se", builtin.diagnostics, { desc = "Telescope: Search Diagnostics" })
     vim.keymap.set("n", "<leader>sj", builtin.jumplist, { desc = "Telescope: Search Jumplist" })
 
-    vim.keymap.set( "n", "<leader>fd", "<Cmd>Telescope file_browser path=%:p:h select_buffer=true<CR>",
-      { desc = "Telescope: Search Files in current folder" }
-    )
+    vim.keymap.set("n", "<leader>fd", function()
+      require("telescope").extensions.file_browser.file_browser {
+        path = vim.fn.expand "%:p:h",
+        select_buffer = true,
+        hidden = true,
+        no_ignore = true,
+      }
+    end, { desc = "Telescope: Search Files in current folder" })
 
     vim.keymap.set("n", "<leader>ff", function()
-      require("telescope").extensions.file_browser.file_browser()
-    end,{desc = "Telescope: Search Files in CWD" })
+      require("telescope").extensions.file_browser.file_browser { hidden = true, no_ignore = true }
+    end, { desc = "Telescope: Search Files in CWD" })
 
     vim.keymap.set("n", "<leader>sd", function()
       builtin.find_files { hidden = true, no_ignore = true, cwd = require("telescope.utils").buffer_dir() }
