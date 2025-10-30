@@ -10,6 +10,26 @@ return {
         ["<M-h>"] = "actions.select_split",
         ["q"] = { "actions.close", mode = "n" },
         ["<leader>R"] = { "actions.refresh", mode = "n" },
+        ["gd"] = {
+          desc = "Oil: Toggle file detail view",
+          callback = function()
+            _OIL_DETAIL = not _OIL_DETAIL
+            if _OIL_DETAIL then
+              require("oil").set_columns { "icon", "permissions", "size", "mtime" }
+            else
+              require("oil").set_columns { "icon" }
+            end
+          end,
+        },
+        ["gy"] = {
+          desc = "Oil: Get cursor file/dir's absolute path",
+          callback = function()
+            local oil = require "oil"
+            local current_dir = oil.get_current_dir()
+            local name = oil.get_cursor_entry().name
+            vim.fn.setreg("+", current_dir .. name)
+          end,
+        },
       },
       view_options = {
         show_hidden = true,
