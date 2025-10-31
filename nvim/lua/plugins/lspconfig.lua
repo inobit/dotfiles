@@ -265,6 +265,10 @@ return {
           },
           -- python
           null_ls.builtins.diagnostics.mypy.with {
+            runtime_condition = function(params)
+              local uri = params.lsp_params.textDocument.uri
+              return not (uri:match "site%-packages" or uri:match "__pycache__") -- exclude site-packages and __pycache__
+            end,
             extra_args = function(_)
               return { "--python-executable", vim.b.python_bin }
             end,
