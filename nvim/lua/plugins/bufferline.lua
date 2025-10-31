@@ -96,9 +96,9 @@ return {
       "<Cmd>BufferLineTogglePin<CR>",
       desc = "Bufferline: Pin toggle",
     },
-    { "<leader>bs", "<Cmd>BufferLinePick<CR>", desc = "Bufferline: Pick" },
+    { "<leader>bn", "<Cmd>BufferLinePick<CR>", desc = "Bufferline: Pick" },
     {
-      "<leader>bS",
+      "<leader>bN",
       "<Cmd>BufferLinePickClose<CR>",
       desc = "Bufferline: Pick to close",
     },
