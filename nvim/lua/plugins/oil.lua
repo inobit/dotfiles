@@ -30,6 +30,12 @@ return {
             vim.fn.setreg("+", current_dir .. name)
           end,
         },
+        ["~"] = {
+          desc = "Oil: Go to home directory",
+          callback = function()
+            require("oil").open(vim.fn.expand "~")
+          end,
+        },
       },
       view_options = {
         show_hidden = true,
