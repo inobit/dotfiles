@@ -127,7 +127,7 @@ return {
         -- default provider
         provider = "openrouter-grok-code-fast",
         providers = {
-          ["openrouter-claude4"] = openrouter_provider "anthropic/claude-sonnet-4",
+          ["openrouter-claude4"] = openrouter_provider "anthropic/claude-sonnet-4.5",
           ["openrouter-gemini-2.5-flash"] = openrouter_provider "google/gemini-2.5-flash",
           ["openrouter-gemini-2.5-pro"] = openrouter_provider "google/gemini-2.5-pro",
           ["openrouter-grok-code-fast"] = openrouter_provider "x-ai/grok-code-fast-1",
