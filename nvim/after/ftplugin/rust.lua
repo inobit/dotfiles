@@ -1,16 +1,8 @@
 local function get_root_dir()
-  local cargo_toml = vim.fn.findfile("Cargo.toml", ".;")
-  if cargo_toml == "" then
-    return vim.fn.getcwd()
-  end
-  return vim.fn.fnamemodify(cargo_toml, ":p:h")
+  return require("lib.utils").get_root_dir(0, "Cargo.toml") or vim.fn.getcwd()
 end
 
 -- cargo run
-require("lib.run").register_run_keymap(function()
-  return string.format("cd %s && %s", get_root_dir(), "cargo run")
-end, "<leader>rr")
+require("lib.run").register_run_keymap("cargo run", { cwd = get_root_dir })
 -- cargo check
-require("lib.run").register_run_keymap(function()
-  return string.format("cd %s && %s", get_root_dir(), "cargo check")
-end, "<leader>rc")
+require("lib.run").register_run_keymap("cargo check", { cwd = get_root_dir, lhs = "<leader>rc" })

@@ -11,15 +11,21 @@ vim.lsp.config("pyright", {
   end,
 })
 
+local function get_root_dir()
+  return require("lib.utils").get_root_dir(0, "pyproject.toml") or vim.fn.getcwd()
+end
+
 ---@return string
 local function python_command_generator()
   local command
+  local project = require("lib.utils").get_root_dir(0, "pyproject.toml")
+  local file = project and "main.py" or vim.fn.expand "%"
   if vim.fn.executable "uv" == 1 then
-    command = "uv run " .. vim.fn.expand "%"
+    command = "uv run"
   else
-    command = "python -u " .. vim.fn.expand "%"
+    command = "python -u"
   end
-  return command
+  return command .. " " .. file
 end
 
-require("lib.run").register_run_keymap(python_command_generator, "<leader>rr")
+require("lib.run").register_run_keymap(python_command_generator, { cwd = get_root_dir })

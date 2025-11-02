@@ -96,6 +96,6 @@ end, { desc = "show messages in current cursor" })
 
 if vim.env.TMUX then
   vim.keymap.set("n", "<C-l>", function()
-    require("lib.run").run "clear"
+    require("lib.run").run("clear", { stdout = false })
   end, { desc = "clear print", silent = true, noremap = true })
 end
