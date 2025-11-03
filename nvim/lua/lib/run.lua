@@ -13,28 +13,43 @@ local function handle_output(out)
   end
 end
 
+---@param iter Iter
+---@param opts? vim.SystemOpts
+local function run_chain(iter, opts)
+  local command = iter:next()
+  if command then
+    vim.system(command, opts, function(out)
+      vim.schedule(function()
+        handle_output(out)
+        if out.code == 0 then
+          run_chain(iter, opts)
+        end
+      end)
+    end)
+  else
+    vim.notify "Command finished!"
+  end
+end
+
 ---@param command string[]
 ---@param opts? vim.SystemOpts
 local function run_local(command, opts)
   local command_str = table.concat(command, " ")
   vim.notify("Running " .. command_str)
   ---@type vim.SystemCompleted
-  local out
   if vim.tbl_contains(command, "&&") then
-    local commands = vim.split(command_str, "&&")
-    for _, cmd in ipairs(commands) do
-      local c = vim.split(vim.trim(cmd), " ")
-      out = vim.system(c, opts):wait()
-      handle_output(out)
-      if out.code ~= 0 then
-        break
-      end
-    end
+    local commands = vim.iter(vim.split(command_str, "&&")):map(function(c)
+      return vim.split(vim.trim(c), " ")
+    end)
+    run_chain(commands, opts)
   else
-    out = vim.system(command, opts):wait()
-    handle_output(out)
+    vim.system(command, opts, function(out)
+      vim.schedule(function()
+        handle_output(out)
+        vim.notify "Command finished!"
+      end)
+    end)
   end
-  vim.notify "Command finished."
 end
 
 ---@param command string | string[]
