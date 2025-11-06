@@ -373,14 +373,7 @@ return {
               fn = function(params, done)
                 local status, _ = pcall(require, "dbee")
                 if status then
-                  local json =
-                    require("lib.dbee").get_selected_row_in_json(params.bufnr, params.lsp_params.position.line)
-                  if json then
-                    json = "```json" .. json .. "```"
-                    done { json }
-                  else
-                    done()
-                  end
+                  require("lib.dbee").get_selected_row_in_prettier(params.bufnr, params.lsp_params.position.line, done)
                 else
                   done()
                 end

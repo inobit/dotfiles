@@ -3,10 +3,9 @@ local M = {}
 local dbee = require "dbee"
 local api = require "dbee.api"
 
----get selected line json
 ---@param bufnr number
 ---@param line number
----@return string | nil
+---@return table<string,any> | nil
 function M.get_selected_row_in_json(bufnr, line)
   local content = vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]
   local row_index = content and tonumber(content:match "%s*(%d+)%s*│.*") -- row format
@@ -19,18 +18,37 @@ function M.get_selected_row_in_json(bufnr, line)
     vim.fn.setreg('"', register_anony)
     vim.fn.setreg("0", register_zero)
 
-    --OPTIMIZE: Use decode directly?
-
     -- remove []
-    json = json:gsub("^%[", ""):gsub("%]%s*$", "")
-    -- remove space
-    local lines = {}
-    for l in json:gmatch "([^\n]*)\n?" do
-      l = l:gsub("^%s%s", "")
-      table.insert(lines, l)
-    end
-    json = table.concat(lines, "\n")
+    -- json = json:gsub("^%[", ""):gsub("%]%s*$", "")
+    json = vim.json.decode(json)[1]
     return json
+  end
+end
+
+---prettier json output
+---@param bufnr number
+---@param line number
+---@param done fun(result?: table)
+function M.get_selected_row_in_prettier(bufnr, line, done)
+  local json = M.get_selected_row_in_json(bufnr, line)
+  if json then
+    -- decode json format value
+    for key, value in pairs(json) do
+      if value and type(value) == "string" and value:match "^%b{}" then
+        local status, decoded = pcall(vim.json.decode, value)
+        if status then
+          json[key] = decoded
+        end
+      end
+    end
+    if vim.fn.executable "jq" == 1 then
+      local json_str = vim.json.encode(json)
+      vim.system({ "jq", "--sort-keys", "." }, { stdin = json_str, text = true }, function(res)
+        done { string.format("```json\n%s```", res.stdout) }
+      end)
+    else
+      done { string.format("```lua\n%s\n```", vim.inspect(json)) }
+    end
   end
 end
 
@@ -95,7 +113,6 @@ function M.code_actions(bufnr, line)
     if not row then
       return
     end
-    row = vim.json.decode(row)
     local query = current_call.query
     if query:upper():match "^SHOW DATABASES;?$" then
       table.insert(actions, {
