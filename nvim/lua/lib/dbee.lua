@@ -34,7 +34,7 @@ function M.get_selected_row_in_prettier(bufnr, line, done)
   if json then
     -- decode json format value
     for key, value in pairs(json) do
-      if value and type(value) == "string" and value:match "^%b{}" then
+      if value and type(value) == "string" and (value:match "^%b{}" or value:match "^%b[]") then
         local status, decoded = pcall(vim.json.decode, value)
         if status then
           json[key] = decoded
