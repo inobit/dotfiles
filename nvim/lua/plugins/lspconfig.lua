@@ -232,12 +232,13 @@ return {
               return {
                 "-c",
                 vim.json.encode {
-                  language = "mysql",
+                  language = "sql",
                   tabWidth = 2,
                   keywordCase = "upper",
                   dataTypeCase = "upper",
                   functionCase = "upper",
                   linesBetweenQueries = 2,
+                  denseOperators = true,
                   paramTypes = { named = { ":" } },
                 },
               }

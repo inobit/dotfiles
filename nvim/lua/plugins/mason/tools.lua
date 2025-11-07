@@ -13,7 +13,7 @@ M.lsp_servers = {
   "jsonls",
   "bashls", -- If shellcheck is installed, bash-language-server will automatically call it to provide linting
   "dockerls",
-  "sqlls",
+  -- "sqlls", -- disable, conflict with dbee-cmp
   "yamlls",
   "docker_compose_language_service",
   "clangd",
