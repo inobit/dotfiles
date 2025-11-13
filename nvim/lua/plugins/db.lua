@@ -74,6 +74,7 @@ return {
           },
         },
         result = {
+          focus_result = false,
           mappings = {
             { key = ">", mode = "", action = "page_next" },
             { key = "<", mode = "", action = "page_prev" },
