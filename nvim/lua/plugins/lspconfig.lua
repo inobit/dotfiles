@@ -266,6 +266,12 @@ return {
           },
           -- python
           null_ls.builtins.diagnostics.mypy.with {
+            command = function()
+              local python_bin = vim.b.python_bin
+              local mypy_bin = python_bin:gsub("/python3$", "/mypy")
+              -- use local mypy first
+              return vim.fn.executable(mypy_bin) == 1 and mypy_bin or "mypy"
+            end,
             runtime_condition = function(params)
               local uri = params.lsp_params.textDocument.uri
               return not (uri:match "site%-packages" or uri:match "__pycache__") -- exclude site-packages and __pycache__
