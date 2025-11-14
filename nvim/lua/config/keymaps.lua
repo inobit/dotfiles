@@ -96,6 +96,11 @@ end, { desc = "show messages in current cursor" })
 
 if vim.env.TMUX then
   vim.keymap.set("n", "<C-l>", function()
-    require("lib.run").run("clear", { stdout = false })
-  end, { desc = "clear print", silent = true, noremap = true })
+    local out = vim.system({ "tmux", "list-panes", "-F", "#F" }, { text = true }):wait()
+    if out and out.stdout:match "Z" then
+      vim.cmd "wincmd l"
+    else
+      require("lib.run").run("clear", { stdout = false })
+    end
+  end, { desc = "<C-l> move or clear", silent = true, noremap = true })
 end
