@@ -54,7 +54,11 @@ return {
           --  Similar to document symbols, except searches over your whole project.
           map("gS", require("telescope.builtin").lsp_workspace_symbols, "[W]orkspace [S]ymbols")
           -- quickfix
-          map("gq", require("telescope.builtin").quickfix, "[Q]uickfix")
+          map("<leader>gq", require("telescope.builtin").quickfix, "[Q]uickfix")
+
+          map("gq", vim.lsp.buf.format, "[F]ormat")
+
+          map("<C-M-f>", vim.lsp.buf.format, "[F]ormat", { "n", "i", "v" })
 
           -- Rename the variable under your cursor
           --  Most Language Servers support renaming across files, etc.
