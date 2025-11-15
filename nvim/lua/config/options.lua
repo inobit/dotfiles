@@ -53,6 +53,21 @@ if (vim.env.SSH_TTY or vim.env.SSH_CLIENT) and not vim.env.TMUX then
   }
 end
 
+if vim.fn.has "wsl" then
+  vim.g.clipboard = {
+    name = "win_clipboard",
+    copy = {
+      ["+"] = "clip.exe",
+      ["*"] = "clip.exe",
+    },
+    paste = {
+      ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+      ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+    },
+    cache_enabled = 0,
+  }
+end
+
 -- 换行后重复之前的缩进
 vim.opt.breakindent = true
 
