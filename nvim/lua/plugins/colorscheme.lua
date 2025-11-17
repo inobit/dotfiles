@@ -55,4 +55,13 @@ return { -- You can easily change to a different colorscheme.
       setTheme(theme)
     end,
   },
+  {
+    "projekt0n/github-nvim-theme",
+    name = "github-theme",
+    priority = 1000,
+    cond = string.find(theme, "github") ~= nil,
+    config = function()
+      setTheme(theme)
+    end,
+  },
 }
