@@ -29,3 +29,7 @@ local function python_command_generator()
 end
 
 require("lib.run").register_run_keymap(python_command_generator, { cwd = get_root_dir })
+require("lib.run").register_run_keymap(
+  string.format("uv run %s", vim.fn.expand "%"),
+  { cwd = get_root_dir, lhs = "<leader>rs" }
+)
