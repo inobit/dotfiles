@@ -53,7 +53,7 @@ if (vim.env.SSH_TTY or vim.env.SSH_CLIENT) and not vim.env.TMUX then
   }
 end
 
-if vim.fn.has "wsl" then
+if vim.fn.has "wsl" == 1 then
   vim.g.clipboard = {
     name = "win_clipboard",
     copy = {
