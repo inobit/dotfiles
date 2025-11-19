@@ -52,6 +52,8 @@ return {
             api_key_name = "OPENROUTER_API_KEY",
             models = {
               { model = "anthropic/claude-sonnet-4.5", temperature = 0.4 },
+              { model = "openai/gpt-5.1", temperature = 0.4 },
+              { model = "google/gemini-3-pro-preview", temperature = 0.4 },
               { model = "google/gemini-2.5-flash", temperature = 0.4 },
               { model = "google/gemini-2.5-flash-lite", temperature = 0.4 },
               { model = "google/gemini-2.5-pro", temperature = 0.4 },
