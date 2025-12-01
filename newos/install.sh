@@ -184,6 +184,10 @@ if [[ ! -d $HOME/.tmux/plugins/tpm ]]; then
 	git clone https://github.com/tmux-plugins/tpm "$HOME"/.tmux/plugins/tpm
 fi
 #tmux source "$HOME"/.config/tmux/tmux.conf
+if [[ -f $HOME/documents/dotfiles/ssh/rc ]]; then
+	test -d "$HOME"/.ssh || mkdir -p "$HOME"/.ssh
+	cp "$HOME"/documents/dotfiles/ssh/rc "$HOME"/.ssh
+fi
 
 echo "install nvm"
 if [[ ! -d $HOME/.nvm ]]; then
