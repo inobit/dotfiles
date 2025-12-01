@@ -18,18 +18,38 @@ if [[ ! -d $mihomo_home ]]; then
 	mkdir -p "$mihomo_home"
 fi
 
-cp ./config.yaml ./mihomo.service "$mihomo_home"
+if [[ ! -f $mihomo_home/config.yaml ]]; then
+	cp ./config.yaml "$mihomo_home"
+fi
+
+if [[ ! -f $mihomo_home/mihomo.service ]]; then
+	cp ./mihomo.service "$mihomo_home"
+fi
 
 cd "$mihomo_home"
+
+install_mihomo() {
+	chmod +x mihomo
+	sudo ln -sf "$(pwd)"/mihomo /usr/local/bin/mihomo
+}
 
 if [[ ! -f ./mihomo ]]; then
 	echo "download mihomo"
 	curl -fSsL -o mihomo.gz "https://github.com/MetaCubeX/mihomo/releases/download/v1.19.15/mihomo-linux-amd64-v2-v1.19.15.gz"
 	gzip -d mihomo.gz
+	install_mihomo
 else
-	chmod +x mihomo
-	sudo ln -sf "$(pwd)"/mihomo /usr/local/bin/mihomo
+	install_mihomo
 fi
+
+install_mihomosh() {
+	chmod +x mihomosh
+	ln -sf "$(pwd)"/mihomosh "$HOME"/.local/bin/mihomosh
+	if ! grep -qE '^eval\s"\$\(mihomosh' "$HOME"/.zshrc; then
+		printf '%s\n' 'eval "$(mihomosh shell-completion zsh)"' >>"$HOME"/.zshrc
+	fi
+	echo "mihomosh can be used to control mihomo. mihomosh should be config first, use command: mihomosh config edit -e nvim"
+}
 
 if [[ ! -f ./mihomosh ]]; then
 	echo "download mihomosh"
@@ -38,30 +58,34 @@ if [[ ! -f ./mihomosh ]]; then
 	tar -zxf "$mihomosh_tmp"/mihomosh.tar.gz -C "$mihomosh_tmp"
 	mv "$mihomosh_tmp"/mihomosh .
 	rm -rf "$mihomosh_tmp"
+	install_mihomosh
 else
-	chmod +x mihomosh
-	ln -sf "$(pwd)"/mihomosh "$HOME"/.local/bin/mihomosh
-	if ! grep -qE '^eval\s"\$\(mihomosh' "$HOME"/.zshrc; then
-		printf '%s\n' 'eval "$(mihomosh shell-completion zsh)"' >>"$HOME"/.zshrc
-	fi
-	echo "mihomosh can be used to control mihomo. mihomosh should be config first, use command: mihomosh config edit -e nvim"
+	install_mihomosh
 fi
 
 echo "config mihomo"
 
-[[ -d /etc/mihomo ]] || sudo mkdir -p /etc/mihomo
+config_mihomo() {
 
-if [[ -d ./data ]]; then
-	sudo cp -r ./data/* /etc/mihomo
-fi
+	[[ -d /etc/mihomo ]] || sudo mkdir -p /etc/mihomo
 
-sudo ln -sf "$(pwd)"/config.yaml /etc/mihomo/config.yaml
+	if [[ -d ./data ]]; then
+		sudo cp -r ./data/* /etc/mihomo
+	fi
 
-sudo ln -sf "$(pwd)"/mihomo.service /etc/systemd/system/mihomo.service
+	if [[ ! -L /etc/mihomo/config.yaml ]]; then
+		sudo ln -sf "$(pwd)"/config.yaml /etc/mihomo/config.yaml
+	fi
 
-sudo systemctl daemon-reload
+	if [[ ! -L /etc/systemd/system/mihomo.service ]]; then
+		sudo ln -sf "$(pwd)"/mihomo.service /etc/systemd/system/mihomo.service
+	fi
 
-sudo systemctl enable mihomo.service
+	sudo systemctl daemon-reload
+	sudo systemctl enable mihomo.service
+}
+
+config_mihomo
 
 echo "start mihomo"
 
