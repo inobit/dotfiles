@@ -2,6 +2,22 @@
 
 set -e
 
+# detect os
+support_os=("debian" "ubuntu")
+OS="UNKONWN"
+detect_os() {
+	if [[ -f /etc/os-release ]]; then
+		. /etc/os-release
+		OS=$ID
+	fi
+}
+
+detect_os
+if [[ ! ${support_os[*]} =~ $OS ]]; then
+	echo "OS $OS is not supported"
+	exit 1
+fi
+
 cd "$HOME"
 
 # config locale
@@ -79,18 +95,6 @@ sudo apt update && sudo apt upgrade -y
 echo "install tools"
 sudo apt install make gcc ripgrep fd-find bat unzip git xclip curl wget jq -y
 
-if ! which fzf >/dev/null 2>&1; then
-	echo "install fzf"
-	fzf_home="$HOME"/.fzf
-	fzf_version=0.65.2
-	curl -fSsL --create-dirs -o "$fzf_home"/bin/fzf.tar.gz https://github.com/junegunn/fzf/releases/download/v"$fzf_version"/fzf-"$fzf_version"-linux_amd64.tar.gz
-	tar -zxf "$fzf_home"/bin/fzf.tar.gz -C "$fzf_home"/bin
-	rm -f "$fzf_home"/bin/fzf.tar.gz
-	test -d "$HOME"/.local/bin || mkdir -p "$HOME"/.local/bin
-	ln -sf "$fzf_home"/bin/fzf "$HOME"/.local/bin/fzf
-	ln -sf "$HOME"/documents/dotfiles/newos/fzf/fzf_preview_handler.sh "$fzf_home"/fzf_preview_handler.sh
-fi
-
 # config firewall
 read -r -p "Whether to config iptables? y or n: " config_iptables
 if [[ $config_iptables = "y" ]]; then
@@ -121,6 +125,18 @@ if [[ ! -d $HOME/documents/dotfiles ]]; then
 	git clone git@gitee.com:inobit/dotfiles.git "$HOME"/documents/dotfiles
 fi
 
+if [[ ! -f "$HOME"/.local/bin/fzf ]]; then
+	echo "install fzf"
+	fzf_home="$HOME"/.fzf
+	fzf_version=0.65.2
+	curl -fSsL --create-dirs -o "$fzf_home"/bin/fzf.tar.gz https://github.com/junegunn/fzf/releases/download/v"$fzf_version"/fzf-"$fzf_version"-linux_amd64.tar.gz
+	tar -zxf "$fzf_home"/bin/fzf.tar.gz -C "$fzf_home"/bin
+	rm -f "$fzf_home"/bin/fzf.tar.gz
+	test -d "$HOME"/.local/bin || mkdir -p "$HOME"/.local/bin
+	ln -sf "$fzf_home"/bin/fzf "$HOME"/.local/bin/fzf
+	ln -sf "$HOME"/documents/dotfiles/newos/fzf/fzf_preview_handler.sh "$fzf_home"/fzf_preview_handler.sh
+fi
+
 echo "install nvim"
 if ! which nvim >/dev/null 2>&1; then
 	sudo rm -rf /opt/nvim-linux64
@@ -131,7 +147,9 @@ fi
 
 echo "ln nvim config"
 test -d "$HOME"/.config || mkdir -p "$HOME"/.config
-ln -sf "$HOME"/documents/dotfiles/nvim "$HOME"/.config/nvim
+if [[ ! -L $HOME/.config/nvim ]]; then
+	ln -sf "$HOME"/documents/dotfiles/nvim "$HOME"/.config/nvim
+fi
 
 echo "install tree-sitter"
 if [[ ! -f $HOME/.local/bin/tree-sitter ]]; then
@@ -159,7 +177,9 @@ fi
 
 echo "config tmux"
 test -d "$HOME"/.config/tmux || mkdir -p "$HOME"/.config/tmux
-ln -sf "$HOME"/documents/dotfiles/tmux/tmux.conf "$HOME"/.config/tmux/tmux.conf
+if [[ ! -L $HOME/.config/tmux/tmux.conf ]]; then
+	ln -sf "$HOME"/documents/dotfiles/tmux/tmux.conf "$HOME"/.config/tmux/tmux.conf
+fi
 if [[ ! -d $HOME/.tmux/plugins/tpm ]]; then
 	git clone https://github.com/tmux-plugins/tpm "$HOME"/.tmux/plugins/tpm
 fi
@@ -194,27 +214,40 @@ if [[ ! -d $HOME/.rustup ]]; then
 	curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
 fi
 
-read -r -p "Whether to install docker(os must be debian)? y or n: " docker
+read -r -p "Whether to install docker? y or n: " docker
 if [[ $docker = "y" ]]; then
+
 	# uninstall all conflicting packages
-	for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
+	sudo apt remove "$(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)"
 
 	# Add Docker's official GPG key:
 	sudo apt-get update
 	sudo apt-get install ca-certificates curl -y
 	sudo install -m 0755 -d /etc/apt/keyrings
-	sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+	sudo curl -fsSL "https://download.docker.com/linux/$OS/gpg" -o /etc/apt/keyrings/docker.asc
 	sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-	# Add the repository to Apt sources:
-	# shellcheck disable=SC1091
-	echo \
-		"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |
-		sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+	if [[ $OS == "ubuntu" ]]; then
+		# Add the repository to Apt sources:
+		sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+	elif [[ $OS == "debian" ]]; then
+		sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/debian
+Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+	fi
 	sudo apt-get update
 	# install the latest version
-	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+	sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 fi
 
 echo "config docker-daemon proxy"
@@ -232,13 +265,17 @@ cat <<EOF | sudo tee "/etc/docker/daemon.json" >/dev/null
 EOF
 
 echo "install zsh"
-sudo apt install zsh -y
+if ! which zsh >/dev/null 2>&1; then
+	sudo apt install zsh -y
+fi
 
 echo "install oh-my-zsh"
 if [[ ! -d $HOME/.oh-my-zsh ]]; then
 	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 # sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 fi
+
+echo "install oh-my-zsh plugins"
 if [[ ! -d $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]]; then
 	echo "install zsh-autosuggestions"
 	git clone --depth 1 git@github.com:zsh-users/zsh-autosuggestions.git "$HOME"/.oh-my-zsh/custom/plugins/zsh-autosuggestions
@@ -263,4 +300,5 @@ chsh -s /usr/bin/zsh
 
 echo "installation complete!"
 echo "switching to zsh shell now..."
+echo "some settings need to be logged in again"
 exec zsh

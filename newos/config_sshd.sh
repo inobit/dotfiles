@@ -25,7 +25,7 @@ EOF
 		allow_users=$USER # default to current user
 	fi
 	if grep -qE "^\s*#?\s*AllowUsers" "$config_file"; then
-		sed -i -e 's/^[[:space:]]*#\?[[:space:]]*AllowUsers.*/AllowUsers '"$allow_users"'/' "$config_file"
+		sudo sed -i -e 's/^[[:space:]]*#\?[[:space:]]*AllowUsers.*/AllowUsers '"$allow_users"'/' "$config_file"
 	else
 		sudo sed -i '$a AllowUsers '"$allow_users" "$config_file"
 	fi
