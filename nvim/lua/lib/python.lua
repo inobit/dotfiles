@@ -11,6 +11,13 @@ function M.setup_nvim_venv(app, python_version)
     return false
   end
 
+  -- install specific version of python
+  local has_version =
+    vim.system({ "uv", "python", "list", python_version, "--only-installed" }, { text = true }):wait().stdout
+  if has_version == "" then
+    vim.system({ "uv", "python", "install", python_version }, { text = true }):wait()
+  end
+
   local data_path = vim.fn.stdpath "data"
 
   -- determine the path separator based on the operating system
