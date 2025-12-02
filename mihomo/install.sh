@@ -29,6 +29,11 @@ else
 	exit 1
 fi
 
+# config timezone
+if [[ $(date +%z) != +0800 ]]; then
+	which timedatectl 1>/dev/null 2>&1 && sudo timedatectl set-timezone Asia/Shanghai
+fi
+
 cdir=$(pwd)
 
 mihomo_home="$HOME"/.mihomo

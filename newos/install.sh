@@ -31,6 +31,11 @@ sudo sed -i \
 sudo locale-gen
 sudo update-locale LANG=en_US.UTF-8 LC_TIME=en_DK.UTF-8
 
+# config timezone
+if [[ $(date +%z) != +0800 ]]; then
+	which timedatectl 1>/dev/null 2>&1 && sudo timedatectl set-timezone Asia/Shanghai
+fi
+
 # config env and alias for login shell
 echo "config env and alias"
 if [[ ! -f $HOME/.profile ]] || ! grep -q "^# config env and alias for login shell$" "$HOME"/.profile; then
