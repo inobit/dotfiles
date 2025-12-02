@@ -196,12 +196,16 @@ if [[ ! -d $HOME/.nvm ]]; then
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/"$version"/install.sh | bash
 fi
 
-echo "install node 20 18"
+echo "install node 22 20"
 # shellcheck disable=SC1091
 source "$HOME/.nvm/nvm.sh"
-nvm install 18
-nvm install 20
-nvm alias default 20
+if [[ -z $(find "$HOME"/.nvm/versions/node -maxdepth 1 -type d -regex ".*v22[\.0-9]+$" 2>/dev/null) ]]; then
+	nvm install 22
+fi
+if [[ -z $(find "$HOME"/.nvm/versions/node -maxdepth 1 -type d -regex ".*v20[\.0-9]+$" 2>/dev/null) ]]; then
+	nvm install 20
+fi
+nvm alias default 22
 
 echo "install pnpm"
 if [[ ! -d $HOME/.local/share/pnpm ]]; then
