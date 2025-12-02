@@ -10,6 +10,25 @@ echo "install mihomo"
 # Decrypt and decompress
 # gpg -d mihomo.tar.gz.gpg | tar -zxf -
 
+read -r -p "input proxy address: " proxy
+if [[ -z $proxy ]]; then
+	client=$(echo "$SSH_CLIENT" | awk '{print $1}')
+	if [[ -n $client ]]; then
+		echo "Trying to use clinet's proxy"
+		if timeout 3 telnet "$client" 7890 >/dev/null 2>&1; then
+			proxy="http://$client:7890"
+		fi
+	fi
+fi
+if [[ -n $proxy ]]; then
+	export ALL_PROXY=$proxy
+	export NO_PROXY="127.0.0.1,localhost,::1"
+	echo "proxy set to $proxy"
+else
+	echo "proxy need to be set"
+	exit 1
+fi
+
 cdir=$(pwd)
 
 mihomo_home="$HOME"/.mihomo
