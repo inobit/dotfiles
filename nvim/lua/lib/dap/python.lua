@@ -54,6 +54,25 @@ table.insert(dap.configurations.python, {
   --args = {} -- args to program if needed
 })
 
+table.insert(dap.configurations.python, {
+  type = "python",
+  request = "launch",
+  name = "project:file",
+  program = function()
+    local root = require("lib.utils").get_root_dir(0, "pyproject.toml")
+    if root then
+      local main_file = vim.fs.joinpath(root, "/main.py")
+      if vim.fn.filereadable(main_file) == 1 then
+        return main_file
+      else
+        return require("dap.utils").pick_file()
+      end
+    else
+      return vim.fn.expand "%:p"
+    end
+  end,
+})
+
 -- custom config
 table.insert(dap.configurations.python, {
   type = "python",
