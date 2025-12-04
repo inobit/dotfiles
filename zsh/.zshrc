@@ -208,3 +208,14 @@ export FZF_DEFAULT_OPTS='--height 60% --tmux bottom,60% --layout reverse --borde
 if [[ -d $HOME/.cargo ]]; then
 	. "$HOME/.cargo/env"
 fi
+
+# docker
+if [[ -d $HOME/.docker-bin ]]; then
+	export DOCKER_HOST=unix:///run/user/$UID/docker.sock
+	case ":${PATH}:" in
+	*:"$HOME/.docker-bin":*) ;;
+	*)
+		export PATH="$HOME/.docker-bin:$PATH"
+		;;
+	esac
+fi

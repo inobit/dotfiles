@@ -229,45 +229,64 @@ fi
 
 read -r -p "Whether to install docker? y or n: " docker
 if [[ $docker = "y" ]]; then
+	read -r -p "Rootless Docker? y or n: " rootless
+	if [[ $rootless = "y" ]]; then
+		echo "install rootless docker"
+		sudo apt install -y uidmap
+		export DOCKER_BIN="$HOME/.docker-bin"
+		curl -fsSL https://get.docker.com/rootless | sh
+		sudo loginctl enable-linger "$USER" # enable user-level services to run after logout
+	else
+		# uninstall all conflicting packages
+		sudo apt remove "$(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)"
 
-	# uninstall all conflicting packages
-	sudo apt remove "$(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)"
+		# Add Docker's official GPG key:
+		sudo apt-get update
+		sudo apt-get install ca-certificates curl -y
+		sudo install -m 0755 -d /etc/apt/keyrings
+		sudo curl -fsSL "https://download.docker.com/linux/$OS/gpg" -o /etc/apt/keyrings/docker.asc
+		sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-	# Add Docker's official GPG key:
-	sudo apt-get update
-	sudo apt-get install ca-certificates curl -y
-	sudo install -m 0755 -d /etc/apt/keyrings
-	sudo curl -fsSL "https://download.docker.com/linux/$OS/gpg" -o /etc/apt/keyrings/docker.asc
-	sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-	if [[ $OS == "ubuntu" ]]; then
-		# Add the repository to Apt sources:
-		sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+		if [[ $OS == "ubuntu" ]]; then
+			# Add the repository to Apt sources:
+			sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
 Types: deb
 URIs: https://download.docker.com/linux/ubuntu
 Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
 Components: stable
 Signed-By: /etc/apt/keyrings/docker.asc
 EOF
-	elif [[ $OS == "debian" ]]; then
-		sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+		elif [[ $OS == "debian" ]]; then
+			sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
 Types: deb
 URIs: https://download.docker.com/linux/debian
 Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
 Components: stable
 Signed-By: /etc/apt/keyrings/docker.asc
 EOF
+		fi
+		sudo apt-get update
+		# install the latest version
+		sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 	fi
-	sudo apt-get update
-	# install the latest version
-	sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-fi
 
-echo "config docker-daemon proxy"
-docker_proxy="$proxy"
-test -n "$docker_proxy" || docker_proxy="http://localhost:7890"
-test -f /etc/docker/daemon.json || sudo touch /etc/docker/daemon.json
-cat <<EOF | sudo tee "/etc/docker/daemon.json" >/dev/null
+	read -r -p "Whether to config docker-daemon proxy? y or n: " docker_proxy
+	if [[ $docker_proxy = "y" ]]; then
+		echo "config docker-daemon proxy"
+		docker_proxy="$proxy"
+		test -n "$docker_proxy" || docker_proxy="http://localhost:7890"
+		docker_file=""
+		if [[ $rootless = "y" ]]; then
+			test -d "$HOME/.config/docker" || mkdir -p "$HOME/.config/docker"
+			docker_file="$HOME/.config/docker/daemon.json"
+			test -f "$docker_file" || touch "$docker_file"
+		else
+			test -d /etc/docker || sudo mkdir -p /etc/docker
+			docker_file="/etc/docker/daemon.json"
+			test -f "$docker_file" || sudo touch "$docker_file"
+		fi
+		temp_daemon_json=$(mktemp)
+		cat <<EOF >"$temp_daemon_json"
 {
   "proxies": {
     "http-proxy": "$docker_proxy",
@@ -276,6 +295,15 @@ cat <<EOF | sudo tee "/etc/docker/daemon.json" >/dev/null
   }
 }
 EOF
+		if [[ "$rootless" == "y" ]]; then
+			mv "$temp_daemon_json" "$docker_file"
+			chmod 644 "$docker_file"
+		else
+			sudo mv "$temp_daemon_json" "$docker_file"
+			sudo chmod 644 "$docker_file"
+		fi
+	fi
+fi
 
 echo "install zsh"
 if ! which zsh >/dev/null 2>&1; then
