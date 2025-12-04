@@ -68,6 +68,7 @@ fi
 
 install_mihomosh() {
 	chmod +x mihomosh
+	test -d "$HOME"/.local/bin || mkdir -p "$HOME"/.local/bin
 	ln -sf "$(pwd)"/mihomosh "$HOME"/.local/bin/mihomosh
 	if ! grep -qE '^eval\s"\$\(mihomosh' "$HOME"/.zshrc; then
 		printf '%s\n' 'eval "$(mihomosh shell-completion zsh)"' >>"$HOME"/.zshrc
@@ -77,7 +78,7 @@ install_mihomosh() {
 
 if [[ ! -f ./mihomosh ]]; then
 	echo "download mihomosh"
-	mihomosh_tmp=$(mktmp -d)
+	mihomosh_tmp=$(mktemp -d)
 	curl -fsSL -o "$mihomosh_tmp"/mihomosh.tar.gz "https://github.com/SamuNatsu/mihomosh/releases/download/v2.0.0/mihomosh-Linux-musl-x86_64.tar.gz"
 	tar -zxf "$mihomosh_tmp"/mihomosh.tar.gz -C "$mihomosh_tmp"
 	mv "$mihomosh_tmp"/mihomosh .
