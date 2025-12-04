@@ -9,7 +9,25 @@ return {
       -- if it fails, try calling it with one of these parameters:
       --    "curl", "wget", "bitsadmin", "go"
       if not vim.fn.has "win32" then
-        require("dbee").install "curl"
+        if not vim.uv.fs_stat(vim.fn.expand "~/.local/bin/dbee") then
+          vim.notify "Downloading dbee"
+          vim
+            .system({
+              "curl",
+              "-L",
+              "https://github.com/kndndrj/nvim-dbee/releases/download/v0.1.9/dbee_linux_amd64.tar.gz",
+              "--create-dirs",
+              "-o",
+              vim.fn.expand "~/.local/bin/dbee.tar.gz",
+            })
+            :wait()
+          vim
+            .system({ "tar", "-xzf", vim.fn.expand "~/.local/bin/dbee.tar.gz", "-C", vim.fn.expand "~/.local/bin" })
+            :wait()
+          vim.system({ "chmod", "+x", vim.fn.expand "~/.local/bin/dbee" }):wait()
+          vim.system({ "rm", vim.fn.expand "~/.local/bin/dbee.tar.gz" }):wait()
+          vim.notify "dbee installed"
+        end
       end
       -- windows manual install
     end,
