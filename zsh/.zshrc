@@ -76,6 +76,7 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete)
 fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
 autoload -U compinit && compinit
 
+DISABLE_MAGIC_FUNCTIONS=true
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
