@@ -11,22 +11,53 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+---@class LastChange
+---@field buf number
+---@field filename string
+---@field line number
+---@field col number
+
+---@type LastChange | nil
+local last_change = nil
+
 -- mark when modified to achieve the effect of lastchange
 vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedT", "TextChangedP", "TextChangedI" }, {
-  desc = "last change",
+  desc = "Record last change position",
   group = augroup "textChange",
   callback = function(event)
-    -- need to exclude floating windows
     local relative = vim.api.nvim_win_get_config(vim.api.nvim_get_current_win()).relative
-    -- exclude NvimTree(nofile) terminal prompt
     local buftype = vim.bo[event.buf].buftype
+    -- exclude floating window and nofile, terminal, prompt
     if relative == "" and not vim.tbl_contains({ "nofile", "terminal", "prompt" }, buftype) then
-      local x, y = unpack(vim.api.nvim_win_get_cursor(0))
-      -- Upper case names are required across buffers.
-      vim.api.nvim_buf_set_mark(0, "Z", x, y, {})
+      local cursor = vim.api.nvim_win_get_cursor(0)
+      local line, col = cursor[1], cursor[2]
+      -- record
+      last_change = { buf = event.buf, line = line, col = col, filename = vim.api.nvim_buf_get_name(event.buf) }
     end
   end,
 })
+
+vim.keymap.set("n", "g.", function()
+  if not last_change then
+    vim.notify("No last change recorded", vim.log.levels.WARN)
+    return
+  end
+  -- check buffer is still valid
+  if vim.api.nvim_buf_is_valid(last_change.buf) and vim.api.nvim_buf_is_loaded(last_change.buf) then
+    vim.api.nvim_set_current_buf(last_change.buf)
+    vim.api.nvim_win_set_cursor(0, { last_change.line, last_change.col })
+  else
+    -- load file
+    if last_change.filename and vim.fn.filereadable(last_change.filename) == 1 then
+      vim.cmd.edit(last_change.filename)
+      vim.bo.buflisted = true
+      vim.api.nvim_win_set_cursor(0, { last_change.line, last_change.col })
+    else
+      vim.notify("Last change file does not exist", vim.log.levels.WARN)
+      last_change = nil -- reset
+    end
+  end
+end, { desc = "Jump to last change position" })
 
 -- cancel auto-add comment leader
 vim.api.nvim_create_autocmd("FileType", {

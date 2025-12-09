@@ -21,8 +21,6 @@ vim.keymap.set("n", "<leader>P", '"0P')
 -- jump
 -- ‘a --> `a
 vim.keymap.set("n", "'", "`")
--- last change
-vim.keymap.set("n", "g.", "`Z")
 
 -- move
 vim.keymap.set("n", "<A-k>", "<Cmd>m-2<CR>==")
