@@ -4,6 +4,7 @@ return {
     ---@module 'oil'
     ---@type oil.SetupOpts
     opts = {
+      cleanup_delay_ms = 500,
       keymaps = {
         ["<C-h>"] = false,
         ["<C-l>"] = false,
