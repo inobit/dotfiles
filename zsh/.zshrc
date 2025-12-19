@@ -220,3 +220,62 @@ if [[ -d $HOME/.docker-bin ]]; then
 		;;
 	esac
 fi
+
+# git function
+
+cherry_pick_to_branch() {
+	if ! command -v git >/dev/null 2>&1; then
+		echo "\033[31mError: git is not installed.\033[0m"
+		return 1
+	fi
+	if ! git rev-parse --git-dir >/dev/null 2>&1; then
+		echo "\033[31mError: Not in a git repository.\033[0m"
+		return 1
+	fi
+	# Parse the arguments: if the first argument is a valid branch name, use it as branch_name, and the rest as commit_ids
+	# Otherwise, branch_name defaults to "dev" and all arguments as commit_ids
+	local branch_name
+	local commit_ids=()
+
+	if [ $# -gt 0 ] && git show-ref --verify --quiet refs/heads/"$1"; then
+		branch_name="$1"
+		shift
+		commit_ids=("$@")
+	else
+		if git show-ref --verify --quiet refs/heads/dev; then
+			branch_name="dev"
+		else
+			echo "\033[31mError: No valid branch name or 'dev' branch found.\033[0m"
+			return 1
+		fi
+		commit_ids=("$@")
+	fi
+
+	# If there are no commit_ids, use the HEAD of the current branch.
+	if [ ${#commit_ids[@]} -eq 0 ]; then
+		commit_ids=($(git rev-parse HEAD))
+	fi
+
+	local current_branch=$(git branch --show-current)
+	local stashed=false
+
+	if ! git diff --quiet || ! git diff --cached --quiet; then
+		git stash
+		stashed=true
+	fi
+
+	git switch "$branch_name"
+	if git cherry-pick "${commit_ids[@]}"; then
+		echo -e "\033[32mCherry-pick completed successfully.\033[0m"
+	else
+		echo -e "\033[33mCherry-pick failed. Aborting...\033[0m"
+		git cherry-pick --abort 2>/dev/null || {
+			git reset --hard
+		}
+	fi
+
+	git switch "$current_branch"
+	if $stashed; then
+		git stash pop
+	fi
+}
