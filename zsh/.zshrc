@@ -275,6 +275,10 @@ cherry_pick_to_branch() {
 	fi
 
 	git switch "$current_branch"
+	echo "Rebasing $branch_name onto $current_branch"
+	if git rebase "$branch_name"; then
+		echo -e "\033[32mRebase completed successfully.\033[0m"
+	fi
 	if $stashed; then
 		git stash pop
 	fi
