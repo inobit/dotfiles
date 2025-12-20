@@ -307,6 +307,16 @@ install_nvim() {
 		mv "$file_base_name" "$HOME"/.local/bin/tree-sitter
 	fi
 	info "tree-sitter installed"
+
+	info "custom mycurl"
+	if [[ ! -x $HOME/.local/bin/mycurl ]]; then
+		cat <<EOF >"$HOME"/.local/bin/mycurl
+#!/bin/bash
+/usr/bin/curl --no-buffer "$@"
+EOF
+		chmod a+x "$HOME"/.local/bin/mycurl
+	fi
+	info "mycurl config done"
 }
 
 install_tmux() {
