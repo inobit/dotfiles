@@ -49,6 +49,7 @@ return {
       "hrsh7th/cmp-cmdline",
       --包含了常见的代码片段
       "rafamadriz/friendly-snippets",
+      "rcarriga/cmp-dap",
       "onsails/lspkind.nvim",
     },
     config = function()
@@ -86,6 +87,9 @@ return {
       -- 全局配置
       cmp.setup {
         -- 配置snippet,推荐必须配置,用来和snip引擎作用
+        enabled = function()
+          return vim.api.nvim_get_option_value("buftype", { buf = 0 }) ~= "prompt" or require("cmp_dap").is_dap_buffer()
+        end,
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
@@ -193,6 +197,13 @@ return {
       cmp.setup.filetype({ "sql", "mysql", "plsql" }, {
         sources = {
           { name = "cmp-dbee" },
+          { name = "buffer" },
+        },
+      })
+      -- dap
+      cmp.setup.filetype({ "dap-repl", "dapui_watches", "dapui_hover" }, {
+        sources = {
+          { name = "dap" },
           { name = "buffer" },
         },
       })
