@@ -1,6 +1,6 @@
 return {
   {
-    "Exafunction/codeium.nvim",
+    "Exafunction/windsurf.nvim",
     event = { "InsertEnter" },
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -10,6 +10,7 @@ return {
       enable_cmp_source = "codeium" ~= vim.g.ai_inline_completion_engine,
       virtual_text = {
         enabled = "codeium" == vim.g.ai_inline_completion_engine,
+        filetypes = { bigfile = false, dap_repl = false, dotenv = false },
         key_bindings = {
           accept = "<M-y>",
           accept_line = "<M-l>",
@@ -32,6 +33,9 @@ return {
         },
       },
     },
+    config = function(_, opts)
+      require("codeium").setup(opts)
+    end,
   },
   {
     "supermaven-inc/supermaven-nvim",
@@ -42,33 +46,8 @@ return {
         clear_suggestion = "<M-e>",
         accept_word = "<M-j>",
       },
-      -- ignore_filetypes = {},
+      ignore_filetypes = { "bigfile", "dap-repl", "dotenv" },
       disable_inline_completion = "supermaven" ~= vim.g.ai_inline_completion_engine,
-    },
-  },
-  {
-    "luozhiya/fittencode.nvim",
-    event = { "InsertEnter" },
-    opts = {
-      inline_completion = {
-        enabled = "fittencode" == vim.g.ai_inline_completion_engine,
-      },
-      source_completion = {
-        enabled = "fittencode" ~= vim.g.ai_inline_completion_engine,
-        engine = "cmp",
-      },
-      keymaps = {
-        -- inline is disabled but inline keymaps are still available
-        inline = "fittencode" == vim.g.ai_inline_completion_engine and {
-          ["<M-y>"] = "accept_all_suggestions",
-          ["<M-l>"] = "accept_line",
-          ["<M-j>"] = "accept_word",
-          ["<M-e>"] = "revoke_line",
-          ["<M-k>"] = "revoke_word",
-          ["<A-,>"] = "triggering_completion",
-        } or nil,
-      },
-      completion_mode = "fittencode" ~= vim.g.ai_inline_completion_engine and "source" or "inline",
     },
   },
   -- avante

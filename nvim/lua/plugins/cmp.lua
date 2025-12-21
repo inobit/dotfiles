@@ -74,7 +74,7 @@ return {
           group_index = 0, -- set group index to 0 to skip loading LuaLS completions
         },
       }
-      local ai_list = { "fittencode", "supermaven", "codeium" }
+      local ai_list = { "supermaven", "codeium" }
       local filtered = vim.tbl_map(function(ai)
         if ai ~= vim.g.ai_inline_completion_engine then
           return { name = ai }
