@@ -1,6 +1,6 @@
 if not vim.g.vscode then
+  require "config.env"
   require "config.options"
-  pcall(require, "config.local-options")
   require "config.keymaps"
   require "config.plugin-manager"
   require "config.autocommands"

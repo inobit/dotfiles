@@ -29,7 +29,7 @@ require("lazy").setup {
       lazy = "💤 ",
     },
   },
-  dev = { path = vim.g.local_plugins or "~/projects" },
+  dev = { path = vim.fn.expand(vim.env.LOCAL_PLUGINS_DIR or "~/projects") },
   change_detection = {
     enabled = false,
     notify = false,

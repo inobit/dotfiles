@@ -1,7 +1,7 @@
 return {
   {
     url = "https://gitee.com/inobit/llm.nvim.git",
-    dev = vim.g.llm_dev or false,
+    dev = vim.env.MY_LLM_DEV or false,
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
