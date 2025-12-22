@@ -6,7 +6,8 @@ M = {}
 M.lsp_servers = {
   "lua_ls",
   "ruff", -- python lsp
-  "pyright", -- python lsp
+  -- "pyright", -- python lsp
+  "ty", -- python lsp and type checker
   "ts_ls",
   "html",
   "cssls",

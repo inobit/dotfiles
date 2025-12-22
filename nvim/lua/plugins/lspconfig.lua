@@ -276,6 +276,24 @@ return {
               -- use local mypy first
               return vim.fn.executable(mypy_bin) == 1 and mypy_bin or "mypy"
             end,
+            condition = function()
+              if vim.env.TOOL_MYPY ~= nil then
+                if vim.env.TOOL_MYPY:lower() == "true" then
+                  return true
+                end
+                return false
+              end
+              local root = require("null-ls.utils").get_root()
+              if root then
+                local res = vim
+                  .system({ "grep", "-qsE", "^\\[tool\\.mypy\\]", vim.fs.joinpath(root, "pyproject.toml") }, { text = true })
+                  :wait()
+                if res.code == 0 then
+                  return true
+                end
+              end
+              return false
+            end,
             runtime_condition = function(params)
               local uri = params.lsp_params.textDocument.uri
               return not (uri:match "site%-packages" or uri:match "__pycache__") -- exclude site-packages and __pycache__
