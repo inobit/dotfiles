@@ -236,6 +236,27 @@ install_git_delta() {
 	fi
 }
 
+install_btop() {
+	info "install btop"
+	if ! which btop >/dev/null 2>&1; then
+		sudo apt install btop -y
+		info "btop installed"
+	else
+		info "$(btop --version) is already installed"
+	fi
+
+	info "config btop"
+	test -d "$HOME"/.config || mkdir -p "$HOME"/.config
+	file="$HOME/.config/btop/btop.conf"
+	if [[ ! -f $file ]]; then
+		warn "btop config file not found, skip config."
+	else
+		if sed -Ei "s/^(vim_keys\s*=\s*)(False)/\1True/" "$file"; then
+			info "btop vim_keys configed"
+		fi
+	fi
+}
+
 # install fzf
 install_fzf() {
 	info "install fzf"
@@ -588,6 +609,7 @@ main() {
 		config_firewall
 		pull_dotfiles
 		install_git_delta
+    install_btop
 		install_fzf
 		install_nvim
 		install_tmux
