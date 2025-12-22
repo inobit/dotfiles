@@ -8,7 +8,7 @@ return {
       -- Install tries to automatically detect the install method.
       -- if it fails, try calling it with one of these parameters:
       --    "curl", "wget", "bitsadmin", "go"
-      if not vim.fn.has "win32" then
+      if vim.fn.has "win32" ~= 1 then
         if not vim.uv.fs_stat(vim.fn.expand "~/.local/bin/dbee") then
           vim.notify "Downloading dbee"
           vim
