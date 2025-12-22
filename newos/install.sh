@@ -340,7 +340,7 @@ install_nvim() {
 
 	info "custom mycurl"
 	if [[ ! -x $HOME/.local/bin/mycurl ]]; then
-		cat <<EOF >"$HOME"/.local/bin/mycurl
+		cat <<'EOF' >"$HOME"/.local/bin/mycurl
 #!/bin/bash
 /usr/bin/curl --no-buffer "$@"
 EOF
