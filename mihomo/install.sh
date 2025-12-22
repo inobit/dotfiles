@@ -82,7 +82,7 @@ install_mihomosh() {
 	test -d "$HOME"/.local/bin || mkdir -p "$HOME"/.local/bin
 	ln -sf "$exec_file" "$HOME"/.local/bin/mihomosh
 	if ! grep -qE '^eval\s"\$\(mihomosh' "$HOME"/.zshrc; then
-		echo "eval $(mihomosh shell-completion zsh)" >>"$HOME"/.zshrc
+		echo "eval \"\$(mihomosh shell-completion zsh)\"" >>"$HOME"/.zshrc
 	fi
 	echo "mihomosh can be used to control mihomo. mihomosh should be config first, use command: mihomosh config edit -e nvim"
 }
