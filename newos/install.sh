@@ -243,6 +243,22 @@ install_git_delta() {
 	else
 		info "$(delta --version) is already installed"
 	fi
+
+	info "config delta"
+	if ! which git >/dev/null 2>&1; then
+		warn "git not found, skip config delta."
+	else
+		local command_prefix="git config --global"
+		declare -A configs
+		configs["core.pager"]="delta"
+		configs["interactive.diffFilter"]="delta --color-only"
+		configs["delta.navigate"]=true
+		configs["merge.conflictStyle"]="zdiff3"
+		for key in "${!configs[@]}"; do
+			$command_prefix "$key" "${configs[$key]}"
+		done
+		info "delta config done"
+	fi
 }
 
 install_btop() {
@@ -647,7 +663,7 @@ main() {
 		done
 	fi
 
-	prepare
+	# prepare
 	for func in "${selected_functions[@]}"; do
 		$func
 	done
