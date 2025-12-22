@@ -29,8 +29,7 @@ prepare() {
 		export NO_PROXY="127.0.0.1,localhost,::1"
 		echo "proxy set to $proxy"
 	else
-		echo "proxy need to be set"
-		exit 1
+		warn "proxy not set, some error may occur"
 	fi
 
 	# config timezone
