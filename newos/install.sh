@@ -33,6 +33,15 @@ detect_os() {
 	fi
 }
 
+# update system
+_update_system() {
+	sudo apt update && sudo apt upgrade -y
+}
+
+_install() {
+	sudo apt install "$@" -y
+}
+
 # prepare
 prepare() {
 	info "check system"
@@ -44,10 +53,10 @@ prepare() {
 	fi
 
 	info "update system"
-	sudo apt update && sudo apt upgrade -y
+	_update_system
 
 	info "install tools"
-	sudo apt install make gcc ripgrep fd-find bat unzip git xclip curl wget jq -y
+	_install make gcc ripgrep fd-find bat unzip git xclip curl wget jq
 
 	info "mkdir downloads"
 	test -d "$DOWNLOADS_DIR" || mkdir -p "$DOWNLOADS_DIR"
@@ -180,7 +189,7 @@ config_ssh_agent() {
 config_firewall() {
 	read -r -p "Whether to config iptables? y or n: " config_iptables
 	if [[ $config_iptables = "y" ]]; then
-		sudo apt install iptables netfilter-persistent fail2ban -y
+		_install iptables netfilter-persistent fail2ban
 		# add rules
 		if ! sudo iptables -t filter -nvL | grep -iE "dpt:22"; then
 			IPTABLES_CMD="sudo iptables -t filter"
@@ -239,7 +248,7 @@ install_git_delta() {
 install_btop() {
 	info "install btop"
 	if ! which btop >/dev/null 2>&1; then
-		sudo apt install btop -y
+		_install btop
 		info "btop installed"
 	else
 		info "$(btop --version) is already installed"
@@ -344,7 +353,7 @@ install_tmux() {
 	info "install tmux"
 	if ! which tmux >/dev/null 2>&1; then
 		TMUX_VERSION=${TMUX_VERSION:-"3.4"}
-		sudo apt install libevent-dev ncurses-dev build-essential bison pkg-config -y
+		_install libevent-dev ncurses-dev build-essential bison pkg-config
 		# sudo apt install tmux
 		local base_name="tmux-$TMUX_VERSION"
 		local file_name="$base_name.tar.gz"
@@ -451,7 +460,7 @@ install_docker() {
 		read -r -p "Rootless Docker? y or n: " rootless
 		if [[ $rootless = "y" ]]; then
 			info "install rootless docker"
-			sudo apt install -y uidmap
+			_install uidmap
 			export DOCKER_BIN="$HOME/.docker-bin"
 			curl -fsSL https://get.docker.com/rootless | sh
 			sudo loginctl enable-linger "$USER" # enable user-level services to run after logout
@@ -488,7 +497,7 @@ EOF
 			fi
 			sudo apt-get update
 			info "install the latest version"
-			sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+			_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 			info "root mode docker installed"
 		fi
 
@@ -534,7 +543,7 @@ EOF
 install_zsh() {
 	info "install zsh"
 	if ! which zsh >/dev/null 2>&1; then
-		sudo apt install zsh -y
+		_install zsh
 		info "zsh installed"
 	else
 		info "$(zsh --version) has already installed"
@@ -609,7 +618,7 @@ main() {
 		config_firewall
 		pull_dotfiles
 		install_git_delta
-    install_btop
+		install_btop
 		install_fzf
 		install_nvim
 		install_tmux
