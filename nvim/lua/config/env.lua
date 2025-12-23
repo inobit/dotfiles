@@ -31,19 +31,3 @@ vim.g.plenary_curl_bin_path = vim.fn.expand(vim.env.CURL_BIN_PATH or "~/.local/b
 vim.g.my_deeplx = vim.env.USE_DEEPLX or false
 
 vim.g.my_deeplx_base_url = string.format("https://api.deeplx.org/%s/translate", vim.env.LINUX_DO_DEEPLX_API_KEY)
-
--- DBEE
-vim.env.DBEE_CONNECTIONS = [[
-  [
-      {
-          "name": "ztjt_v3_test",
-          "url": "root:{{ env `ZTJT_V3_TEST_PASSWORD` }}@tcp(192.168.1.222:3318)/",
-          "type": "mysql"
-      },
-      {
-          "name": "tender_info",
-          "url": "~/myprojects/tender_information/data/tender.db",
-          "type": "sqlite"
-      }
-  ]
-]]

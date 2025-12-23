@@ -77,16 +77,9 @@ return {
       local api = require "dbee.api"
       local dbee = require "dbee"
       dbee.setup {
-        -- sources = {
-        --   require("dbee.sources").MemorySource:new {
-        --     {
-        --       id = "xxx",
-        --       name = "xxx",
-        --       type = "mysql",
-        --       url = "username:password@tcp(host)/database-name",
-        --     },
-        --   },
-        -- },
+        sources = {
+          require("dbee.sources").FileSource:new(vim.fn.expand "~/.dbee/connections.json"),
+        },
         drawer = {
           mappings = {
             -- manually refresh drawer
