@@ -663,7 +663,9 @@ main() {
 		done
 	fi
 
-	# prepare
+	if [[ $1 == "-p" ]]; then
+		prepare
+	fi
 	for func in "${selected_functions[@]}"; do
 		$func
 	done
