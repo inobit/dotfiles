@@ -9,24 +9,42 @@ return {
       -- if it fails, try calling it with one of these parameters:
       --    "curl", "wget", "bitsadmin", "go"
       if vim.fn.has "win32" ~= 1 then
-        if not vim.uv.fs_stat(vim.fn.expand "~/.local/bin/dbee") then
+        local file_dir = vim.fn.expand "~/.local/bin"
+        local pack_name = "dbee_linux_amd64.tar.gz"
+        local file_name = "dbee"
+        local full_pack_name = vim.fs.joinpath(file_dir, pack_name)
+        local full_file_name = vim.fs.joinpath(file_dir, file_name)
+        if not vim.uv.fs_stat(full_file_name) then
+          ---@param callback fun(out: vim.SystemCompleted)
+          local function callback_wrap(callback)
+            return function(out)
+              if out.code == 0 then
+                callback(out)
+              else
+                print("Dbee install failed: " .. out.stderr)
+              end
+            end
+          end
           vim.notify "Downloading dbee"
-          vim
-            .system({
-              "curl",
-              "-L",
-              "https://github.com/kndndrj/nvim-dbee/releases/download/v0.1.9/dbee_linux_amd64.tar.gz",
-              "--create-dirs",
-              "-o",
-              vim.fn.expand "~/.local/bin/dbee.tar.gz",
-            })
-            :wait()
-          vim
-            .system({ "tar", "-xzf", vim.fn.expand "~/.local/bin/dbee.tar.gz", "-C", vim.fn.expand "~/.local/bin" })
-            :wait()
-          vim.system({ "chmod", "+x", vim.fn.expand "~/.local/bin/dbee" }):wait()
-          vim.system({ "rm", vim.fn.expand "~/.local/bin/dbee.tar.gz" }):wait()
-          vim.notify "dbee installed"
+          local function clean()
+            vim.system({ "rm", "-f", full_pack_name }, { text = true }, function()
+              print "Dbee installed"
+            end)
+          end
+          local function chmod()
+            vim.system({ "chmod", "+x", full_file_name }, { text = true }, callback_wrap(clean))
+          end
+          local function unpack()
+            vim.system({ "tar", "-xzf", full_pack_name, "-C", file_dir }, { text = true }, callback_wrap(chmod))
+          end
+          vim.system({
+            "curl",
+            "-L",
+            "https://github.com/kndndrj/nvim-dbee/releases/download/v0.1.9/dbee_linux_amd64.tar.gz",
+            "--create-dirs",
+            "-o",
+            full_pack_name,
+          }, { text = true }, callback_wrap(unpack))
         end
       end
       -- windows manual install
