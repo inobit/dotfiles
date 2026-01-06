@@ -284,7 +284,7 @@ return {
                 return false
               end
               local root = require("null-ls.utils").get_root()
-              if root then
+              if root and vim.fn.executable "grep" == 1 then
                 local res = vim
                   .system({ "grep", "-qsE", "^\\[tool\\.mypy\\]", vim.fs.joinpath(root, "pyproject.toml") }, { text = true })
                   :wait()
