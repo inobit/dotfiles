@@ -28,6 +28,6 @@ vim.g.ai_inline_completion_engine = vim.env.AI_INLINE_COMPLETION_ENGINE or "supe
 vim.g.plenary_curl_bin_path = vim.fn.expand(vim.env.CURL_BIN_PATH or "~/.local/bin/mycurl") -- use --no-buffer
 
 -- set self-build DeepLX
-vim.g.my_deeplx = vim.env.USE_DEEPLX or false
+vim.g.my_deeplx = vim.env.USE_DEEPLX == "true" or false
 
 vim.g.my_deeplx_base_url = string.format("https://api.deeplx.org/%s/translate", vim.env.LINUX_DO_DEEPLX_API_KEY)
