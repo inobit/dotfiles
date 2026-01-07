@@ -329,10 +329,10 @@ wezterm.on("update-right-status", function(window, _)
 	}))
 end)
 
-table.insert(config.keys, { key = "T", mods = "LEADER|SHIFT", action = act.EmitEvent("tabs.toggle-tab-bar") })
+table.insert(config.keys, { key = "T", mods = "LEADER", action = act.EmitEvent("tabs.toggle-tab-bar") })
 
 -- custom event
-wezterm.on("tabs.toggle-tab-bar", function(window, _pane)
+wezterm.on("tabs.toggle-tab-bar", function(window, _)
 	local effective_config = window:effective_config()
 	window:set_config_overrides({
 		enable_tab_bar = not effective_config.enable_tab_bar,
