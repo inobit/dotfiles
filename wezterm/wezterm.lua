@@ -8,14 +8,21 @@ config.animation_fps = 120
 
 config.prefer_egl = true
 
+config.adjust_window_size_when_changing_font_size = false
+
 -- appearance
 config.window_decorations = "RESIZE"
 config.window_padding = {
 	left = 0.,
 	right = 0.,
-	top = 0.,
-	bottom = 0.,
+	top = 5, -- config with font size and line height
+	bottom = 0,
 }
+
+-- font
+config.font = wezterm.font("JetBrainsMonoNL Nerd Font")
+config.font_size = 12.5
+config.line_height = 1.1
 
 -- init size
 config.initial_cols = 160
@@ -26,6 +33,12 @@ config.hide_tab_bar_if_only_one_tab = true
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.tab_and_split_indices_are_zero_based = false
+
+-- inactive pane style
+config.inactive_pane_hsb = {
+	saturation = 0.9,
+	brightness = 0.8,
+}
 
 local is_windows = wezterm.target_triple:find("windows") ~= nil
 
@@ -38,11 +51,6 @@ mod.SUPER_SHIFT = mod.SUPER .. "|SHIFT"
 if is_windows then
 	config.default_prog = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" }
 end
-
--- font
-config.font = wezterm.font("JetBrainsMonoNL Nerd Font")
-config.font_size = 13
-config.line_height = 1.0
 
 -- colors
 config.color_scheme = "Tokyo Night"
@@ -281,7 +289,7 @@ local function tab_title(tab_info)
 end
 
 ---@diagnostic disable-next-line: unused-local
-wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
+wezterm.on("format-tab-title", function(tab, tabs, panes, _config, hover, max_width)
 	local title = " " .. tab.tab_index + 1 .. " " .. tab_title(tab) .. " "
 	title = wezterm.truncate_right(title, max_width - 2)
 
@@ -319,6 +327,17 @@ wezterm.on("update-right-status", function(window, _)
 		{ Background = { Color = std_colors.date_bg } },
 		{ Text = " " .. date .. " " },
 	}))
+end)
+
+table.insert(config.keys, { key = "T", mods = "LEADER|SHIFT", action = act.EmitEvent("tabs.toggle-tab-bar") })
+
+-- custom event
+wezterm.on("tabs.toggle-tab-bar", function(window, _pane)
+	local effective_config = window:effective_config()
+	window:set_config_overrides({
+		enable_tab_bar = not effective_config.enable_tab_bar,
+		background = effective_config.background,
+	})
 end)
 
 return config
