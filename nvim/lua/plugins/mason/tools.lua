@@ -1,6 +1,19 @@
 ---@class mason.Tools
 M = {}
 
+---@class mason.Environment
+---@field lsps? string[]
+---@field formatters? string[]
+---@field linters? string[]
+---@field debugger_adapter? string[]
+
+---@type mason.Environment
+local rust_env = {
+  lsps = { "rust-analyzer", "bacon_ls" },
+  formatters = { "rustfmt" },
+  linters = { "bacon" },
+}
+
 -- don't add jdtls here, it is configured by nvim-java
 ---@type string[]
 M.lsp_servers = {
@@ -21,8 +34,6 @@ M.lsp_servers = {
   "emmet_ls",
   "marksman",
   "eslint", --vsocde eslint, package name is eslint-lsp, need install eslint (global or local)
-  "rust_analyzer", -- rust lsp
-  "bacon_ls", -- a lsp server wrapper for rust bacon
 }
 
 ---@type string[]
@@ -39,7 +50,6 @@ M.formatters = {
   "xmlformatter", -- xml formatter
   "sql-formatter", --sql formatter
   "google-java-format", -- java formatter
-  --  "rustfmt", -- , rustfmt should now be installed via rustup.
 }
 
 ---@type string[]
@@ -54,7 +64,14 @@ M.linters = {
   "sqlfluff", -- sql linter
   "yamllint", -- yaml linter
   "selene", -- lua linter
-  "bacon", -- rust linter ,used by bacon-ls
 }
+
+local enbale_rust_env = not (vim.env.ENABLE_RUST_ENV == "false")
+if enbale_rust_env then
+  M.lsp_servers = vim.list_extend(M.lsp_servers, rust_env.lsps or {})
+  M.formatters = vim.list_extend(M.formatters, rust_env.formatters or {})
+  M.linters = vim.list_extend(M.linters, rust_env.linters or {})
+  M.debugger_adapter = vim.list_extend(M.debugger_adapter, rust_env.debugger_adapter or {})
+end
 
 return M
