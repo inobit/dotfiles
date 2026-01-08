@@ -58,6 +58,8 @@ config.color_scheme = "Tokyo Night"
 -- keybindings
 config.leader = { key = "Space", mods = mod.SUPER, timeout_milliseconds = 1000 }
 config.keys = {
+	-- debug
+	{ key = "F12", mods = "NONE", action = act.ShowDebugOverlay },
 	-- reload config
 	{ key = "R", mods = "LEADER", action = act.ReloadConfiguration },
 	-- copy mode
@@ -249,8 +251,9 @@ local meta_colors = {
 	pink = "#eb8497",
 	mauve = "#c6a0f6",
 	red = "#f38ba8",
+	peach = "#ff79c6",
+	peach2 = "#f5a97f",
 	maroon = "#eba0ac",
-	peach = "#f5a97f",
 	yellow = "#f9e2af",
 	orange = "#fd8c6a",
 	green = "#a6e3a1",
@@ -275,6 +278,8 @@ local std_colors = {
 	leader_text = meta_colors.crust,
 	date_fg = meta_colors.crust,
 	date_bg = meta_colors.lavender,
+	bat_fg = meta_colors.white,
+	bat_bg = meta_colors.peach,
 }
 
 local function tab_title(tab_info)
@@ -287,7 +292,6 @@ local function tab_title(tab_info)
 	-- in that tab
 	return tab_info.active_pane.title
 end
-
 ---@diagnostic disable-next-line: unused-local
 wezterm.on("format-tab-title", function(tab, tabs, panes, _config, hover, max_width)
 	local title = " " .. tab.tab_index + 1 .. " " .. tab_title(tab) .. " "
@@ -322,7 +326,25 @@ end)
 
 wezterm.on("update-right-status", function(window, _)
 	local date = wezterm.strftime("%Y-%m-%d %H:%M")
+	local bat = ""
+	for _, b in ipairs(wezterm.battery_info()) do
+		local icon = ""
+		local state = b.state_of_charge
+		if state < 0.3 then
+			icon = " 󰁻 "
+		elseif state < 0.5 then
+			icon = " 󰁾 "
+		elseif state < 0.9 then
+			icon = " 󰂂 "
+		else
+			icon = " 󰁹 "
+		end
+		bat = icon .. string.format("%.0f%%", state * 100)
+	end
 	window:set_right_status(wezterm.format({
+		{ Foreground = { Color = std_colors.bat_fg } },
+		{ Background = { Color = std_colors.bat_bg } },
+		{ Text = bat .. " " },
 		{ Foreground = { Color = std_colors.date_fg } },
 		{ Background = { Color = std_colors.date_bg } },
 		{ Text = " " .. date .. " " },
