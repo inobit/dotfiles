@@ -47,6 +47,10 @@ function GetChildItemUnix ($path) {
 
 Set-Alias ll GetChildItemUnix
 
+if (Get-Command -Name "bat" -ErrorAction SilentlyContinue) {
+  Set-Alias cat bat
+}
+
 # Utilities
 function which ($command) {
   Get-Command -Name $command -ErrorAction SilentlyContinue |
