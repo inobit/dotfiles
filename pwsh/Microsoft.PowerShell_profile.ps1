@@ -9,30 +9,30 @@ Invoke-Expression (&starship init powershell)
 
 Import-Module -Name Terminal-Icons
 
-#PSReadLine
+# PSReadLine
 Import-Module PSReadLine
-# 设置编辑模式,可以使用ctrl+a,ctrl+k,ctrl+e等类似bash的按键来编辑command
+# Emacs mode
 Set-PSReadLineOption -EditMode Emacs
 
-# 设置预测文本来源为历史记录
+# history source
 Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 
-# 每次回溯输入历史，光标定位于输入内容末尾
+# cursor to end
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
-# 设置 Tab 为菜单补全和 Intellisense
+# tab for auto complete
 Set-PSReadLineKeyHandler -Key "Tab" -Function MenuComplete
 
-# 设置 Ctrl+z 为撤销
+# undo
 Set-PSReadLineKeyHandler -Key "Ctrl+z" -Function Undo
 
-# 设置向上键为后向搜索历史记录
+#  search backward
 Set-PSReadLineKeyHandler -Key "Ctrl+p" -Function HistorySearchBackward
 
-# 设置向下键为前向搜索历史纪录
+# search forward
 Set-PSReadLineKeyHandler -Key "Ctrl+n" -Function HistorySearchForward
 
-# 移除ctrl space 和tmux冲突
+#  remove ctrl space(conflict with tmux)
 Remove-PSReadLineKeyHandler -Chord Ctrl+SpaceBar
 
 # Alias
@@ -51,6 +51,49 @@ Set-Alias ll GetChildItemUnix
 function which ($command) {
   Get-Command -Name $command -ErrorAction SilentlyContinue |
       Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+}
+
+# ln
+function ln {
+    param(
+        [switch]$s,  # soft link
+        [switch]$f,  # force
+        [Parameter(Position=0, Mandatory=$true)]
+        [string]$Target,  #  target path
+        [Parameter(Position=1, Mandatory=$true)]
+        [string]$Link     # link name
+    )
+
+    if (-not (Test-Path $Target)) {
+        Write-Error "Target path '$Target' does not exist"
+        return
+    }
+
+    $targetType = if (Test-Path -Path $Target -PathType Container) {
+        "Directory"
+    } else {
+        "File"
+    }
+
+    # build params
+    $params = @{
+        Path = $Link
+        ItemType = "SymbolicLink"
+        Target = $Target
+    }
+
+    if ($f) {
+        $params.Force = $true
+    }
+
+    # command map
+    try {
+        New-Item @params -ErrorAction Stop | Out-Null
+        Write-Host "Created symbolic link: $Link -> $Target ($targetType)"
+    }
+    catch {
+        Write-Error "Failed to create symbolic link: $_"
+    }
 }
 
 
