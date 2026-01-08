@@ -340,4 +340,16 @@ wezterm.on("tabs.toggle-tab-bar", function(window, _)
 	})
 end)
 
+-- merge local options
+local status, local_options = pcall(require, "local-options")
+if status then
+	for k, v in pairs(local_options) do
+		if k == "font" then
+			config[k] = wezterm.font(v)
+		else
+			config[k] = v
+		end
+	end
+end
+
 return config
