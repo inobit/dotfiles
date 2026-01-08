@@ -234,6 +234,30 @@ config.keys = {
 			window:maximize()
 		end),
 	},
+	{
+		key = "k",
+		mods = mod.SUPER_CTRL,
+		action = act.QuickSelect,
+	},
+	{
+		key = "l",
+		mods = mod.SUPER_CTRL,
+		action = act.QuickSelectArgs({
+			label = "open url",
+			patterns = {
+				"\\((https?://\\S+)\\)",
+				"\\[(https?://\\S+)\\]",
+				"\\{(https?://\\S+)\\}",
+				"<(https?://\\S+)>",
+				"\\bhttps?://\\S+[)/a-zA-Z0-9-]+",
+			},
+			action = wezterm.action_callback(function(window, pane)
+				local url = window:get_selection_text_for_pane(pane)
+				wezterm.log_info("opening: " .. url)
+				wezterm.open_with(url)
+			end),
+		}),
+	},
 }
 
 for i = 1, 9 do
