@@ -350,29 +350,40 @@ end)
 
 wezterm.on("update-right-status", function(window, _)
 	local date = wezterm.strftime("%Y-%m-%d %H:%M")
-	local bat = ""
-	for _, b in ipairs(wezterm.battery_info()) do
-		local icon = ""
-		local state = b.state_of_charge
-		if state < 0.3 then
-			icon = " 󰁻 "
-		elseif state < 0.5 then
-			icon = " 󰁾 "
-		elseif state < 0.9 then
-			icon = " 󰂂 "
-		else
-			icon = " 󰁹 "
-		end
-		bat = icon .. string.format("%.0f%%", state * 100)
-	end
-	window:set_right_status(wezterm.format({
-		{ Foreground = { Color = std_colors.bat_fg } },
-		{ Background = { Color = std_colors.bat_bg } },
-		{ Text = bat .. " " },
+	local battery_info = wezterm.battery_info()
+	local right_status = {
 		{ Foreground = { Color = std_colors.date_fg } },
 		{ Background = { Color = std_colors.date_bg } },
 		{ Text = " " .. date .. " " },
-	}))
+	}
+	if #battery_info > 0 then
+		local bat = ""
+		for _, b in ipairs(battery_info) do
+			local icon = ""
+			local state = b.state_of_charge
+			if state < 0.3 then
+				icon = " 󰁻 "
+			elseif state < 0.5 then
+				icon = " 󰁾 "
+			elseif state < 0.9 then
+				icon = " 󰂂 "
+			else
+				icon = " 󰁹 "
+			end
+			bat = icon .. string.format("%.0f%%", state * 100)
+		end
+		local bat_status = {
+			{ Foreground = { Color = std_colors.bat_fg } },
+			{ Background = { Color = std_colors.bat_bg } },
+			{ Text = bat .. " " },
+		}
+		local combined_status = bat_status
+		for _, status in ipairs(right_status) do
+			table.insert(combined_status, status)
+		end
+		right_status = combined_status
+	end
+	window:set_right_status(wezterm.format(right_status))
 end)
 
 table.insert(config.keys, { key = "T", mods = "LEADER", action = act.EmitEvent("tabs.toggle-tab-bar") })
