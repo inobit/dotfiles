@@ -9,3 +9,5 @@ for (app in apps) {
 #HotIf WinActive("ahk_exe Obsidian.exe")
 ^f::Right
 #HotIf
+
+^!p::Run("wezterm-gui.exe") ; ctrl+alt+p
