@@ -40,6 +40,9 @@ config.inactive_pane_hsb = {
 	brightness = 0.8,
 }
 
+-- quit confirmation
+config.window_close_confirmation = "NeverPrompt"
+
 local is_windows = wezterm.target_triple:find("windows") ~= nil
 
 -- default super key
@@ -58,6 +61,8 @@ config.color_scheme = "Tokyo Night"
 -- keybindings
 config.leader = { key = "Space", mods = mod.SUPER, timeout_milliseconds = 1000 }
 config.keys = {
+	-- quit
+	{ key = "Q", mods = "LEADER", action = act.QuitApplication },
 	-- debug
 	{ key = "F12", mods = "NONE", action = act.ShowDebugOverlay },
 	-- reload config
