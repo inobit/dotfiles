@@ -404,12 +404,52 @@ wezterm.on("tabs.toggle-tab-bar", function(window, _)
 	})
 end)
 
+-- ssh domains
+config.ssh_domains = wezterm.default_ssh_domains()
+
+---@param unique_key string
+---@param list table[]
+---@return table<string, table>
+local function list_to_dict(unique_key, list)
+	local d = {}
+	for _, v in ipairs(list) do
+		if v[unique_key] then
+			d[v[unique_key]] = v
+		end
+	end
+	return d
+end
+
+---@param domains table[]
+local function merge_ssh_domains(domains)
+	if not domains or #domains == 0 then
+		return
+	end
+	if config.ssh_domains and #config.ssh_domains > 0 then
+		local parsed_domains = list_to_dict("name", config.ssh_domains)
+		local individual_domains = list_to_dict("name", domains)
+		for k, v in pairs(individual_domains) do
+			if parsed_domains[k] then
+				for k2, v2 in pairs(v) do
+					parsed_domains[k][k2] = v2
+				end
+			else
+				table.insert(config.ssh_domains, v)
+			end
+		end
+	else
+		config.ssh_domains = domains
+	end
+end
+
 -- merge local options
 local status, local_options = pcall(require, "local-options")
 if status then
 	for k, v in pairs(local_options) do
 		if k == "font" then
 			config[k] = wezterm.font(v)
+		elseif k == "ssh_domains" then
+			merge_ssh_domains(v)
 		else
 			config[k] = v
 		end
