@@ -296,9 +296,11 @@ local meta_colors = {
 
 local std_colors = {
 	tab_bar_active_tab_bg = meta_colors.pink,
+	tab_bar_inactive_tab_bg = meta_colors.surface0,
 	tab_bar_text = meta_colors.white,
 	leader_active = meta_colors.yellow,
 	leader_inactive = meta_colors.green,
+	workspace_bg = meta_colors.teal,
 	leader_text = meta_colors.crust,
 	date_fg = meta_colors.crust,
 	date_bg = meta_colors.lavender,
@@ -329,20 +331,25 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, _config, hover, max_wi
 		}
 	else
 		return {
+			{ Background = { Color = std_colors.tab_bar_inactive_tab_bg } },
 			{ Foreground = { Color = std_colors.tab_bar_text } },
 			{ Text = title },
 		}
 	end
 end)
 
-wezterm.on("update-status", function(window, _)
+wezterm.on("update-status", function(window, pane)
 	local workspace = window:active_workspace()
+	local domain = pane:get_domain_name()
 	local bg_color = std_colors.leader_inactive
 	if window:leader_is_active() then
 		bg_color = std_colors.leader_active
 	end
 	window:set_left_status(wezterm.format({
 		{ Background = { Color = bg_color } },
+		{ Foreground = { Color = std_colors.leader_text } },
+		{ Text = "  " .. domain .. " " },
+		{ Background = { Color = std_colors.workspace_bg } },
 		{ Foreground = { Color = std_colors.leader_text } },
 		{ Text = " 󰖲 " .. workspace .. " " },
 	}))
