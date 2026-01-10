@@ -107,6 +107,11 @@ config.keys = {
 		action = act.ActivateTabRelative(1),
 	},
 	{
+		key = "Tab",
+		mods = "LEADER",
+		action = act.ActivateLastTab,
+	},
+	{
 		key = "[",
 		mods = mod.SUPER_CTRL,
 		action = act.MoveTabRelative(-1),
