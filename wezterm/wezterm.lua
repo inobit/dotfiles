@@ -173,8 +173,8 @@ config.keys = {
 		action = wezterm.action.ActivatePaneDirection("Right"),
 	},
 	-- pane scroll
-	{ key = "u", mods = mod.SUPER, action = act.ScrollByLine(-5) },
-	{ key = "d", mods = mod.SUPER, action = act.ScrollByLine(5) },
+	{ key = "u", mods = mod.SUPER_CTRL, action = act.ScrollByLine(-5) },
+	{ key = "d", mods = mod.SUPER_CTRL, action = act.ScrollByLine(5) },
 	{ key = "g", mods = "LEADER", action = act.ScrollToTop },
 	{ key = "G", mods = "LEADER", action = act.ScrollToBottom },
 	-- pane size adjustment
