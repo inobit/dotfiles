@@ -47,6 +47,14 @@ if (Get-Command -Name "wezterm" -ErrorAction SilentlyContinue) {
   function wzcs { wezterm cli spawn --domain-name @args }
 }
 
+# fzf
+$env:_PSFZF_FZF_DEFAULT_OPTS = '--height 60% --tmux bottom,60% --layout reverse --border'
+# replace 'Ctrl+t' and 'Ctrl+r' with your preferred bindings:
+Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
+Set-PsFzfOption -TabExpansion
+Set-PsFzfOption -TabCompletionPreviewWindow 'right|down|hidden'
+Set-PSReadLineKeyHandler -Key Tab -ScriptBlock { Invoke-FzfTabCompletion }
+
 
 function GetChildItemUnix ($path) {
   Get-ChildItem $path | Format-Table  -AutoSize
