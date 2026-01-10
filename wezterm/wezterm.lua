@@ -177,6 +177,21 @@ config.keys = {
 		mods = "LEADER",
 		action = wezterm.action.ActivatePaneDirection("Right"),
 	},
+	{
+		key = "n",
+		mods = "LEADER",
+		action = act.PaneSelect({ alphabet = "1234567890", mode = "Activate" }),
+	},
+	{
+		key = "n",
+		mods = "LEADER|" .. mod.SUPER,
+		action = act.PaneSelect({ alphabet = "1234567890", mode = "MoveToNewTab" }),
+	},
+	{
+		key = "n",
+		mods = "LEADER|CTRL",
+		action = act.PaneSelect({ alphabet = "1234567890", mode = "MoveToNewWindow" }),
+	},
 	-- pane scroll
 	{ key = "u", mods = mod.SUPER_CTRL, action = act.ScrollByLine(-5) },
 	{ key = "d", mods = mod.SUPER_CTRL, action = act.ScrollByLine(5) },
