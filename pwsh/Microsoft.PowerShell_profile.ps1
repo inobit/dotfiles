@@ -40,6 +40,14 @@ Remove-PSReadLineKeyHandler -Chord Ctrl+SpaceBar
 Set-Alias vim nvim
 Set-Alias grep findstr
 
+# wezterm
+if (Get-Command -Name "wezterm" -ErrorAction SilentlyContinue) {
+  Set-Alias wz wezterm
+  function wzc { wezterm connect @args }
+  function wzcs { wezterm cli spawn --domain-name @args }
+}
+
+
 function GetChildItemUnix ($path) {
   Get-ChildItem $path | Format-Table  -AutoSize
   # Get-ChildItem $path | Select-Object Mode, @{n='LastWriteTime';e={'{0:yyyy-MM-dd HH:mm:ss}' -f $_.LastWriteTime}}, Length,@{N='Name';E={if($_.Target) {$_.Name+' -> '+$_.Target} else {$_.Name}}}
