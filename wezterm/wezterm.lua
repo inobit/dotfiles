@@ -62,7 +62,7 @@ config.color_scheme = "Tokyo Night"
 config.leader = { key = "Space", mods = mod.SUPER, timeout_milliseconds = 1000 }
 config.keys = {
 	-- quit
-	{ key = "Q", mods = "LEADER", action = act.QuitApplication },
+	{ key = "q", mods = mod.SUPER_CTRL, action = act.QuitApplication },
 	-- debug
 	{ key = "F12", mods = "NONE", action = act.ShowDebugOverlay },
 	-- reload config
