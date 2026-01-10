@@ -199,13 +199,13 @@ config.keys = {
 		action = act.AdjustPaneSize({ "Up", 5 }),
 	},
 	-- windows zoom
-	{
-		key = "0",
-		mods = mod.SUPER_CTRL,
-		action = wezterm.action_callback(function(window, _)
-			window:restore()
-		end),
-	},
+	-- {
+	-- 	key = "0",
+	-- 	mods = mod.SUPER_CTRL,
+	-- 	action = wezterm.action_callback(function(window, _)
+	-- 		window:restore()
+	-- 	end),
+	-- },
 	{
 		key = "-",
 		mods = mod.SUPER_CTRL,
@@ -232,11 +232,17 @@ config.keys = {
 			window:set_inner_size(new_width, new_height)
 		end),
 	},
+	-- toggle maximize
 	{
 		key = "Enter",
 		mods = mod.SUPER_CTRL,
 		action = wezterm.action_callback(function(window, _)
-			window:maximize()
+			local dimensions = window:get_dimensions()
+			if dimensions.pixel_width == wezterm.gui.screens().active.width then
+				window:restore()
+			else
+				window:maximize()
+			end
 		end),
 	},
 	{
