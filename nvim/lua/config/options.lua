@@ -31,7 +31,15 @@ vim.opt.cindent = true
 vim.opt.clipboard = "unnamedplus"
 -- vim.opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus"
 -- ssh时使用OSC 52 clipboard.在tmux中还是使用默认tmux clipboard
-if (vim.env.SSH_TTY or vim.env.SSH_CLIENT) and not vim.env.TMUX then
+if
+  not vim.env.TMUX
+  and (
+    vim.env.SSH_TTY
+    or vim.env.SSH_CLIENT
+    -- wezterm remove the SSH_TTY and SSH_CLIENT in mux mode
+    or (vim.env.WEZTERM_EXECUTABLE and vim.env.WEZTERM_EXECUTABLE:find "wezterm%-mux%-server")
+  )
+then
   local function my_paste()
     return function()
       -- 有些terminal不允许通过OSC 52读clipboard,所以这里的paste改为使用""p
