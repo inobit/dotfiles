@@ -146,6 +146,16 @@ case ":$PATH:" in
 esac
 # pnpm end
 
+# flush ssh agent
+function flush_ssh_agent() {
+	if [[ -L $HOME/.ssh/ssh_auth_sock ]] && [[ -S $HOME/.ssh/ssh_auth_sock ]]; then
+		export SSH_AUTH_SOCK=$HOME/.ssh/ssh_auth_sock
+	else
+		echo "\033[31msocket file not found\033[0m"
+	fi
+}
+alias fsa=flush_ssh_agent
+
 # wsl setup
 if [[ "$(uname -r)" == *"microsoft"* || "$(uname -r)" == *"wsl"* ]]; then
 	WSL_SSH_DIR="$HOME/.ssh"
