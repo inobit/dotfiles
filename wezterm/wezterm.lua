@@ -192,6 +192,23 @@ config.keys = {
 		mods = "LEADER|CTRL",
 		action = act.PaneSelect({ alphabet = "1234567890", mode = "MoveToNewWindow" }),
 	},
+	-- swap panes
+	{
+		key = ">",
+		mods = "LEADER|SHIFT",
+		action = wezterm.action_callback(function(window, _)
+			local tab = window:active_tab()
+			tab:rotate_clockwise()
+		end),
+	},
+	{
+		key = "<",
+		mods = "LEADER|SHIFT",
+		action = wezterm.action_callback(function(window, _)
+			local tab = window:active_tab()
+			tab:rotate_counter_clockwise()
+		end),
+	},
 	-- pane scroll
 	{ key = "u", mods = mod.SUPER_CTRL, action = act.ScrollByLine(-5) },
 	{ key = "d", mods = mod.SUPER_CTRL, action = act.ScrollByLine(5) },
