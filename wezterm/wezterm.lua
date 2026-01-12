@@ -371,6 +371,10 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, _config, hover, max_wi
 	local title = " " .. tab.tab_index + 1 .. " " .. tab_title(tab) .. " "
 	title = wezterm.truncate_right(title, max_width - 2)
 
+	if tab.active_pane.is_zoomed then
+		title = " " .. wezterm.nerdfonts.cod_zoom_in .. title
+	end
+
 	if tab.is_active then
 		return {
 			{ Background = { Color = std_colors.tab_bar_active_tab_bg } },
