@@ -63,6 +63,12 @@ config.leader = { key = "Space", mods = mod.SUPER, timeout_milliseconds = 1000 }
 config.keys = {
 	-- quit
 	{ key = "q", mods = mod.SUPER_CTRL, action = act.QuitApplication },
+	-- detach
+	{
+		key = "d",
+		mods = "LEADER",
+		action = act.DetachDomain("CurrentPaneDomain"),
+	},
 	-- debug
 	{ key = "F12", mods = "NONE", action = act.ShowDebugOverlay },
 	-- reload config
