@@ -356,6 +356,10 @@ local std_colors = {
 	bat_bg = meta_colors.peach,
 }
 
+local function basename(s)
+	return string.gsub(s, "(.*[/\\])(.*)", "%2")
+end
+
 local function tab_title(tab_info)
 	local title = tab_info.tab_title
 	-- if the tab title is explicitly set, take that
@@ -364,12 +368,11 @@ local function tab_title(tab_info)
 	end
 	-- Otherwise, use the title from the active pane
 	-- in that tab
-	return tab_info.active_pane.title
+	return basename(tab_info.active_pane.title)
 end
 ---@diagnostic disable-next-line: unused-local
 wezterm.on("format-tab-title", function(tab, tabs, panes, _config, hover, max_width)
 	local title = " " .. tab.tab_index + 1 .. " " .. tab_title(tab) .. " "
-	title = wezterm.truncate_right(title, max_width - 2)
 
 	if tab.active_pane.is_zoomed then
 		title = " " .. wezterm.nerdfonts.cod_zoom_in .. title
