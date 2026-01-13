@@ -231,6 +231,16 @@ if [[ -d $HOME/.docker-bin ]]; then
 	esac
 fi
 
+# opencode
+if [[ -d $HOME/.opencode/bin ]]; then
+	case ":${PATH}:" in
+	*:"$HOME/.opencode/bin":*) ;;
+	*)
+		export PATH="$HOME/.opencode/bin:$PATH"
+		;;
+	esac
+fi
+
 # git function
 
 cherry_pick_to_branch() {
