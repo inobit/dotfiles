@@ -134,3 +134,7 @@ vim.opt.showbreak = ""
 vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
 vim.opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
+
+-- cursor style
+vim.opt.guicursor =
+  "n-v-c-sm:block-Cursor,i-ci-ve:ver25-Cursor,r-cr-o:hor20-Cursor,t:block-Cursor-blinkon500-blinkoff500-TermCursor"
