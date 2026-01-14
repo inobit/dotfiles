@@ -10,6 +10,8 @@ config.prefer_egl = true
 
 config.adjust_window_size_when_changing_font_size = false
 
+config.force_reverse_video_cursor = true
+
 -- appearance
 config.window_decorations = "RESIZE"
 config.window_padding = {
