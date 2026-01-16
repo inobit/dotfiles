@@ -56,7 +56,7 @@ return {
                   return client.name
                 end)
                 :totable()
-              return "  " .. table.concat(lsps, ", ")
+              return "󱁜 " .. table.concat(lsps, ", ")
             end,
             cond = function() return #vim.lsp.get_clients { bufnr = vim.api.nvim_get_current_buf() } > 0 end,
             color = function() return { fg = string.format("#%06x", vim.api.nvim_get_hl(0, { name = "Define", link = false }).fg) } end,
