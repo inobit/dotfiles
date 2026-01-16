@@ -7,7 +7,7 @@ if [[ -e "$file_path" ]]; then
 
 	case "$mime_type" in
 	text/*)
-		batcat --color=always --style=numbers --line-range=:500 "$file_path" || head --lines=500 "$file_path"
+		batcat --theme base16 --color=always --style=numbers --line-range=:500 "$file_path" || head --lines=500 "$file_path"
 		;;
 	inode/directory)
 		ls -lh --color=always "$file_path"
