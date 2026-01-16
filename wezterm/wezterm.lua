@@ -382,22 +382,43 @@ local function basename(s)
 	return string.gsub(s, "(.*[/\\])(.*)", "%2")
 end
 
+---@param title string
+---@return boolean, string, integer?
+local function split_copy_mode(title)
+	local pattern = "^Copy%smode:%s+"
+	local copy_mode = title:match(pattern)
+	if copy_mode then
+		return true, title:gsub(pattern, "")
+	end
+	return false, title
+end
+
+---@param tab_info table
+---@return boolean, string
 local function tab_title(tab_info)
 	local title = tab_info.tab_title
 	-- if the tab title is explicitly set, take that
 	if title and #title > 0 then
-		return title
+		return split_copy_mode(title)
 	end
 	-- Otherwise, use the title from the active pane
 	-- in that tab
-	return basename(tab_info.active_pane.title)
+	local copy_mode, pane_title = split_copy_mode(tab_info.active_pane.title)
+	pane_title = basename(pane_title)
+	return copy_mode, pane_title
 end
+
 ---@diagnostic disable-next-line: unused-local
 wezterm.on("format-tab-title", function(tab, tabs, panes, _config, hover, max_width)
-	local title = " " .. tab.tab_index + 1 .. " " .. tab_title(tab) .. " "
+	local copy_mode, title = tab_title(tab)
+	title = " " .. tab.tab_index + 1 .. " " .. title .. " "
 
 	if tab.active_pane.is_zoomed then
 		title = " " .. wezterm.nerdfonts.cod_zoom_in .. title
+	end
+
+	if copy_mode then
+		title = " " .. wezterm.nerdfonts.md_content_copy .. title
 	end
 
 	if tab.is_active then
