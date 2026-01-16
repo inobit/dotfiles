@@ -43,8 +43,6 @@ M.debugger_adapter = { "codelldb", "js-debug-adapter" }
 M.formatters = {
   "stylua", -- lua formatter
   "clang-format", -- c cpp formatter
-  "black", -- python formatter
-  "isort", -- python formatter
   "prettier", -- html,css,js,ts,json,markdown,yaml formatter
   "shfmt", -- shell formatter
   "xmlformatter", -- xml formatter
@@ -54,7 +52,6 @@ M.formatters = {
 
 ---@type string[]
 M.linters = {
-  -- "ruff", -- python linter(lsp)
   "mypy", -- python linter
   -- "eslint_d", -- use eslint-lsp
   "htmlhint", -- html linter

@@ -203,12 +203,14 @@ return {
               }
             end,
           },
-          -- python
-          null_ls.builtins.formatting.black.with {
-            extra_args = function()
-              return { "--line-length", 100 }
-            end,
-          },
+
+          -- python, use ruff instead
+          -- null_ls.builtins.formatting.black.with {
+          --   extra_args = function()
+          --     return { "--line-length", 100 }
+          --   end,
+          -- },
+
           -- javascript,typescript,javascriptreact,typescriptreact,html,css,scss,sass,less,json,jsonc,json5,markdown,yaml
           null_ls.builtins.formatting.prettier.with {
             filetypes = {
