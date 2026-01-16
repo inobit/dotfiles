@@ -10,7 +10,7 @@ M = {}
 ---@type mason.Environment
 local rust_env = {
   lsps = { "rust-analyzer", "bacon_ls" },
-  formatters = { "rustfmt" },
+  -- formatters = { "rustfmt" }, - rustfmt is deprecated, install it from rustup
   linters = { "bacon" },
 }
 
