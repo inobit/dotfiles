@@ -305,13 +305,13 @@ config.keys = {
 		end),
 	},
 	{
-		key = "k",
-		mods = mod.SUPER_CTRL,
+		key = "p", -- pick
+		mods = "LEADER",
 		action = act.QuickSelect,
 	},
 	{
-		key = "l",
-		mods = mod.SUPER_CTRL,
+		key = "f", -- follow
+		mods = "LEADER",
 		action = act.QuickSelectArgs({
 			label = "open url",
 			patterns = {
