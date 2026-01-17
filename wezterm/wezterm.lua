@@ -408,6 +408,18 @@ local function tab_title(tab_info)
 	return copy_mode, pane_title
 end
 
+---@param panes table[]
+local function check_unseen_output(panes)
+	local unseen_output = false
+	for _, pane in ipairs(panes) do
+		if pane.has_unseen_output then
+			unseen_output = true
+			break
+		end
+	end
+	return unseen_output
+end
+
 ---@diagnostic disable-next-line: unused-local
 wezterm.on("format-tab-title", function(tab, tabs, panes, _config, hover, max_width)
 	local copy_mode, title = tab_title(tab)
@@ -428,6 +440,10 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, _config, hover, max_wi
 			{ Text = title },
 		}
 	else
+		local unseen_output = check_unseen_output(tab.panes)
+		if unseen_output then
+			title = " " .. wezterm.nerdfonts.md_message_alert_outline .. title
+		end
 		return {
 			{ Background = { Color = std_colors.tab_bar_inactive_tab_bg } },
 			{ Foreground = { Color = std_colors.tab_bar_text } },
