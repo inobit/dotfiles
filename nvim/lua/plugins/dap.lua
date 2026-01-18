@@ -58,7 +58,7 @@ return {
     -- dap client -launch/attach-> adapter(debugger) -launch/attach-> debuggee
     local dap, dapui = require "dap", require "dapui"
     -- load persistence module
-    local persistence = require "lib.dap.breakpoint_persistence"
+    local dap_utils = require "lib.dap.utils"
     -- load run module
     -- require "lib.dap.run"
 
@@ -115,10 +115,12 @@ return {
     end
 
     -- stylua: ignore start
-    vim.keymap.set("n", "<leader>B", function() persistence.toggle_breakpoints() end, { desc = "Debug: toggle breakpoints" })
-    vim.keymap.set("n", "<leader>dpl", function() persistence.load_breakpoints() end, { desc = "Debug: load breakpoints" })
-    vim.keymap.set("n", "<leader>dps", function() persistence.store_breakpoints(false) end, { desc = "Debug: store breakpoints" })
-    vim.keymap.set("n", "<leader>dpc", function() persistence.store_breakpoints(true) end, { desc = "Debug: clear persistence  breakpoints" })
+    vim.keymap.set("n", "<leader>B", function() dap_utils.toggle_breakpoints() end, { desc = "Debug: toggle breakpoints" })
+    vim.keymap.set("n", "<leader>dpl", function() dap_utils.load_breakpoints() end, { desc = "Debug: load breakpoints" })
+    vim.keymap.set("n", "<leader>dps", function() dap_utils.store_breakpoints(false) end, { desc = "Debug: store breakpoints" })
+    vim.keymap.set("n", "<leader>dpc", function() dap_utils.store_breakpoints(true) end, { desc = "Debug: clear persistence  breakpoints" })
+    vim.keymap.set('n', ']d', function() dap_utils.gotoBreakpoint("next") end, { desc = "Debug: goto next breakpoint" })
+    vim.keymap.set('n', '[d', function() dap_utils.gotoBreakpoint("prev") end, { desc = "Debug: goto prev breakpoint"})
     vim.keymap.set("n", "<leader>dt", function() require("dapui").toggle() end, { desc = "Debug: toggle dapui" })
     vim.keymap.set({ "n", "v" }, "<leader>de", function() require("dapui").eval() end, { desc = "Debug: eval" })
     vim.keymap.set({ "n", "v" }, "<leader>da", function() require("dapui").elements.watches.add() end, { desc = "Debug: add to watch" })
