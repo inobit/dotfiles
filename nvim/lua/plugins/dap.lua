@@ -88,8 +88,7 @@ return {
         open = "o",
         remove = "d",
         repl = "r",
-        --BUG: default is "t",conflict with plugin eyeliner
-        toggle = "s",
+        toggle = "t",
       },
     }
 
