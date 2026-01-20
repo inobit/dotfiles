@@ -81,9 +81,14 @@ function M.gotoBreakpoint(direction)
   end
 
   local points = {}
+  local current_bufnr_points = {}
+  local current_bufnr = vim.api.nvim_get_current_buf()
   for bufnr, buffer in pairs(_breakpoints) do
     for _, point in ipairs(buffer) do
       table.insert(points, { bufnr = bufnr, line = point.line })
+      if bufnr == current_bufnr then
+        table.insert(current_bufnr_points, { bufnr = bufnr, line = point.line })
+      end
     end
   end
 
@@ -111,8 +116,6 @@ function M.gotoBreakpoint(direction)
   ---@type DapPoint | nil
   local nextPoint
 
-  local current_bufnr = vim.api.nvim_get_current_buf()
-  local current_bufnr_points = vim.deepcopy(_breakpoints[current_bufnr])
   local current_pos = { bufnr = current_bufnr, line = vim.api.nvim_win_get_cursor(0)[1] }
 
   nextPoint = get_next_point(current_pos, points)
@@ -124,7 +127,9 @@ function M.gotoBreakpoint(direction)
     else
       -- if current buffer has breakpoints, get the next breakpoint in current buffer scope
       table.insert(current_bufnr_points, current_pos)
-      table.sort(current_bufnr_points)
+      table.sort(current_bufnr_points, function(a, b)
+        return a.line < b.line
+      end)
       nextPoint = get_next_point(current_pos, current_bufnr_points)
     end
   end -- Fallback to first if none found
