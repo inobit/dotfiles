@@ -84,6 +84,14 @@ return {
       sources = vim.list_extend(sources, filtered)
       sources = vim.list_extend(sources, default_sources)
 
+      -- confilc with vim-matchup
+      cmp.event:on("menu_opened", function()
+        vim.b.matchup_matchparen_enabled = false
+      end)
+      cmp.event:on("menu_closed", function()
+        vim.b.matchup_matchparen_enabled = true
+      end)
+
       -- 全局配置
       cmp.setup {
         -- 配置snippet,推荐必须配置,用来和snip引擎作用
