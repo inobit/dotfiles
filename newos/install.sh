@@ -20,7 +20,9 @@ error() {
 	echo -e "${RED}[ERROR]${NC} $1"
 }
 
+DOCUMENTS_DIR="$HOME"/documents
 DOWNLOADS_DIR="$HOME"/downloads
+DOTFILES="$DOCUMENTS_DIR"/dotfiles
 LOCAL_BIN_DIR="$HOME"/.local/bin
 LOCAL_CONFIG_DIR="$HOME"/.config
 
@@ -33,7 +35,7 @@ detect_os() {
 	fi
 }
 
-# update system
+# update syste
 _update_system() {
 	sudo apt update && sudo apt upgrade -y
 }
@@ -220,9 +222,9 @@ EOF
 # get dotfiles
 pull_dotfiles() {
 	info "pull dotfiles"
-	if [[ ! -d $HOME/documents/dotfiles ]]; then
-		mkdir -p "$HOME"/documents/dotfiles
-		git clone https://gitee.com/inobit/dotfiles.git "$HOME"/documents/dotfiles
+	if [[ ! -d $DOTFILES ]]; then
+		mkdir -p "$DOTFILES"
+		git clone https://gitee.com/inobit/dotfiles.git "$DOTFILES"
 	fi
 	info "pull dotfiles done"
 }
@@ -293,9 +295,9 @@ install_fzf() {
 		rm -f "$fzf_home"/bin/fzf.tar.gz
 		test -d "$HOME"/.local/bin || mkdir -p "$HOME"/.local/bin
 		ln -sf "$fzf_home"/bin/fzf "$HOME"/.local/bin/fzf
-		if [[ -f "$HOME"/documents/dotfiles/newos/fzf/fzf_preview_handler.sh ]]; then
+		if [[ -f "$DOTFILES"/newos/fzf/fzf_preview_handler.sh ]]; then
 			info "config fzf preview handler"
-			ln -sf "$HOME"/documents/dotfiles/newos/fzf/fzf_preview_handler.sh "$fzf_home"/fzf_preview_handler.sh
+			ln -sf "$DOTFILES"/newos/fzf/fzf_preview_handler.sh "$fzf_home"/fzf_preview_handler.sh
 		else
 			warn "fzf_preview_handler.sh not found, skip config preview handler."
 		fi
@@ -325,7 +327,7 @@ install_nvim() {
 	info "config nvim"
 	test -d "$HOME"/.config || mkdir -p "$HOME"/.config
 	if [[ ! -L $HOME/.config/nvim ]]; then
-		local config_dir="$HOME"/documents/dotfiles/nvim
+		local config_dir="$DOTFILES"/nvim
 		if [[ -d $config_dir ]]; then
 			ln -sf "$config_dir" "$HOME"/.config/nvim
 			info "nvim config done"
@@ -395,7 +397,7 @@ install_tmux() {
 	info "config tmux"
 	test -d "$HOME"/.config/tmux || mkdir -p "$HOME"/.config/tmux
 	if [[ ! -L $HOME/.config/tmux/tmux.conf ]]; then
-		local tmux_config_file="$HOME"/documents/dotfiles/tmux/tmux.conf
+		local tmux_config_file="$DOTFILES"/tmux/tmux.conf
 		if [[ -f $tmux_config_file ]]; then
 			ln -sf "$tmux_config_file" "$HOME"/.config/tmux/tmux.conf
 			info "tmux config done"
@@ -415,7 +417,7 @@ install_tmux() {
 	info "config ssh auth socks"
 	if [[ -f $HOME/documents/dotfiles/ssh/rc ]]; then
 		test -d "$HOME"/.ssh || mkdir -p "$HOME"/.ssh
-		cp "$HOME"/documents/dotfiles/ssh/rc "$HOME"/.ssh
+		cp "$DOTFILES"/ssh/rc "$HOME"/.ssh
 		info "ssh auth socks config done"
 	else
 		warn "ssh rc file not found, skip config."
@@ -597,9 +599,9 @@ install_zsh() {
 	info "zsh-completions installed"
 
 	info "config zsh"
-	if [[ -f "$HOME"/documents/dotfiles/zsh/.zshrc ]]; then
+	if [[ -f "$DOTFILES"/zsh/.zshrc ]]; then
 		info "copy .zshrc"
-		cp "$HOME"/documents/dotfiles/zsh/.zshrc "$HOME"/.zshrc
+		cp "$DOTFILES"/zsh/.zshrc "$HOME"/.zshrc
 		info "config zsh done"
 	else
 		warn "zsh config file not found, skip config."
