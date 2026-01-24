@@ -59,6 +59,10 @@ end
 
 -- colors
 config.color_scheme = "Tokyo Night"
+config.colors = {
+	selection_bg = "#151B54",
+	selection_fg = "white",
+}
 
 -- keybindings
 config.leader = { key = "Space", mods = mod.SUPER, timeout_milliseconds = 1000 }
