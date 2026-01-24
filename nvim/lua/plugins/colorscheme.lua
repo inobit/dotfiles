@@ -2,7 +2,7 @@ local function setTheme(theme)
   vim.cmd.colorscheme(theme)
   vim.cmd.hi "Comment gui=none"
 end
-local theme = vim.env.MY_THEME or "catppuccin-frappe"
+local theme = vim.env.MY_THEME or (vim.env.TTY_COLOR_MODE == "light" and "rose-pine-dawn" or "tokyonight")
 return { -- You can easily change to a different colorscheme.
   {
     -- Change the name of the colorscheme plugin below, and then
