@@ -146,6 +146,15 @@ case ":$PATH:" in
 esac
 # pnpm end
 
+# local .func
+if [[ -d $HOME/.funcs ]]; then
+	for file in $HOME/.funcs/*; do
+		if [[ -f $file ]] && [[ -x $file ]]; then
+			source $file
+		fi
+	done
+fi
+
 # flush ssh agent
 function flush_ssh_agent() {
 	if [[ -L $HOME/.ssh/ssh_auth_sock ]] && [[ -S $HOME/.ssh/ssh_auth_sock ]]; then
@@ -214,7 +223,20 @@ eval "$(uvx --generate-shell-completion zsh)"
 
 # fzf
 source <(fzf --zsh)
-export FZF_DEFAULT_OPTS='--height 60% --tmux bottom,60% --layout reverse --border --preview "$HOME/.fzf/fzf_preview_handler.sh {}"'
+set_fzf_options() {
+	if [[ $TTY_COLOR_MODE == "light" ]]; then
+		FZF_LIGHT_THEME='
+--color=fg:#797593,bg:#faf4ed,hl:#d7827e
+--color=fg+:#575279,bg+:#f2e9e1,hl+:#d7827e
+--color=border:#dfdad9,header:#286983,gutter:#faf4ed
+--color=spinner:#ea9d34,info:#56949f
+--color=pointer:#907aa9,marker:#b4637a,prompt:#797593'
+	else
+		FZF_LIGHT_THEME=''
+	fi
+	export FZF_DEFAULT_OPTS="$FZF_LIGHT_THEME --height 60% --tmux bottom,60% --layout reverse --border --preview \"$HOME/.fzf/fzf_preview_handler.sh {}\""
+}
+set_fzf_options
 
 if [[ -d $HOME/.cargo ]]; then
 	. "$HOME/.cargo/env"
@@ -303,3 +325,18 @@ cherry_pick_to_branch() {
 		git stash pop
 	fi
 }
+
+# flush color mode
+flush_color_mode() {
+	# refresh current color mode
+	if command -v tcm >/dev/null 2>&1; then
+		tcm
+	fi
+
+	# app settings
+	# fzf
+	if command -v set_fzf_options >/dev/null 2>&1; then
+		set_fzf_options
+	fi
+}
+alias fcc=flush_color_mode
