@@ -606,6 +606,15 @@ install_zsh() {
 	fi
 }
 
+cp_shell_funcs() {
+	info "copy shell functions to $HOME/.funcs"
+	if [[ -d $DOTFILES/zsh/funcs ]]; then
+		test -d "$HOME"/.funcs || mkdir -p "$HOME"/.funcs
+		cp -r "$DOTFILES"/zsh/funcs/* "$HOME"/.funcs
+	fi
+	info "shell functions copied"
+}
+
 ch_zsh() {
 	if [[ -x /usr/bin/zsh ]]; then
 		info "change login shell to zsh"
@@ -643,6 +652,7 @@ main() {
 		install_rust_env
 		install_docker
 		install_zsh
+		cp_shell_funcs
 		ch_zsh)
 
 	declare -A valid_functions
