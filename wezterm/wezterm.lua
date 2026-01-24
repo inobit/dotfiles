@@ -22,7 +22,7 @@ config.window_padding = {
 }
 
 -- font
-config.font = wezterm.font("JetBrainsMonoNL Nerd Font")
+config.font = wezterm.font_with_fallback({ "JetBrainsMonoNL Nerd Font", "Maple Mono Normal CN" })
 config.font_size = 12.5
 config.line_height = 1.1
 
