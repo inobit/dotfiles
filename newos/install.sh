@@ -425,29 +425,20 @@ install_tmux() {
 }
 
 install_node_env() {
-	info "install nvm"
-	if [[ ! -d $HOME/.nvm ]]; then
-		# get latest release version
-		version=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | jq -r '.tag_name')
-		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/"$version"/install.sh | bash
+	info "install fnm"
+	FNM_PATH="$HOME/.local/share/fnm"
+	if [[ ! -d $FNM_PATH ]]; then
+		curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
 	fi
-	info "nvm installed"
+	info "fnm installed"
 
-	# shellcheck disable=SC1091
-	source "$HOME/.nvm/nvm.sh"
 	info "install node 22"
-	if [[ -z $(find "$HOME"/.nvm/versions/node -maxdepth 1 -type d -regex ".*v22[\.0-9]+$" 2>/dev/null) ]]; then
-		nvm install 22
+	if [[ -z $(find "$FNM_PATH"/node-versions -maxdepth 1 -type d -regex ".*v22[\.0-9]+$" 2>/dev/null) ]]; then
+		"$FNM_PATH"/fnm install 22
 	fi
 	info "node 22 installed"
 
-	info "install node 20"
-	if [[ -z $(find "$HOME"/.nvm/versions/node -maxdepth 1 -type d -regex ".*v20[\.0-9]+$" 2>/dev/null) ]]; then
-		nvm install 20
-	fi
-	info "node 20 installed"
-
-	nvm alias default 22
+	"$FNM_PATH"/fnm default 22
 
 	info "install pnpm"
 	if [[ ! -d $HOME/.local/share/pnpm ]]; then

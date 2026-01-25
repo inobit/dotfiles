@@ -24,7 +24,7 @@ ZSH_THEME="robbyrussell"
 # HYPHEN_INSENSITIVE="true"
 
 # Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
+zstyle ':omz:update' mode disabled # disable automatic updates
 # zstyle ':omz:update' mode auto      # update automatically without asking
 # zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
@@ -108,35 +108,24 @@ source $ZSH/oh-my-zsh.sh
 # use GPG_TTY to allow using pinentry-tty
 export GPG_TTY=$(tty)
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
-# nvm config
-# place this after nvm initialization!
-autoload -U add-zsh-hook
-
-load-nvmrc() {
-	local nvmrc_path
-	nvmrc_path="$(nvm_find_nvmrc)"
-
-	if [ -n "$nvmrc_path" ]; then
-		local nvmrc_node_version
-		nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-
-		if [ "$nvmrc_node_version" = "N/A" ]; then
-			nvm install
-		elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
-			nvm use
-		fi
-	elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
-		echo "Reverting to nvm default version"
-		nvm use default
+# add to path
+add_to_path() {
+	local _path=$1
+	if [[ -d $_path ]]; then
+		case ":$PATH:" in
+		*":$_path:"*) ;;
+		*) export PATH="$_path:$PATH" ;;
+		esac
 	fi
 }
 
-add-zsh-hook chpwd load-nvmrc
-load-nvmrc
+# fnm
+FNM_PATH="$HOME/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+	add_to_path "$FNM_PATH"
+	eval "$(fnm env --use-on-cd --shell zsh)"
+	eval "$(fnm completions --shell zsh)"
+fi
 
 # pnpm
 export PNPM_HOME="$HOME/.local/share/pnpm"
