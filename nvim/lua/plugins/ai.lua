@@ -2,6 +2,7 @@ return {
   {
     "Exafunction/windsurf.nvim",
     event = { "InsertEnter" },
+    cond = not vim.g.disable_ai_completion,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "hrsh7th/nvim-cmp",
@@ -40,6 +41,7 @@ return {
   {
     "supermaven-inc/supermaven-nvim",
     event = { "InsertEnter" },
+    cond = not vim.g.disable_ai_completion,
     opts = {
       keymaps = {
         accept_suggestion = "<M-y>",

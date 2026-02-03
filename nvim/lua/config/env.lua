@@ -17,6 +17,7 @@ end
 vim.g.obsidian_vault = vim.fn.expand(vim.env.OBSIDIAN_VAULT or "~/documents/notes/")
 
 ---ai controll,if not set all ai engine will be used for cmp source
+vim.g.disable_ai_completion = string.lower(vim.env.DISABLE_AI_COMPLETION or "false") == "true" or false
 vim.g.ai_inline_completion_engine = vim.env.AI_INLINE_COMPLETION_ENGINE or "supermaven"
 
 -- linux

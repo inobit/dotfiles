@@ -75,13 +75,14 @@ return {
           group_index = 0, -- set group index to 0 to skip loading LuaLS completions
         },
       }
-      local ai_list = { "supermaven", "codeium" }
-      local filtered = vim.tbl_map(function(ai)
-        if ai ~= vim.g.ai_inline_completion_engine then
-          return { name = ai }
-        end
-      end, ai_list)
-      sources = vim.list_extend(sources, filtered)
+      -- disable ai completion for cmp
+      -- local ai_list = { "supermaven", "codeium" }
+      -- local filtered = vim.tbl_map(function(ai)
+      --   if ai ~= vim.g.ai_inline_completion_engine then
+      --     return { name = ai }
+      --   end
+      -- end, ai_list)
+      -- sources = vim.list_extend(sources, filtered)
       sources = vim.list_extend(sources, default_sources)
 
       -- confilc with vim-matchup
