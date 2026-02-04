@@ -191,7 +191,7 @@ config_ssh_agent() {
 config_firewall() {
 	read -r -p "Whether to config iptables? y or n: " config_iptables
 	if [[ $config_iptables = "y" ]]; then
-		_install iptables netfilter-persistent fail2ban
+		_install iptables iptables-persistent netfilter-persistent fail2ban
 		# add rules
 		if ! sudo iptables -t filter -nvL | grep -iE "dpt:22"; then
 			IPTABLES_CMD="sudo iptables -t filter"
