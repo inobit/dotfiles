@@ -80,6 +80,16 @@ return {
           rendered = "  ",
         },
       },
+      checkbox = {
+        custom = {
+          not_planned = {
+            raw = "[~]",
+            rendered = "󰅘 ",
+            highlight = "RenderMarkdownChecked",
+            scope_highlight = "@markup.strikethrough", -- 整行删除线
+          },
+        },
+      },
     },
     ft = { "markdown", "norg", "rmd", "org", vim.g.inobit_filetype, "Avante" },
   },
