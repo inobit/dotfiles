@@ -469,7 +469,7 @@ install_docker() {
 		read -r -p "Rootless Docker? y or n: " rootless
 		if [[ $rootless = "y" ]]; then
 			info "install rootless docker"
-			_install uidmap
+			_install uidmap slirp4netns
 			export DOCKER_BIN="$HOME/.docker-bin"
 			curl -fsSL https://get.docker.com/rootless | sh
 			sudo loginctl enable-linger "$USER" # enable user-level services to run after logout
