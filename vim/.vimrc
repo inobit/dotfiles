@@ -98,10 +98,6 @@ nnoremap <C-l> <C-w>l
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 
-" 分屏
-nnoremap <leader>sp <C-w>s
-nnoremap <leader>vp <C-w>v
-
 " resize
 nnoremap <C-Up> :resize +2<CR>
 nnoremap <C-Down> :resize -2<CR>
@@ -111,6 +107,8 @@ nnoremap <C-Right> :vertical resize +2<CR>
 nnoremap ]t :tabnext<CR>
 nnoremap [t :tabprevious<CR>
 
+nnoremap ]b :bnext<CR>
+nnoremap [b :bprevious<CR>
 
 " Stay in indent mode
 vnoremap < <gv
