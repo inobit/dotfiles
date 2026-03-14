@@ -100,36 +100,58 @@ return {
     config = function(_, opts)
       require("oil-git-status").setup(opts)
 
+      local plugin_namespace = "oil-git-status"
+
       ---@param direction "prev" | "next"
       ---@param signs vim.api.keyset.get_extmark_item[]
       ---@return number | nil
       local function get_next_sign(direction, signs)
-        local next_line = nil
         if not signs or #signs == 0 then
           return nil
         end
+
         local line = vim.fn.line "."
+        local valid_signs = {}
+
         for _, sign in ipairs(signs) do
-          if direction == "prev" then
-            if sign[2] + 1 >= line then
-              return next_line
-            end
-          end
           if
             sign[4].sign_hl_group ~= "OilGitStatusIndexUnmodified"
             and sign[4].sign_hl_group ~= "OilGitStatusWorkingTreeUnmodified"
+            and sign[4].sign_hl_group ~= "OilGitStatusIndexIgnored"
+            and sign[4].sign_hl_group ~= "OilGitStatusWorkingTreeIgnored"
           then
-            next_line = sign[2] + 1
+            table.insert(valid_signs, sign[2] + 1)
           end
+        end
+
+        if #valid_signs == 0 then
+          return nil
+        end
+
+        table.sort(valid_signs)
+
+        for i, sign_line in ipairs(valid_signs) do
           if direction == "next" then
-            if next_line and next_line > line then
-              return next_line
+            if sign_line > line then
+              return sign_line
+            end
+          elseif direction == "prev" then
+            if sign_line >= line then
+              if i > 1 then
+                return valid_signs[i - 1]
+              else
+                return valid_signs[#valid_signs]
+              end
             end
           end
         end
-      end
 
-      local plugin_namespace = "oil-git-status"
+        if direction == "next" then
+          return valid_signs[1]
+        else
+          return valid_signs[#valid_signs]
+        end
+      end
 
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("inobit_oil_next_change", { clear = true }),
