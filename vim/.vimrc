@@ -110,6 +110,16 @@ nnoremap [t :tabprevious<CR>
 nnoremap ]b :bnext<CR>
 nnoremap [b :bprevious<CR>
 
+" file explorer
+nnoremap <expr> - ":Explore " . (empty(expand('%:h')) ? '.' : expand('%:h')) . "\n"
+nnoremap ~ :Explore ~/<CR>
+
+" netrw: press q to close
+augroup NetrwQMapping
+  autocmd!
+  autocmd FileType netrw nnoremap <buffer> q :bd<CR>
+augroup END
+
 " Stay in indent mode
 vnoremap < <gv
 vnoremap > >gv
