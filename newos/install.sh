@@ -47,7 +47,6 @@ _install() {
 # prepare
 prepare() {
 	info "check system"
-	detect_os
 	local support_os=("debian" "ubuntu")
 	if [[ ! ${support_os[*]} =~ $OS ]]; then
 		error "OS $OS is not supported"
@@ -507,6 +506,10 @@ EOF
 			sudo apt-get update
 			info "install the latest version"
 			_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+			_user=$USER
+			info "add $_user to docker group"
+			sudo usermod -aG docker "$_user"
+			info "please logout and login again to make the group take effect"
 			info "root mode docker installed"
 		fi
 
@@ -622,6 +625,7 @@ ch_zsh() {
 
 main() {
 	info "---------- install start ----------"
+	detect_os
 	local current_dir
 	current_dir="$(pwd)"
 	info "entry home dir"
