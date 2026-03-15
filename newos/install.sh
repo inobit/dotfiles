@@ -510,6 +510,11 @@ EOF
 			info "add $_user to docker group"
 			sudo usermod -aG docker "$_user"
 			info "please logout and login again to make the group take effect"
+			info "root docker will auto expose mapped port, you can user DOCKER-USER chain control it: "
+			info "first: reject all from specify eth interface"
+			info ">> iptables -I DOCKER-USER -i eth0 -j DROP"
+			info "then: add allowed port"
+			info ">> iptables -I DOCKER-USER -i eth0 -p tcp --dport 80 -j ACCEPT"
 			info "root mode docker installed"
 		fi
 
