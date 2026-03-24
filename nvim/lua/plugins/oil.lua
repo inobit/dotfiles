@@ -22,13 +22,25 @@ return {
             end
           end,
         },
-        ["gy"] = {
+        ["gY"] = {
           desc = "Oil: Get cursor file/dir's absolute path",
           callback = function()
             local oil = require "oil"
             local current_dir = oil.get_current_dir()
             local name = oil.get_cursor_entry().name
             vim.fn.setreg("+", current_dir .. name)
+          end,
+        },
+        ["gy"] = {
+          desc = "Oil: Get cursor file/dir's relative path",
+          callback = function()
+            local oil = require "oil"
+            local current_dir = oil.get_current_dir()
+            local name = oil.get_cursor_entry().name
+            local full_path = current_dir .. name
+            -- 转换为相对路径
+            local rel_path = vim.fn.fnamemodify(full_path, ":.")
+            vim.fn.setreg("+", rel_path)
           end,
         },
         ["~"] = {
