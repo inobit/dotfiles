@@ -557,6 +557,24 @@ EOF
 	fi
 }
 
+install_gh() {
+	info "install gh (GitHub CLI)"
+	if ! which gh >/dev/null 2>&1; then
+		(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+			&& sudo mkdir -p -m 755 /etc/apt/keyrings \
+			&& out=$(mktemp) && wget -nv -O"$out" https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+			&& cat "$out" | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null \
+			&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+			&& sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+			&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null \
+			&& sudo apt update \
+			&& sudo apt install gh -y
+		info "gh installed"
+	else
+		info "$(gh --version | head -1) is already installed"
+	fi
+}
+
 install_zsh() {
 	info "install zsh"
 	if ! which zsh >/dev/null 2>&1; then
@@ -628,6 +646,30 @@ ch_zsh() {
 	fi
 }
 
+# 函数注册（格式：函数名|描述）
+FUNC_REGISTRY=(
+	"config_locale|配置系统语言环境"
+	"config_timezone|配置系统时区"
+	"config_env_and_alias|配置环境变量和别名"
+	"config_proxy|配置系统代理"
+	"config_ssh_agent|配置 SSH 代理"
+	"config_firewall|配置防火墙规则"
+	"pull_dotfiles|克隆 dotfiles 仓库"
+	"install_git_delta|安装 git-delta"
+	"install_btop|安装 btop 资源监视器"
+	"install_fzf|安装 fzf 模糊搜索"
+	"install_nvim|安装 Neovim 编辑器"
+	"install_tmux|安装 tmux 终端复用器"
+	"install_node_env|安装 Node.js 环境"
+	"install_python_env|安装 Python 环境"
+	"install_rust_env|安装 Rust 环境"
+	"install_docker|安装 Docker 容器"
+	"install_gh|安装 GitHub CLI"
+	"install_zsh|安装 zsh 和插件"
+	"cp_shell_funcs|复制 shell 函数"
+	"ch_zsh|切换默认 shell 为 zsh"
+)
+
 main() {
 	info "---------- install start ----------"
 	detect_os
@@ -635,52 +677,117 @@ main() {
 	current_dir="$(pwd)"
 	info "entry home dir"
 	cd "$HOME"
-	# register all functions
-	functions=(
-		config_locale
-		config_timezone
-		config_env_and_alias
-		config_proxy
-		config_ssh_agent
-		config_firewall
-		pull_dotfiles
-		install_git_delta
-		install_btop
-		install_fzf
-		install_nvim
-		install_tmux
-		install_node_env
-		install_python_env
-		install_rust_env
-		install_docker
-		install_zsh
-		cp_shell_funcs
-		ch_zsh)
 
-	declare -A valid_functions
-	for func in "${functions[@]}"; do
-		valid_functions[$func]=1
+	# 从注册表解析函数名和描述
+	local functions=()
+	declare -A FUNC_DESC
+	for entry in "${FUNC_REGISTRY[@]}"; do
+		local func="${entry%%|*}"
+		local desc="${entry#*|}"
+		functions+=("$func")
+		FUNC_DESC["$func"]="$desc"
 	done
 
+	# 显示函数列表
+	show_menu() {
+		echo ""
+		echo "可用函数列表:"
+		echo "序号  函数名                描述"
+		echo "----  --------------------  ----------------------------------------"
+		for i in "${!functions[@]}"; do
+			local func="${functions[$i]}"
+			local desc="${FUNC_DESC[$func]}"
+			printf "%2d    %-20s  %s\n" "$((i + 1))" "$func" "$desc"
+		done
+		echo ""
+		echo "用法:"
+		echo "  - 输入序号执行对应函数（多个序号用空格分隔，如: 1 3 5）"
+		echo "  - 输入 'all' 执行所有函数"
+		echo "  - 输入 'q' 或 'quit' 退出"
+		echo ""
+	}
+
+	# 解析序号为函数名
+	parse_numbers() {
+		local input="$1"
+		local -a result=()
+		for num in $input; do
+			if [[ "$num" =~ ^[0-9]+$ ]]; then
+				local idx=$((num - 1))
+				if [[ $idx -ge 0 && $idx -lt ${#functions[@]} ]]; then
+					result+=("${functions[$idx]}")
+				else
+					warn "序号 $num 超出范围，忽略"
+				fi
+			else
+				warn "无效序号 '$num'，忽略"
+			fi
+		done
+		echo "${result[@]}"
+	}
+
 	local selected_functions=()
-	if [ $# -eq 0 ]; then
-		selected_functions=("${functions[@]}")
+	local run_prepare=false
+	local other_params=()
+
+	# 先解析所有参数
+	for param in "$@"; do
+		if [[ "$param" == "-p" ]]; then
+			run_prepare=true
+		else
+			other_params+=("$param")
+		fi
+	done
+
+	if [ ${#other_params[@]} -eq 0 ]; then
+		# 无其他参数时显示交互菜单
+		show_menu
+		read -r -p "请输入序号: " user_input
+
+		if [[ "$user_input" == "q" || "$user_input" == "quit" ]]; then
+			info "退出安装"
+			cd "$current_dir"
+			return
+		elif [[ "$user_input" == "all" ]]; then
+			selected_functions=("${functions[@]}")
+		else
+			selected_functions=($(parse_numbers "$user_input"))
+		fi
 	else
-		for param in "$@"; do
-			if [[ -n "${valid_functions[$param]}" ]]; then
+		# 有其他参数时检查是否为数字或函数名
+		for param in "${other_params[@]}"; do
+			if [[ "$param" =~ ^[0-9]+$ ]]; then
+				# 参数是序号
+				local idx=$((param - 1))
+				if [[ $idx -ge 0 && $idx -lt ${#functions[@]} ]]; then
+					selected_functions+=("${functions[$idx]}")
+				else
+					warn "序号 $param 超出范围，忽略"
+				fi
+			elif [[ " ${functions[*]} " == *" $param "* ]]; then
+				# 参数是函数名
 				selected_functions+=("$param")
 			else
-				info "Warning: Unknown function '$param', skipping."
+				warn "未知参数 '$param'，忽略"
 			fi
 		done
 	fi
 
-	if [[ $1 == "-p" ]]; then
+	# 执行 prepare
+	if [[ "$run_prepare" == true ]]; then
 		prepare
 	fi
+
+	if [[ ${#selected_functions[@]} -eq 0 ]]; then
+		warn "未选择任何函数"
+	else
+		info "将执行以下函数: ${selected_functions[*]}"
+	fi
+
 	for func in "${selected_functions[@]}"; do
 		$func
 	done
+
 	cd "$current_dir"
 	info "---------- install end ----------"
 }
