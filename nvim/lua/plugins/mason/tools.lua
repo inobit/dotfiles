@@ -63,8 +63,8 @@ M.linters = {
   "selene", -- lua linter
 }
 
-local enbale_rust_env = not (vim.env.ENABLE_RUST_ENV == "false")
-if enbale_rust_env then
+local enable_rust_env = not (vim.env.ENABLE_RUST_ENV == "false")
+if enable_rust_env then
   M.lsp_servers = vim.list_extend(M.lsp_servers, rust_env.lsps or {})
   M.formatters = vim.list_extend(M.formatters, rust_env.formatters or {})
   M.linters = vim.list_extend(M.linters, rust_env.linters or {})
