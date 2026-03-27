@@ -17,6 +17,8 @@ return {
           require "lib.dap.codelldb"
         elseif vim.bo.filetype == "java" then
           require "lib.dap.java"
+        elseif vim.bo.filetype == "go" then
+          require "lib.dap.go"
         end
         -- run debug
         require("dap").continue()
@@ -52,6 +54,7 @@ return {
     "nvim-neotest/nvim-nio",
     { "theHamsta/nvim-dap-virtual-text", opts = {} },
     "mfussenegger/nvim-dap-python",
+    { "leoluz/nvim-dap-go" }, -- Go debug adapter
     "mason-org/mason.nvim", -- install dap adapter
   },
   config = function()

@@ -408,6 +408,12 @@ return {
               return utils.root_has_file { ".yamllint", ".yamllint.yaml", ".yamllint.yml" }
             end,
           },
+          -- go
+          null_ls.builtins.diagnostics.golangci_lint.with {
+            condition = function(utils)
+              return utils.root_has_file { ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json" }
+            end,
+          },
           -- hover
           {
             name = "dbee_hover",

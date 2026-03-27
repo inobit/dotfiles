@@ -14,6 +14,13 @@ local rust_env = {
   linters = { "bacon" },
 }
 
+---@type mason.Environment
+local go_env = {
+  lsps = { "gopls" },
+  linters = { "golangci-lint" },
+  debugger_adapter = { "delve" },
+}
+
 -- don't add jdtls here, it is configured by nvim-java
 ---@type string[]
 M.lsp_servers = {
@@ -69,6 +76,14 @@ if enable_rust_env then
   M.formatters = vim.list_extend(M.formatters, rust_env.formatters or {})
   M.linters = vim.list_extend(M.linters, rust_env.linters or {})
   M.debugger_adapter = vim.list_extend(M.debugger_adapter, rust_env.debugger_adapter or {})
+end
+
+local enable_go_env = not (vim.env.ENABLE_GO_ENV == "false")
+if enable_go_env then
+  M.lsp_servers = vim.list_extend(M.lsp_servers, go_env.lsps or {})
+  M.formatters = vim.list_extend(M.formatters, go_env.formatters or {})
+  M.linters = vim.list_extend(M.linters, go_env.linters or {})
+  M.debugger_adapter = vim.list_extend(M.debugger_adapter, go_env.debugger_adapter or {})
 end
 
 return M
