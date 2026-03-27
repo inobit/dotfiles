@@ -79,6 +79,7 @@ FZF_VERSION="0.65.2"
 NVIM_VERSION="0.11.4"
 TREE_SITTER_VERSION="0.25.9"
 TMUX_VERSION="3.6"
+GO_VERSION="1.26.1"
 
 # config locale
 config_locale() {
@@ -462,6 +463,26 @@ install_rust_env() {
 	info "rustup installed"
 }
 
+install_go_env() {
+	info "install go"
+	if ! which go >/dev/null 2>&1; then
+		GO_VERSION=${GO_VERSION:-"1.26.1"}
+		local file_name="go${GO_VERSION}.linux-amd64.tar.gz"
+		local full_name="$DOWNLOADS_DIR/$file_name"
+		if [[ ! -f $full_name ]]; then
+			info "downloading $file_name"
+			curl -fSsL -o "$full_name" "https://go.dev/dl/$file_name"
+		fi
+		# Remove any previous Go installation (official instruction)
+		test -d /usr/local/go && sudo rm -rf /usr/local/go
+		# Extract into /usr/local, creating a Go tree in /usr/local/go
+		sudo tar -C /usr/local -xzf "$full_name"
+		info "go installed"
+	else
+		info "$(go version) is already installed"
+	fi
+}
+
 install_docker() {
 	read -r -p "Whether to install docker? y or n: " docker
 	if [[ $docker = "y" ]]; then
@@ -663,6 +684,7 @@ FUNC_REGISTRY=(
 	"install_node_env|安装 Node.js 环境"
 	"install_python_env|安装 Python 环境"
 	"install_rust_env|安装 Rust 环境"
+	"install_go_env|安装 Go 环境"
 	"install_docker|安装 Docker 容器"
 	"install_gh|安装 GitHub CLI"
 	"install_zsh|安装 zsh 和插件"

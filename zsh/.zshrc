@@ -258,6 +258,8 @@ if [[ -d $HOME/.opencode/bin ]]; then
 	esac
 fi
 
+# go
+add_to_path /usr/local/go/bin
 # git function
 
 cherry_pick_to_branch() {
