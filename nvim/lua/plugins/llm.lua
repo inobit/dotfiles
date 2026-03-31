@@ -32,21 +32,6 @@ return {
       local opts = {
         servers = {
           {
-            server = "SiliconFlow",
-            base_url = "https://api.siliconflow.cn/v1/chat/completions",
-            api_key_name = "SILICONFLOW_API_KEY",
-            models = {
-              { model = "Qwen/Qwen2.5-Coder-7B-Instruct", max_tokens = 8192 },
-              { model = "Qwen/Qwen2.5-Coder-32B-Instruct" },
-              { model = "Qwen/Qwen3-235B-A22B" },
-            },
-            stream = true,
-            temperature = 0.6,
-            max_tokens = 4096,
-            multi_round = true,
-            user_role = "user",
-          },
-          {
             server = "OpenRouter",
             base_url = "https://openrouter.ai/api/v1/chat/completions",
             api_key_name = "OPENROUTER_API_KEY",
@@ -59,17 +44,6 @@ return {
               { model = "x-ai/grok-code-fast-1", max_tokens = 8192, temperature = 0.6 },
             },
             max_tokens = 4096,
-            stream = true,
-            multi_round = true,
-            user_role = "user",
-          },
-          {
-            server = "MiniMax",
-            base_url = "https://api.minimax.io/v1/chat/completions",
-            api_key_name = "MINIMAX_API_KEY",
-            models = {
-              { model = "MiniMax-M2", max_tokens = 8192 },
-            },
             stream = true,
             multi_round = true,
             user_role = "user",
