@@ -94,7 +94,7 @@ nmap <leader>rf <Action>(RenameFile)
 command! Fnew :action NewFile
 command! Cnew :action NewClass
 command! Dnew :action NewDir
-command! Connew :action Jdbc.OpenConsole.New
+command! Qnew :action Jdbc.OpenConsole.New
 
 " buffer navigation
 nmap [b <Action>(PreviousTab)
@@ -106,16 +106,9 @@ nmap <leader>bh <Action>(CloseAllToTheLeft)
 nmap <leader>bl <Action>(CloseAllToTheRight)
 nmap <leader>bu <Action>(CloseAllUnmodifiedEditors)
 
-" window navigation
-nmap <leader>tt <Action>(ActivateTerminalToolWindow)
-nmap <leader>te <Action>(ActivateProjectToolWindow)
-nmap <leader>fd <Action>(ActivateDebugToolWindow)
-nmap <leader>fr <Action>(ActivateRunToolWindow)
-nmap <leader>fs <Action>(ActivateStructureToolWindow)
-nmap <leader>fe <Action>(SelectInProjectView)
 
-nmap <leader>uw <Action>(HideActiveWindow)
-nmap <leader>ua <Action>(HideAllWindows)
+nmap <leader>hw <Action>(HideActiveWindow)
+nmap <leader>ha <Action>(HideAllWindows)
 
 " window split
 nmap <leader>sp <Action>(SplitHorizontally)
@@ -142,13 +135,29 @@ nmap <leader>db <Action>(ToggleLineBreakpoint)
 nmap <leader>dc <Action>(AddConditionalBreakpoint)
 nmap <leader>de <Action>(EvaluateExpression)
 
-nmap <leader>rr <Action>(ChooseRunConfiguration)
-nmap <leader>rs <Action>(Stop)
 
-" datagrip
-nmap <leader>rx <Action>(Console.Jdbc.Execute)
-vmap <leader>rx <Action>(Console.Jdbc.Execute)
-nmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
-vmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
-nmap <leader>fm <Action>(Console.Jdbc.ChooseSchema)
+if has('ide')
+  if &ide =~? 'datagrip'
+    " DataGrip 配置
+    nmap <leader>rr <Action>(Console.Jdbc.Execute)
+    vmap <leader>rr <Action>(Console.Jdbc.Execute)
+    nmap <leader>rs <Action>(Console.Jdbc.Cancel)
+    nmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
+    vmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
+    nmap <leader>fe <Action>(ActivateDatabaseToolWindow)
+    nmap <leader>fm <Action>(Console.Jdbc.ChooseSchema)
+  else
+    " IntelliJ IDEA 配置
+    nmap <leader>rr <Action>(ChooseRunConfiguration)
+    nmap <leader>rs <Action>(Stop)
+    " window navigation
+    nmap <leader>ft <Action>(ActivateTerminalToolWindow)
+    nmap <leader>fe <Action>(ActivateProjectToolWindow)
+    nmap <leader>fD <Action>(ActivateDebugToolWindow)
+    nmap <leader>fr <Action>(ActivateRunToolWindow)
+    nmap <leader>fs <Action>(ActivateStructureToolWindow)
+    nmap <leader>fp <Action>(SelectInProjectView)
+  endif
+endif
+
 
