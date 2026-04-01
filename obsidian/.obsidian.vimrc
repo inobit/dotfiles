@@ -170,3 +170,7 @@ nmap <Space>R :relaod<CR>
 
 exmap renametitle obcommand workspace:edit-file-title
 nmap <Space>rf :renametitle<CR>
+
+" github image plugin
+exmap deleteGithubImage obcommand obsidian-github-image-plugin:github-delete-image-under-cursor
+nmap <Space>di :deleteGithubImage<CR>
