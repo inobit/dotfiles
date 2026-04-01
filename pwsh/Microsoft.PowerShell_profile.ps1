@@ -136,3 +136,7 @@ $env:Path = "$env:USERPROFILE\.local\bin;" + $env:Path
 if (Get-Command -Name mihomosh -ErrorAction SilentlyContinue) {
   (& mihomosh shell-completion powershell) | Out-String | Invoke-Expression
 }
+
+# fnm config
+fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
+fnm completions --shell powershell | Out-String | Invoke-Expression
