@@ -17,7 +17,7 @@ config.window_decorations = "RESIZE"
 config.window_padding = {
 	left = 0.,
 	right = 0.,
-	top = 5, -- config with font size and line height
+	top = 0, -- config with font size and line height
 	bottom = 0,
 }
 
@@ -32,7 +32,7 @@ config.initial_rows = 38
 
 -- tab bar
 config.hide_tab_bar_if_only_one_tab = false
-config.tab_bar_at_bottom = true
+config.tab_bar_at_bottom = false
 config.use_fancy_tab_bar = false
 config.tab_and_split_indices_are_zero_based = false
 
