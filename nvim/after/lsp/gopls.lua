@@ -22,7 +22,7 @@ return {
       desc = "Format Go with gopls and organize imports on save",
       callback = function()
         -- organize imports
-        local params = vim.lsp.util.make_range_params()
+        local params = vim.lsp.util.make_range_params(0, "utf-8")
         params.context = { only = { "source.organizeImports" } }
         local result = vim.lsp.buf_request_sync(buf, "textDocument/codeAction", params, 3000)
         for cid, res in pairs(result or {}) do
