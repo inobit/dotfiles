@@ -110,9 +110,9 @@ nnoremap [t :tabprevious<CR>
 nnoremap ]b :bnext<CR>
 nnoremap [b :bprevious<CR>
 
-" file explorer
-nnoremap <expr> - ":Explore " . (empty(expand('%:h')) ? '.' : expand('%:h')) . "\n"
-nnoremap ~ :Explore ~/<CR>
+" file explorer - 静默执行，不显示命令行
+nnoremap <expr> - "<Cmd>Explore " . (empty(expand('%:h')) ? '.' : expand('%:h')) . "<CR>"
+nnoremap ~ <Cmd>Explore ~/<CR>
 
 " netrw: press q to close
 augroup NetrwQMapping
