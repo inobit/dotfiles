@@ -4,6 +4,7 @@ return {
       analyses = {
         unusedparams = true,
         shadow = true,
+        ST1000 = false, -- Incorrect or missing package comment
       },
       staticcheck = true,
       gofumpt = true,
