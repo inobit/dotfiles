@@ -114,8 +114,8 @@ nnoremap [b :bprevious<CR>
 nnoremap <expr> - "<Cmd>Explore " . (empty(expand('%:h')) ? '.' : expand('%:h')) . "<CR>"
 nnoremap ~ <Cmd>Explore ~/<CR>
 
-" netrw: press q to close
-augroup NetrwQMapping
+" 垂直分割线样式（实线，无背景）
+set fillchars+=vert:│
   autocmd!
   autocmd FileType netrw nnoremap <buffer> q :bd<CR>
 augroup END
