@@ -116,8 +116,82 @@ nnoremap ~ <Cmd>Explore ~/<CR>
 
 " 垂直分割线样式（实线，无背景）
 set fillchars+=vert:│
+
+" Netrw Preview (Ctrl+P toggle)
+let g:preview_win = -1
+
+function! IsText(fname)
+  let blob = readfile(a:fname, 'B', 4096)
+  return blob->string() !~# '\%x00'
+endfunction
+
+function! PreviewClose()
+  if g:preview_win > 0 && win_id2win(g:preview_win) > 0
+    call win_execute(g:preview_win, 'close')
+  endif
+  let g:preview_win = -1
+endfunction
+
+function! PreviewUpdate()
+  if g:preview_win <= 0 || win_id2win(g:preview_win) <= 0
+    return
+  endif
+
+  let line = getline('.')
+  if line =~# '^["$/]' || line =~# '^$' | return | endif
+
+  let fname = substitute(line, '^\s*', '', '')
+  let fname = substitute(fname, '\s\+\d.*$', '', '')
+  if fname == '' | return | endif
+
+  let path = b:netrw_curdir . '/' . fname
+  let path = fnamemodify(path, ':p')
+
+  if isdirectory(path)
+    " Remove trailing slash from path to avoid double slashes
+    let clean_path = substitute(path, '/$', '', '')
+    let lines = ['=== Directory: ' . fname . ' ===', ''] + glob(clean_path . '/*', 0, 1)
+  elseif !filereadable(path)
+    let lines = ['=== Cannot read: ' . fname . ' ===']
+  elseif !IsText(path)
+    let lines = ['=== Binary file: ' . fname . ' ===']
+  else
+    let lines = readfile(path, '', 500)
+    if empty(lines) | let lines = ['(empty file)'] | endif
+  endif
+
+  call win_execute(g:preview_win, '%delete _ | call setline(1, ' . string(lines) . ')')
+endfunction
+
+function! PreviewToggle()
+  if g:preview_win > 0 && win_id2win(g:preview_win) > 0
+    " Save cursor position before closing preview
+    let save_pos = getcurpos()
+    call PreviewClose()
+    " Restore cursor position after closing
+    call setpos('.', save_pos)
+  else
+    let save_pos = getcurpos()
+    silent! rightbelow vnew
+    let g:preview_win = win_getid()
+    silent! wincmd p
+    call win_execute(g:preview_win, 'setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted readonly nocursorline nocursorcolumn')
+    call setpos('.', save_pos)
+    call PreviewUpdate()
+  endif
+endfunction
+
+augroup NetrwPreview
   autocmd!
-  autocmd FileType netrw nnoremap <buffer> q :bd<CR>
+  autocmd FileType netrw nnoremap <silent> <buffer> <C-p> <Cmd>call PreviewToggle()<CR>
+  autocmd FileType netrw nnoremap <silent> <buffer> j j<Cmd>call PreviewUpdate()<CR>
+  autocmd FileType netrw nnoremap <silent> <buffer> k k<Cmd>call PreviewUpdate()<CR>
+  autocmd FileType netrw nnoremap <silent> <buffer> <Down> <Down><Cmd>call PreviewUpdate()<CR>
+  autocmd FileType netrw nnoremap <silent> <buffer> <Up> <Up><Cmd>call PreviewUpdate()<CR>
+  autocmd FileType netrw nnoremap <silent> <buffer> q <Cmd>call PreviewClose() <Bar> bd<CR>
+  " netrw statusline：只显示当前目录（带颜色）
+  autocmd FileType netrw setlocal statusline=%#StslineBackColorBG#\ %{getcwd()}
+  autocmd BufLeave * if &filetype == 'netrw' | call PreviewClose() | endif
 augroup END
 
 " Stay in indent mode
