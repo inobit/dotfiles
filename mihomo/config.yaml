@@ -172,58 +172,75 @@ proxy-group-anchor:
     - 🇬🇧 英国
     - 🇬🇧 英国➰
     - 自建
+    - 🧭 Break
+  loose-groups: &loose-groups
+    - 🇭🇰️ 香港
+    - 🇭🇰️ 香港➰
+    - 🇹🇼 台湾
+    - 🇹🇼 台湾➰
+    - 🇯🇵 日本
+    - 🇯🇵 日本➰
+    - 🇸🇬 新加坡
+    - 🇸🇬 新加坡➰
+    - 🇺🇸 美国
+    - 🇺🇸 美国✔️
+    - 🇺🇸 美国➰
+    - 🇬🇧 英国
+    - 🇬🇧 英国➰
+    - 自建
+    - 🧭 Break
     - DIRECT
   ai-groups: &ai-groups
     - 🇺🇸 美国✔️
     - 自建
     - 🇺🇸 美国
 proxy-groups:
-  - name: 🧭 master自动选择
+  - name: 🧭 Break
     <<: *url-test
     filter: (?i)^master
   - name: 🇭🇰️ 香港
     <<: *url-test
-    filter: (?i)^master.*(港|Hong\sKong).*$
+    filter: (?i)^master(?!.*中转).*(港|Hong\sKong).*$
   - name: 🇭🇰️ 香港➰
     <<: *url-test
     filter: (?i)^master.*(港|Hong\sKong)[^|]*$
   - name: 🇹🇼 台湾
     <<: *url-test
-    filter: (?i)^master.*(台|Taiwan).*$
+    filter: (?i)^master(?!.*中转).*(台|Taiwan).*$
   - name: 🇹🇼 台湾➰
     <<: *url-test
     filter: (?i)^master.*(台|Taiwan)[^|]*$
   - name: 🇯🇵 日本
     <<: *url-test
-    filter: (?i)^master.*(日|Japan).*$
+    filter: (?i)^master(?!.*中转).*(日|Japan).*$
   - name: 🇯🇵 日本➰
     <<: *url-test
     filter: (?i)^master.*(日|Japan)[^|]*$
   - name: 🇸🇬 新加坡
     <<: *url-test
-    filter: (?i)^master.*(新|Singapore).*$
+    filter: (?i)^master(?!.*中转).*(新|Singapore).*$
   - name: 🇸🇬 新加坡➰
     <<: *url-test
     filter: (?i)^master.*(新|Singapore).*$
   - name: 🇺🇸 美国
     <<: *url-test
-    filter: (?i)^master.*(美|USA).*$
+    filter: (?i)^master(?!.*中转).*(美|USA).*$
   - name: 🇺🇸 美国✔️
     <<: *url-test
-    filter: (?i)^master.*(美|USA).*(原生).*$
+    filter: (?i)^master(?!.*中转).*(美|USA).*(原生).*$
   - name: 🇺🇸 美国➰
     <<: *url-test
     filter: (?i)^master.*(美|USA)[^|]*$
   - name: 🇬🇧 英国
     <<: *url-test
-    filter: (?i)^master.*(英|UK).*$
+    filter: (?i)^master(?!.*中转).*(英|UK).*$
   - name: 🇬🇧 英国➰
     <<: *url-test
     filter: (?i)^master.*(英|UK)[^|]*$
   - name: Microsoft
     type: select
     icon: https://www.clashverge.dev/assets/icons/microsoft.svg
-    proxies: *std-groups
+    proxies: *loose-groups
   - name: Steam
     type: select
     icon: https://www.clashverge.dev/assets/icons/steam.svg
@@ -231,7 +248,7 @@ proxy-groups:
   - name: Video
     type: select
     icon: https://www.clashverge.dev/assets/icons/netflix.svg
-    proxies: *std-groups
+    proxies: *loose-groups
   - name: Github
     <<: *fallback
     icon: https://www.clashverge.dev/assets/icons/github.svg
@@ -276,7 +293,7 @@ proxy-groups:
     include-all: true
     filter: hotfree
   - name: Master
-    <<: *fallback
+    type: select
     icon: https://www.clashverge.dev/assets/icons/speed.svg
     proxies: *std-groups
     include-all: true
