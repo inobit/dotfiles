@@ -9,7 +9,7 @@ return {
       -- show progress bar, notification, etc.
       { "j-hui/fidget.nvim", opts = {} },
       -- signatures reinforce
-      "ray-x/lsp_signature.nvim",
+      -- "ray-x/lsp_signature.nvim",
     },
     init = function()
       local lsp_servers = require("plugins.mason.tools").lsp_servers
@@ -141,23 +141,23 @@ return {
               end,
             })
           end
-          require("lsp_signature").on_attach({
-            hint_enable = false,
-            handler_opts = { border = "none" },
-            -- 忽略正常的 LSP 并发错误 (LSP 规范建议客户端不应显示这些错误)
-            ignore_error = function(err, ctx, config)
-              if not err then return false end
-              -- ContentModified: 文档在请求期间被修改
-              -- ServerCancelled: 服务器取消请求
-              -- RequestCancelled: 请求被取消
-              local ignored_codes = {
-                [-32801] = true, -- ContentModified
-                [-32802] = true, -- ServerCancelled
-                [-32800] = true, -- RequestCancelled
-              }
-              return ignored_codes[err.code] or false
-            end,
-          }, event.buf)
+          -- require("lsp_signature").on_attach({
+          --   hint_enable = false,
+          --   handler_opts = { border = "none" },
+          --   -- 忽略正常的 LSP 并发错误 (LSP 规范建议客户端不应显示这些错误)
+          --   ignore_error = function(err, ctx, config)
+          --     if not err then return false end
+          --     -- ContentModified: 文档在请求期间被修改
+          --     -- ServerCancelled: 服务器取消请求
+          --     -- RequestCancelled: 请求被取消
+          --     local ignored_codes = {
+          --       [-32801] = true, -- ContentModified
+          --       [-32802] = true, -- ServerCancelled
+          --       [-32800] = true, -- RequestCancelled
+          --     }
+          --     return ignored_codes[err.code] or false
+          --   end,
+          -- }, event.buf)
         end,
       })
     end,
