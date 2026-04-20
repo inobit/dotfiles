@@ -174,3 +174,15 @@ nmap <Space>rf :renametitle<CR>
 " github image plugin
 exmap deleteGithubImage obcommand obsidian-github-image-plugin:github-delete-image-under-cursor
 nmap <Space>di :deleteGithubImage<CR>
+
+# nav plugin
+exmap navPrev obcommand obsidian-sidebar-nav-plugin:nav-prev
+exmap navNext obcommand obsidian-sidebar-nav-plugin:nav-next
+nmap [q :navPrev<CR>
+nmap ]q :navNext<CR>
+
+exmap navPrevSibling obcommand obsidian-sidebar-nav-plugin:nav-prev-sibling
+exmap navNextSibling obcommand obsidian-sidebar-nav-plugin:nav-next-sibling
+nmap [{ :navPrevSibling<CR>
+nmap ]} :navNextSibling<CR>
+
