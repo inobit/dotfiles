@@ -26,7 +26,7 @@ vim.g.ai_inline_completion_engine = vim.env.AI_INLINE_COMPLETION_ENGINE or "supe
 -- windows
 -- @echo off
 -- "C:\Windows\System32\curl.exe" --no-buffer %*
-vim.g.plenary_curl_bin_path = vim.fn.expand(vim.env.CURL_BIN_PATH or "~/.local/bin/mycurl") -- use --no-buffer
+vim.g.plenary_curl_bin_path = vim.fn.expand(vim.env.CURL_BIN_PATH or "curl") -- use --no-buffer
 
 -- set self-build DeepLX
 vim.g.my_deeplx = vim.env.USE_DEEPLX == "true" or false
