@@ -40,6 +40,16 @@ Remove-PSReadLineKeyHandler -Chord Ctrl+SpaceBar
 Set-Alias vim nvim
 Set-Alias grep findstr
 
+
+# git alias
+function gsb { git status --short --branch @args }
+function gss { git status --short @args }
+function gsb { git status  @args }
+function glog { git log --oneline --decorate --graph @args }
+function glg { git log --stat }
+function gpp { git push }
+function gll { git pull }
+
 # wezterm
 if (Get-Command -Name "wezterm" -ErrorAction SilentlyContinue) {
   Set-Alias wz wezterm
