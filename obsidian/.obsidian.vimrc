@@ -175,7 +175,7 @@ nmap <Space>rf :renametitle<CR>
 exmap deleteGithubImage obcommand obsidian-github-image-plugin:github-delete-image-under-cursor
 nmap <Space>di :deleteGithubImage<CR>
 
-# nav plugin
+" nav plugin
 exmap navPrev obcommand obsidian-sidebar-nav-plugin:nav-prev
 exmap navNext obcommand obsidian-sidebar-nav-plugin:nav-next
 nmap [q :navPrev<CR>
