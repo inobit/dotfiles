@@ -64,6 +64,10 @@ config.colors = {
 	selection_fg = "white",
 }
 
+-- ssh
+config.mux_enable_ssh_agent = false
+config.ssh_backend = "LibSsh"
+
 -- keybindings
 config.leader = { key = "Space", mods = mod.SUPER, timeout_milliseconds = 1000 }
 config.keys = {
