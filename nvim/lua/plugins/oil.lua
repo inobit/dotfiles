@@ -165,34 +165,59 @@ return {
         end
       end
 
-      vim.api.nvim_create_autocmd("FileType", {
-        group = vim.api.nvim_create_augroup("inobit_oil_next_change", { clear = true }),
-        pattern = { "oil" },
-        callback = function(context)
-          local bufnr = context.buf
-          local git_signs = { signs = {} }
-          vim.keymap.set("n", "]c", function()
-            local next_line = get_next_sign("next", git_signs.signs)
-            if next_line then
-              vim.api.nvim_win_set_cursor(0, { next_line, 0 })
-            end
-          end, { buffer = bufnr, desc = "Oil: Go to next change" })
-          vim.keymap.set("n", "[c", function()
-            local next_line = get_next_sign("prev", git_signs.signs)
-            if next_line then
-              vim.api.nvim_win_set_cursor(0, { next_line, 0 })
-            end
-          end, { buffer = bufnr, desc = "Oil: Go to prev change" })
+      local git_signs = { signs = {} }
 
-          vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
-            buffer = bufnr,
-            group = vim.api.nvim_create_augroup("inobit_oil_refresh_signs", { clear = true }),
-            callback = function()
-              local namespace = vim.api.nvim_get_namespaces()[plugin_namespace]
-              git_signs.signs =
-                vim.api.nvim_buf_get_extmarks(bufnr, namespace, 0, -1, { hl_name = true, details = true })
-            end,
-          })
+      local function refresh_signs(bufnr)
+        local namespace = vim.api.nvim_get_namespaces()[plugin_namespace]
+        if namespace then
+          git_signs.signs =
+            vim.api.nvim_buf_get_extmarks(bufnr, namespace, 0, -1, { hl_name = true, details = true })
+        end
+      end
+
+      local function setup_keymaps(bufnr)
+        vim.keymap.set("n", "]c", function()
+          if #git_signs.signs == 0 then
+            refresh_signs(bufnr)
+          end
+          local next_line = get_next_sign("next", git_signs.signs)
+          if next_line then
+            vim.api.nvim_win_set_cursor(0, { next_line, 0 })
+          end
+        end, { buffer = bufnr, desc = "Oil: Go to next change" })
+        vim.keymap.set("n", "[c", function()
+          if #git_signs.signs == 0 then
+            refresh_signs(bufnr)
+          end
+          local next_line = get_next_sign("prev", git_signs.signs)
+          if next_line then
+            vim.api.nvim_win_set_cursor(0, { next_line, 0 })
+          end
+        end, { buffer = bufnr, desc = "Oil: Go to prev change" })
+      end
+
+      vim.api.nvim_create_autocmd("User", {
+        group = vim.api.nvim_create_augroup("inobit_oil_change", { clear = true }),
+        pattern = "OilEnter",
+        callback = function(args)
+          local bufnr = args.data.buf
+          setup_keymaps(bufnr)
+          vim.defer_fn(function()
+            refresh_signs(bufnr)
+          end, 100)
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("User", {
+        group = vim.api.nvim_create_augroup("inobit_oil_refresh", { clear = true }),
+        pattern = "OilMutationComplete",
+        callback = function()
+          local bufnr = vim.api.nvim_get_current_buf()
+          if vim.bo[bufnr].filetype == "oil" then
+            vim.defer_fn(function()
+              refresh_signs(bufnr)
+            end, 100)
+          end
         end,
       })
     end,
