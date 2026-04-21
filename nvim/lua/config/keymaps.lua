@@ -94,11 +94,26 @@ end, { desc = "show messages in current cursor" })
 
 if vim.env.TMUX then
   vim.keymap.set("n", "<C-l>", function()
-    local out = vim.system({ "tmux", "list-panes", "-F", "#F" }, { text = true }):wait()
+    local target_pane = vim.v.count == 0 and 2 or vim.v.count
+    local out = vim
+      .system({ "tmux", "list-panes", "-F", "#{pane_index},#{window_zoomed_flag},#{pane_current_command}" }, { text = true })
+      :wait()
     if out.stdout then
-      local _, count = string.gsub(out.stdout, "*", "")
-      if count > 1 and not out.stdout:match "Z" then
-        require("lib.run").run("clear", { stdout = false })
+      local pane_count = 0
+      local pane_is_shell = false
+      local window_zoomed = false
+      for line in out.stdout:gmatch "[^\n]+" do
+        pane_count = pane_count + 1
+        local idx, zoomed_flag, cmd = line:match "^(%d+),(%d+),(.+)$"
+        if idx then
+          window_zoomed = window_zoomed or zoomed_flag == "1"
+          if tonumber(idx) == target_pane then
+            pane_is_shell = cmd == "zsh" or cmd == "bash" or cmd == "sh" or cmd == "fish"
+          end
+        end
+      end
+      if pane_count > 1 and not window_zoomed and pane_is_shell then
+        require("lib.run").run("clear", { stdout = false }, target_pane)
       else
         vim.cmd "wincmd l"
       end
