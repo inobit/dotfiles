@@ -54,7 +54,7 @@ return {
             api_key_name = "NVIDIA_API_KEY",
             models = {
               { model = "minimaxai/minimax-m2.7", max_tokens = 8192, temperature = 0.6 },
-              { model = "z-ai/glm4.7", max_tokens = 8192, temperature = 0.6 },
+              { model = "z-ai/glm5", max_tokens = 8192, temperature = 0.6 },
             },
             temperature = 1,
             stream = true,
@@ -62,7 +62,7 @@ return {
             user_role = "user",
           },
         },
-        default_server = "nvidia@minimaxai/minimax-m2.7",
+        default_server = "nvidia@z-ai/glm5",
         default_translate_server = vim.g.my_deeplx and "DeepL@DeepLX" or "OpenRouter@google/gemini-2.0-flash-001",
         user_prompt = "~",
         chat_layout = "vsplit",
