@@ -1,6 +1,6 @@
 return {
   {
-    url = "https://gitee.com/inobit/llm.nvim.git",
+    "inobit/llm.nvim",
     dev = vim.env.MY_LLM_DEV == "true",
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -53,7 +53,7 @@ return {
             base_url = "https://integrate.api.nvidia.com/v1/chat/completions",
             api_key_name = "NVIDIA_API_KEY",
             models = {
-              { model = "minimaxai/minimax-m2", max_tokens = 8192, temperature = 0.6 },
+              { model = "minimaxai/minimax-m2.7", max_tokens = 8192, temperature = 0.6 },
               { model = "z-ai/glm4.7", max_tokens = 8192, temperature = 0.6 },
             },
             temperature = 1,
@@ -62,9 +62,13 @@ return {
             user_role = "user",
           },
         },
-        default_server = "nvidia@minimaxai/minimax-m2",
+        default_server = "nvidia@minimaxai/minimax-m2.7",
         default_translate_server = vim.g.my_deeplx and "DeepL@DeepLX" or "OpenRouter@google/gemini-2.0-flash-001",
         user_prompt = "~",
+        chat_layout = "vsplit",
+        vsplit_win = {
+          width_percentage = 0.35, -- Width of the chat panel (0.2 - 0.7)
+        },
       }
       if vim.g.my_deeplx then
         table.insert(opts.servers, {
