@@ -1,7 +1,7 @@
 ﻿#Requires AutoHotkey v2.0
 #SingleInstance Force
 
-apps := ["ahk_exe chrome.exe", "ahk_exe datagrip64.exe", "ahk_exe idea64.exe"]
+apps := ["ahk_exe chrome.exe", "ahk_exe datagrip64.exe", "ahk_exe idea64.exe", "ahk_exe Obsidian.exe"]
 
 for (app in apps) {
      HotIfWinActive(app)
@@ -10,7 +10,8 @@ for (app in apps) {
 }
 
 #HotIf WinActive("ahk_exe Obsidian.exe")
-^f::Right
+^l::Right
+^h::Left
 #HotIf
 
 ^!p::Run("wezterm-gui.exe")
