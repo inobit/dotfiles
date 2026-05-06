@@ -1,3 +1,6 @@
+-- disable list
+vim.opt_local.list = false
+
 local function get_root_dir()
   return require("lib.utils").get_root_dir(0, "go.mod")
 end
