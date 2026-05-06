@@ -85,8 +85,9 @@ function M.apply_theme()
 
   for _, h in ipairs(handlers) do
     if h.match(theme) then
-      -- 有些主题会修改 background 变量，使用applying避免递归调用
       h.apply(theme)
+      -- force reload colorscheme
+      vim.cmd.doautocmd "ColorScheme"
       break
     end
   end
