@@ -91,6 +91,6 @@ return {
         },
       },
     },
-    ft = { "markdown", "norg", "rmd", "org", vim.g.inobit_filetype, "Avante" },
+    ft = { "markdown", "norg", "rmd", "org", "inobit" },
   },
 }
