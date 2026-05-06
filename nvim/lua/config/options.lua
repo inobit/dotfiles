@@ -7,9 +7,6 @@ vim.g.loaded_netrwPlugin = 1
 -- optionally enable 24-bit colour
 vim.opt.termguicolors = true
 
--- custom filetype
-vim.g.inobit_filetype = "inobit"
-
 -- :h hidden 允许隐藏buffer(toggleterm plugin)
 vim.opt.hidden = true
 
