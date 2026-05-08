@@ -68,21 +68,38 @@ function M.run(command, opts, target_pane)
       target_pane = vim.v.count == 0 and 2 or vim.v.count
     end
     -- test if pane exists and active
-    local panes = vim
-      .system({ "tmux", "list-panes", "-F", "#{pane_index},#{window_zoomed_flag}" }, { text = true })
+    local out = vim
+      .system({ "tmux", "list-panes", "-F", "#{pane_index},#{window_zoomed_flag},#{pane_current_command}" }, { text = true })
       :wait()
-    if panes.stdout:match(target_pane .. ",0") then
-      if opts and opts.cwd then
-        command_str = "cd " .. opts.cwd .. " && " .. command_str
+    if out.stdout then
+      local pane_count = 0
+      local pane_is_shell = false
+      local window_zoomed = false
+      for line in out.stdout:gmatch "[^\n]+" do
+        pane_count = pane_count + 1
+        local idx, zoomed_flag, cmd = line:match "^(%d+),(%d+),(.+)$"
+        if idx then
+          window_zoomed = window_zoomed or zoomed_flag == "1"
+          if tonumber(idx) == target_pane then
+            pane_is_shell = cmd == "zsh" or cmd == "bash" or cmd == "sh" or cmd == "fish"
+          end
+        end
       end
-      vim.system({
-        "tmux",
-        "send",
-        "-t",
-        tostring(target_pane),
-        command_str --[[@as string]],
-        "Enter",
-      }, { text = true })
+      if pane_count > 1 and not window_zoomed and pane_is_shell then
+        if opts and opts.cwd then
+          command_str = "cd " .. opts.cwd .. " && " .. command_str
+        end
+        vim.system({
+          "tmux",
+          "send",
+          "-t",
+          tostring(target_pane),
+          command_str --[[@as string]],
+          "Enter",
+        }, { text = true })
+      else
+        run_local(command_tbl --[=[@as string[]]=], opts)
+      end
     else
       run_local(command_tbl --[=[@as string[]]=], opts)
     end
