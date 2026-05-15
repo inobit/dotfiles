@@ -7,8 +7,11 @@ local function handle_output(out)
       vim.notify(out.stderr, vim.log.levels.ERROR)
     end
   else
-    if out.stdout then
+    if out.stdout and out.stdout ~= "" then
       vim.notify(out.stdout, vim.log.levels.INFO)
+    end
+    if out.stderr and out.stderr ~= "" then
+      vim.notify(out.stderr, vim.log.levels.ERROR)
     end
   end
 end
