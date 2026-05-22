@@ -40,9 +40,9 @@ exmap vs obcommand workspace:split-vertical
 " Go back and forward with Ctrl+O and Ctrl+I
 " (make sure to remove default Obsidian shortcuts for these to work)
 exmap back obcommand app:go-back
-nmap <C-o> :back<CR>
+nmap <Space>H :back<CR>
 exmap forward obcommand app:go-forward
-nmap <C-i> :forward<CR>
+nmap <Space>L :forward<CR>
 
 " fold
 exmap togglefold obcommand editor:toggle-fold
