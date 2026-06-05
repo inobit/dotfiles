@@ -46,6 +46,9 @@ return {
     { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "Debug: toggle breakpoint", },
     { "<leader>do", function() require("dap").set_breakpoint(nil, nil, vim.fn.input "Log point message: ") end, desc = "Debug: set log breakpoint", },
     { "<leader>dc", function() require("dap").set_breakpoint(vim.fn.input "Condition: ", nil, nil) end, desc = "Debug: set condition breakpoint", },
+    -- fzf
+    { "<leader>sdb", "<cmd>FzfLua dap_breakpoints<cr>", desc = "Debug: Breakpoints" },
+    { "<leader>sdc", "<cmd>FzfLua dap_commands<cr>", desc = "Debug: Commands" },
     -- stylua: ignore end
   },
   dependencies = {

@@ -37,30 +37,31 @@ return {
             end
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
           end
+          -- stylua: ignore start
           --  To jump back, press <C-t>.
-          map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+          map("gd", function() require("fzf-lua").lsp_definitions() end, "[G]oto [D]efinition")
           -- Find references for the word under your cursor.
-          map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+          map("gr", function() require("fzf-lua").lsp_references() end, "[G]oto [R]eferences")
           -- Jump to the implementation of the word under your cursor. Useful when your language has ways of declaring types without an actual implementation.
-          map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+          map("gI", function() require("fzf-lua").lsp_implementations() end, "[G]oto [I]mplementation")
           -- Jump to the type of the word under your cursor.
-          --  Useful when you're not sure what type a variable is and you want to see
-          --  the definition of its *type*, not where it was *defined*.
-          map("gT", require("telescope.builtin").lsp_type_definitions, "[G]oto [T]ype Definition")
-          -- Fuzzy find all the symbols in your current document.
-          --  Symbols are things like variables, functions, types, etc.
-          map("gs", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-          -- Fuzzy find all the symbols in your current workspace
-          --  Similar to document symbols, except searches over your whole project.
-          map("gS", require("telescope.builtin").lsp_workspace_symbols, "[W]orkspace [S]ymbols")
-          -- quickfix
-          map("<leader>gq", require("telescope.builtin").quickfix, "[Q]uickfix")
+          map("gT", function() require("fzf-lua").lsp_typedefs() end, "[G]oto [T]ype Definition")
+          -- super
+          map("gs", function() require("fzf-lua").lsp_type_super() end, "[G]oto [S]uper Types")
+          -- sub
+          map("gS", function() require("fzf-lua").lsp_type_sub() end, "[G]oto [S]ub Types")
+          -- incoming calls
+          map("gci", function() require("fzf-lua").lsp_incoming_calls() end, "[g]oto [c]alling calls")
+          -- outgoing calls
+          map("gco", function() require("fzf-lua").lsp_outgoing_calls() end, "[g]oto [c]alling calls")
 
-          map("gq", vim.lsp.buf.format, "[F]ormat")
 
-          map("<C-M-f>", vim.lsp.buf.format, "[F]ormat", { "n", "i", "v" })
 
-          -- Rename the variable under your cursor
+          map("gq", vim.lsp.buf.format, "[f]ormat")
+
+          map("<c-m-f>", vim.lsp.buf.format, "[f]ormat", { "n", "i", "v" })
+
+          -- rename the variable under your cursor
           --  Most Language Servers support renaming across files, etc.
           map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
           -- Execute a code action, usually your cursor needs to be on top of an error
@@ -80,6 +81,7 @@ return {
           map("<leader>K", vim.lsp.buf.signature_help, "Hover Signature")
           map("<c-K>", vim.lsp.buf.signature_help, "Hover Signature", "i")
           map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+          -- stylua: ignore end
 
           -- Diagnostic settings
           -- Diagnostic keymaps

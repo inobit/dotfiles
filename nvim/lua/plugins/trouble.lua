@@ -40,18 +40,18 @@ return {
   cmd = "Trouble",
   keys = {
     {
-      "<leader>ew",
+      "<leader>xe",
       "<cmd>Trouble diagnostics toggle<cr>",
       desc = "Diagnostics (Trouble)",
     },
     {
-      "<leader>eb",
+      "<leader>xE",
       "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
       desc = "Buffer Diagnostics (Trouble)",
     },
     {
-      "<leader>xa",
-      "<cmd>Trouble diagnostics toggle<cr>",
+      "<leader>xq",
+      "<cmd>Trouble close<cr>",
       desc = "Diagnostics (Trouble)",
     },
     {
@@ -75,7 +75,7 @@ return {
       desc = "Location List (Trouble)",
     },
     {
-      "<leader>xq",
+      "<leader>xQ",
       "<cmd>Trouble qflist toggle<cr>",
       desc = "Quickfix List (Trouble)",
     },
