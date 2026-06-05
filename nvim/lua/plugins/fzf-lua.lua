@@ -6,6 +6,18 @@ return {
     local config = fzf.config
     local actions = fzf.actions
 
+    -- Allow q to close fzf-lua in terminal-normal mode (C-\ C-n)
+    -- Does NOT block typing q in the search box
+    vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("fzf-lua-q-close", { clear = true }),
+      pattern = "fzf",
+      callback = function(args)
+        vim.keymap.set("n", "q", function()
+          fzf.hide()
+        end, { buffer = args.buf, silent = true })
+      end,
+    })
+
     -- Quickfix
     config.defaults.keymap.fzf["ctrl-y"] = "select-all+accept"
     config.defaults.keymap.fzf["ctrl-u"] = "half-page-up"

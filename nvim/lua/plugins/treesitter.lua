@@ -1,150 +1,204 @@
-return { -- Highlight, edit, and navigate code
-  "nvim-treesitter/nvim-treesitter",
-  event = { "BufReadPost", "BufWritePost", "BufNewFile", "VeryLazy" },
-  build = ":TSUpdate",
-  dependencies = {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    "windwp/nvim-ts-autotag",
-    {
-      "andymass/vim-matchup",
-      opts = {
-        treesitter = {
-          stopline = 500,
-        },
+return {
+  { -- Highlight, edit, and navigate code
+    "nvim-treesitter/nvim-treesitter",
+    branch = "main",
+    event = { "BufReadPost", "BufWritePost", "BufNewFile" },
+    cmd = { "TSUpdate", "TSInstall", "TSLog", "TSUninstall" },
+    opts_extend = { "ensure_installed" },
+    build = function()
+      require("nvim-treesitter").update(nil, { summary = true })
+    end,
+    opts = {
+      ensure_installed = {
+        "bash",
+        "cpp",
+        "css",
+        "diff",
+        "go",
+        "gomod",
+        "gosum",
+        "gowork",
+        "html",
+        "javascript",
+        "json",
+        "jsonc",
+        "json5",
+        "lua",
+        "luadoc",
+        "luap",
+        "markdown",
+        "markdown_inline",
+        "python",
+        "query",
+        "regex",
+        "toml",
+        "tsx",
+        "typescript",
+        "vim",
+        "vimdoc",
+        "xml",
+        "yaml",
+        "dockerfile",
+        "latex",
+        "git_config",
+        "git_rebase",
+        "gitattributes",
+        "gitcommit",
+        "gitignore",
+        "java",
+        "rust",
+        "ron", -- rust object notation
       },
+      auto_install = true,
+      highlight = { enable = true },
+      indent = { enable = true },
     },
+    config = function(_, opts)
+      local TS = require "nvim-treesitter"
+
+      -- Setup treesitter (install_dir etc.)
+      TS.setup(opts)
+
+      -- Helper: check if a parser is installed
+      local function have_parser(lang)
+        local installed = TS.get_installed "parsers"
+        return vim.tbl_contains(installed, lang)
+      end
+
+      -- Install missing parsers from ensure_installed list
+      local install = vim.tbl_filter(function(lang)
+        return not have_parser(lang)
+      end, opts.ensure_installed or {})
+      if #install > 0 then
+        TS.install(install, { summary = true })
+      end
+
+      -- FileType autocommand for enabling features per filetype
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("user_treesitter_filetype", { clear = true }),
+        callback = function(ev)
+          local lang = vim.treesitter.language.get_lang(ev.match)
+
+          -- Enabled only for configured lang
+          if not vim.tbl_contains(opts.ensure_installed or {}, lang) then
+            return
+          end
+
+          -- Auto-install missing parser (best-effort, needs reload after install)
+          if opts.auto_install and not have_parser(lang) then
+            TS.install(lang, { summary = false })
+            return
+          end
+
+          -- Highlighting (provided by Neovim)
+          if opts.highlight and opts.highlight.enable ~= false then
+            pcall(vim.treesitter.start, ev.buf)
+          end
+
+          -- Indentation (provided by nvim-treesitter, experimental)
+          if opts.indent and opts.indent.enable ~= false then
+            vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
+    end,
   },
-  opts = {
-    ensure_installed = {
-      "bash",
-      "cpp",
-      "css",
-      "diff",
-      "go",
-      "gomod",
-      "gosum",
-      "gowork",
-      "html",
-      "javascript",
-      "json",
-      "jsonc",
-      "json5",
-      "lua",
-      "luadoc",
-      "luap",
-      "markdown",
-      "markdown_inline",
-      "python",
-      "query",
-      "regex",
-      "toml",
-      "tsx",
-      "typescript",
-      "vim",
-      "vimdoc",
-      "xml",
-      "yaml",
-      "dockerfile",
-      "latex", -- need npm install -g tree-sitter-cli
-      "git_config",
-      "git_rebase",
-      "gitattributes",
-      "gitcommit",
-      "gitignore",
-      "java",
-      "rust",
-      "ron", --rust object notation
-    },
-    -- Autoinstall languages that are not installed
-    auto_install = true,
-    highlight = { enable = true },
-    indent = { enable = true },
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        node_incremental = "v",
-        node_decremental = "<leader>v",
-      },
-    },
-    textobjects = {
-      select = {
-        enable = true,
-        -- Automatically jump forward to textobj, similar to targets.vim
-        lookahead = true,
-        keymaps = {
-          -- You can use the capture groups defined in textobjects.scm
-          ["aa"] = {
-            query = "@parameter.outer",
-            desc = "Select outer part of a function parameter",
-          },
-          ["ia"] = {
-            query = "@parameter.inner",
-            desc = "Select inner part of a function parameter",
-          },
-          ["af"] = {
-            query = "@function.outer",
-            desc = "Select outer part of a function region",
-          },
-          ["if"] = {
-            query = "@function.inner",
-            desc = "Select inner part of a function region",
-          },
-          ["as"] = {
-            query = "@class.outer",
-            desc = "Select inner part of a class region",
-          },
-          ["is"] = {
-            query = "@class.inner",
-            desc = "Select inner part of a class region",
-          },
-          ["ac"] = {
-            query = "@comment.outer",
-            desc = "Select inner part of a comment region",
-          },
-          ["ic"] = {
-            query = "@comment.inner",
-            desc = "select inner part of a comment region",
-          },
-        },
-        -- you can choose the select mode (default is charwise 'v')
-        --
-        -- can also be a function which gets passed a table with the keys
-        -- * query_string: eg '@function.inner'
-        -- * method: eg 'v' or 'o'
-        -- and should return the mode ('v', 'v', or '<c-v>') or a table
-        -- mapping query_strings to modes.
-        selection_modes = {
-          ["@parameter.outer"] = "v", -- charwise
-          ["@function.outer"] = "v", -- linewise
-          ["@class.outer"] = "<c-v>", -- blockwise
-        },
-        -- If you set this to `true` (default is `false`) then any textobject is
-        -- extended to include preceding or succeeding whitespace. Succeeding
-        -- whitespace has priority in order to act similarly to eg the built-in
-        -- `ap`.
-        --
-        -- Can also be a function which gets passed a table with the keys
-        -- * query_string: eg '@function.inner'
-        -- * selection_mode: eg 'v'
-        -- and should return true or false
-        include_surrounding_whitespace = false,
-      },
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    branch = "main",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {
       move = {
         enable = true,
         set_jumps = true,
-        goto_next_start = { ["]f"] = "@function.outer", ["]s"] = "@class.outer", ["]a"] = "@parameter.inner" },
-        goto_next_end = { ["]F"] = "@function.outer", ["]S"] = "@class.outer", ["]A"] = "@parameter.inner" },
-        goto_previous_start = { ["[f"] = "@function.outer", ["[s"] = "@class.outer", ["[a"] = "@parameter.inner" },
-        goto_previous_end = { ["[F"] = "@function.outer", ["[S"] = "@class.outer", ["[A"] = "@parameter.inner" },
+      },
+      select = {
+        enable = true,
+        lookahead = true,
+        selection_modes = {
+          ["@function.outer"] = "V",
+          ["@parameter.outer"] = "v",
+        },
+      },
+      keys = {
+        f = "@function",
+        s = "@class",
+        a = "@parameter",
       },
     },
-    autotag = {
-      enable = true,
-    },
+    config = function(_, opts)
+      require("nvim-treesitter-textobjects").setup(opts)
+
+      local function have_parser(lang)
+        local parsers = vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", true)
+        return #parsers > 0
+      end
+
+      local function name_of(query_base)
+        local name = query_base:gsub("^@", "")
+        return name:sub(1, 1):upper() .. name:sub(2)
+      end
+
+      local function attach(buf)
+        local ft = vim.bo[buf].filetype
+        if not have_parser(ft) then
+          return
+        end
+
+        -- move: ]f / [f / ]F / [F
+        if opts.move and opts.move.enable then
+          for short, base in pairs(opts.keys or {}) do
+            local outer = base .. ".outer"
+            local name = name_of(base)
+
+            vim.keymap.set({ "n", "x", "o" }, "]" .. short, function()
+              require("nvim-treesitter-textobjects.move").goto_next_start(outer, "textobjects")
+            end, { buffer = buf, desc = "Next " .. name .. " Start", silent = true })
+
+            vim.keymap.set({ "n", "x", "o" }, "]" .. short:upper(), function()
+              require("nvim-treesitter-textobjects.move").goto_next_end(outer, "textobjects")
+            end, { buffer = buf, desc = "Next " .. name .. " End", silent = true })
+
+            vim.keymap.set({ "n", "x", "o" }, "[" .. short, function()
+              require("nvim-treesitter-textobjects.move").goto_previous_start(outer, "textobjects")
+            end, { buffer = buf, desc = "Prev " .. name .. " Start", silent = true })
+
+            vim.keymap.set({ "n", "x", "o" }, "[" .. short:upper(), function()
+              require("nvim-treesitter-textobjects.move").goto_previous_end(outer, "textobjects")
+            end, { buffer = buf, desc = "Prev " .. name .. " End", silent = true })
+          end
+        end
+
+        -- select: af / if
+        if opts.select and opts.select.enable then
+          for short, base in pairs(opts.keys or {}) do
+            local outer = base .. ".outer"
+            local inner = base .. ".inner"
+            local name = name_of(base)
+
+            vim.keymap.set({ "x", "o" }, "a" .. short, function()
+              require("nvim-treesitter-textobjects.select").select_textobject(outer, "textobjects")
+            end, { buffer = buf, desc = "Around " .. name, silent = true })
+
+            vim.keymap.set({ "x", "o" }, "i" .. short, function()
+              require("nvim-treesitter-textobjects.select").select_textobject(inner, "textobjects")
+            end, { buffer = buf, desc = "Inner " .. name, silent = true })
+          end
+        end
+      end
+
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("user_treesitter_textobjects", { clear = true }),
+        callback = function(ev)
+          attach(ev.buf)
+        end,
+      })
+      vim.tbl_map(attach, vim.api.nvim_list_bufs())
+    end,
   },
-  config = function(_, opts)
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    ---@diagnostic disable-next-line: missing-fields
-    require("nvim-treesitter.configs").setup(opts)
-  end,
+  {
+    "windwp/nvim-ts-autotag",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {},
+  },
 }

@@ -20,15 +20,6 @@ vim.g.obsidian_vault = vim.fn.expand(vim.env.OBSIDIAN_VAULT or "~/documents/note
 vim.g.disable_ai_completion = string.lower(vim.env.DISABLE_AI_COMPLETION or "false") == "true" or false
 vim.g.ai_inline_completion_engine = vim.env.AI_INLINE_COMPLETION_ENGINE or "supermaven"
 
--- linux
--- #!/bin/bash
--- /usr/bin/curl --no-buffer "$@"
--- windows
--- @echo off
--- "C:\Windows\System32\curl.exe" --no-buffer %*
-vim.g.plenary_curl_bin_path = vim.fn.expand(vim.env.CURL_BIN_PATH or "curl") -- use --no-buffer
-
 -- set self-build DeepLX
 vim.g.my_deeplx = vim.env.USE_DEEPLX == "true" or false
-
 vim.g.my_deeplx_base_url = string.format("https://api.deeplx.org/%s/translate", vim.env.LINUX_DO_DEEPLX_API_KEY)

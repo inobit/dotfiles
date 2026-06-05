@@ -18,14 +18,13 @@ return {
         vim.lsp.enable(server) -- jdtls is configured by nvim-java
       end
 
-      -- lsp config
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+      -- -- lsp config
+      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
 
-      -- Configuration from the result of merging all tables returned by lsp/<name>.lua files in 'runtimepath' for a server of name.
-      vim.lsp.config("*", {
-        capabilities = capabilities,
-      })
+      -- -- Configuration from the result of merging all tables returned by lsp/<name>.lua files in 'runtimepath' for a server of name.
+      -- vim.lsp.config("*", {
+      --   capabilities = capabilities,
+      -- })
     end,
     config = function()
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -131,7 +130,7 @@ return {
             })
           end
           -- rust_analyzer on_attach has been set by nvim-lspconfig，and duplicate registrations are not allowed
-          if client.name == "rust_analyzer" and client.supports_method "textDocument/formatting" then
+          if client and client.name == "rust_analyzer" and client:supports_method "textDocument/formatting" then
             local group = vim.api.nvim_create_augroup("inobit_rust_analyzer_formatter", { clear = false }) -- don't clear autocmds
             vim.api.nvim_clear_autocmds { group = group, buffer = event.buf }
             vim.api.nvim_create_autocmd("BufWritePre", {
@@ -467,7 +466,7 @@ return {
           },
         },
         on_attach = function(client, bufnr)
-          if client.supports_method "textDocument/formatting" then
+          if client:supports_method "textDocument/formatting" then
             vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
             vim.api.nvim_create_autocmd("BufWritePre", {
               group = augroup,

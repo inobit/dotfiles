@@ -1,223 +1,126 @@
 return {
-  {
-    -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-    -- used for completion, annotations and signatures of Neovim apis
-    -- make sure to uninstall or disable neodev.nvim
-    "folke/lazydev.nvim",
-    ft = "lua", -- only load on lua files
-    dependencies = {
-      { "Bilal2453/luvit-meta", lazy = true },
-    },
-    opts = {
-      library = {
-        -- Load luvit types when the `vim.uv` word is found
-        { path = "luvit-meta/library", words = { "vim%.uv" } },
-        -- add plenary.nvim to workspace.library in test file
-        { path = "plenary.nvim", words = { 'describe%(%"', "Job" } },
-        { path = "snacks.nvim", words = { "Snacks" } },
-      },
-    },
-  },
   { -- Autocompletion
-    -- Autocompletion的引擎，本身不提供source(候选项),需要其他扩展来提供
-    "hrsh7th/nvim-cmp",
+    "saghen/blink.cmp",
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      {
-        "L3MON4D3/LuaSnip",
-        build = (function()
-          -- Build Step is needed for regex support in snippets
-          -- This step is not supported in many windows environments
-          -- Remove the below condition to re-enable on windows
-          if vim.fn.has "win32" == 1 or vim.fn.executable "make" == 0 then
-            return
-          end
-          return "make install_jsregexp"
-        end)(),
-      },
-      -- 配置source
-      -- LuaSnip在cmp中的适配层,让LuaSnip可以作为source提供候选项
-      "saadparwaiz1/cmp_luasnip",
-      -- lsp source
-      "hrsh7th/cmp-nvim-lsp",
-      -- 文件 source
-      "hrsh7th/cmp-buffer",
-      -- path source
-      "hrsh7th/cmp-path",
-      -- cmd line source
-      "hrsh7th/cmp-cmdline",
-      --包含了常见的代码片段
+      "saghen/blink.lib",
+      "saghen/blink.compat",
       "rafamadriz/friendly-snippets",
-      "rcarriga/cmp-dap",
       "onsails/lspkind.nvim",
+      "rcarriga/cmp-dap",
     },
-    config = function()
-      -- See `:help cmp`
-      local cmp = require "cmp"
-      local luasnip = require "luasnip"
-      local lspkind = require "lspkind"
-      -- local has_words_before = function()
-      --   unpack = unpack or table.unpack
-      --   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-      --   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
-      -- end
-      -- 构建sources
-      local default_sources = {
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "path" },
-        { name = "buffer" },
-      }
-      local sources = {
-        {
-          name = "lazydev",
-          group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+    build = function()
+      require("blink.cmp").build():pwait()
+    end,
+    opts_extend = {
+      "sources.completion.enabled_providers",
+      "sources.compat",
+      "sources.default",
+    },
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      snippets = { preset = "default" },
+      appearance = {
+        nerd_font_variant = "mono",
+      },
+      completion = {
+        accept = {
+          auto_brackets = { enabled = true },
         },
-      }
-      -- disable ai completion for cmp
-      -- local ai_list = { "supermaven", "codeium" }
-      -- local filtered = vim.tbl_map(function(ai)
-      --   if ai ~= vim.g.ai_inline_completion_engine then
-      --     return { name = ai }
-      --   end
-      -- end, ai_list)
-      -- sources = vim.list_extend(sources, filtered)
-      sources = vim.list_extend(sources, default_sources)
-
-      -- confilc with vim-matchup
-      cmp.event:on("menu_opened", function()
-        vim.b.matchup_matchparen_enabled = false
-      end)
-      cmp.event:on("menu_closed", function()
-        vim.b.matchup_matchparen_enabled = true
-      end)
-
-      -- 全局配置
-      cmp.setup {
-        -- 配置snippet,推荐必须配置,用来和snip引擎作用
-        enabled = function()
-          return vim.api.nvim_get_option_value("buftype", { buf = 0 }) ~= "prompt" or require("cmp_dap").is_dap_buffer()
-        end,
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
-        },
-        -- :h completeopt
-        completion = { completeopt = "menu,menuone,noinsert" },
-        mapping = cmp.mapping.preset.insert {
-          ["<C-u>"] = cmp.mapping.scroll_docs(-4), -- Up
-          ["<C-d>"] = cmp.mapping.scroll_docs(4), -- Down
-          ["<C-e>"] = cmp.mapping.abort(),
-          -- 正常不需要,因为是自动触发
-          ["<A-,>"] = cmp.mapping.complete(),
-          ["<C-y>"] = {
-            i = cmp.mapping.confirm { select = true },
-            c = cmp.mapping.confirm { select = false },
+        menu = {
+          draw = {
+            treesitter = { "lsp" },
+            columns = {
+              { "label", "label_description", gap = 1 },
+              { "kind_icon", "kind", gap = 1 },
+              { "source_name" },
+            },
+            components = {
+              kind_icon = {
+                text = function(ctx)
+                  if ctx.item.source_name == "LSP" then
+                    local color_item =
+                      require("nvim-highlight-colors").format(ctx.item.documentation, { kind = ctx.kind })
+                    if color_item and color_item.abbr ~= "" then
+                      return color_item.abbr .. ctx.icon_gap
+                    end
+                  end
+                  return (require("lspkind").symbol_map[ctx.kind] or "") .. ctx.icon_gap
+                end,
+                highlight = function(ctx)
+                  if ctx.item.source_name == "LSP" then
+                    local color_item =
+                      require("nvim-highlight-colors").format(ctx.item.documentation, { kind = ctx.kind })
+                    if color_item and color_item.abbr_hl_group then
+                      return color_item.abbr_hl_group
+                    end
+                  end
+                  return "BlinkCmpKind" .. ctx.kind
+                end,
+              },
+            },
           },
-          ["<Tab>"] = cmp.mapping(function()
-            if cmp.visible() then
-              cmp.select_next_item()
-            else
-              cmp.complete()
-            end
-          end, { "c" }),
-          ["<S-Tab>"] = cmp.mapping(function()
-            if cmp.visible() then
-              cmp.select_prev_item()
-            else
-              cmp.complete()
-            end
-          end, { "c" }),
-          ["<C-n>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-            -- that way you will only jump inside the snippet region
-            elseif luasnip.expand_or_jumpable() then
-              luasnip.expand_or_jump()
-            -- elseif has_words_before() then
-            --   cmp.complete()
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-
-          ["<C-p>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
         },
-        sources = sources,
-        ---@diagnostic disable-next-line: missing-fields
-        formatting = {
-          format = lspkind.cmp_format {
-            mode = "symbol", -- show only symbol annotations
-            maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-            -- can also be a function to dynamically calculate max width such as
-            -- maxwidth = function() return math.floor(0.45 * vim.o.columns) end,
-            ellipsis_char = "...", -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
-            symbol_map = { Codeium = "", Supermaven = "", FittenCode = "" },
-            show_labelDetails = true, -- show labelDetails in menu. Disabled by default
-            -- The function below will be called before any actual modifications from lspkind
-            -- so that you can provide more controls on popup customization. (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
-            before = function(entry, vim_item)
-              vim_item.menu = "[" .. string.upper(entry.source.name) .. "]"
-              return vim_item
+        documentation = {
+          auto_show = true,
+          auto_show_delay_ms = 200,
+        },
+        ghost_text = { enabled = true },
+      },
+      sources = {
+        compat = { "cmp-dbee", "dap" },
+        default = { "lsp", "path", "snippets", "buffer" },
+        per_filetype = {
+          sql = { "cmp-dbee", "buffer" },
+          mysql = { "cmp-dbee", "buffer" },
+          plsql = { "cmp-dbee", "buffer" },
+          ["dap-repl"] = { "dap", "buffer" },
+          dapui_watches = { "dap", "buffer" },
+          dapui_hover = { "dap", "buffer" },
+          lua = { inherit_defaults = true, "lazydev" },
+        },
+        providers = {
+          lazydev = {
+            name = "LazyDev",
+            module = "lazydev.integrations.blink",
+            score_offset = 100, -- show at a higher priority than lsp
+          },
+        },
+      },
+      cmdline = {
+        enabled = true,
+        keymap = { preset = "cmdline" },
+        completion = {
+          list = { selection = { preselect = false } },
+          menu = {
+            auto_show = function(ctx)
+              return vim.fn.getcmdtype() == ":"
             end,
           },
         },
-      }
-      -- 针对类别单独配置,比如cmdline,filetype,buffer
-      -- :h getcmdtype()
-      -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-      -- preset.cmdline修改了C-n,C-p,不符合使用习惯,造成无法使用历史命令
-      cmp.setup.cmdline({ "/", "?" }, {
-        -- completion = { completeopt = "menu,menuone,noinsert,noselect" },
-        -- mapping = cmp.mapping.preset.cmdline(),
-        sources = {
-          { name = "buffer" },
-        },
-      })
-      -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-      cmp.setup.cmdline(":", {
-        -- completion = { completeopt = "menu,menuone,noinsert,noselect" },
-        -- mapping = cmp.mapping.preset.cmdline(),
-        sources = cmp.config.sources({
-          { name = "path" },
-        }, {
-          { name = "cmdline", keyword_pattern = [=[[^[:blank:]\!]*]=], option = { ignore_cmds = { "Man" } } },
-        }),
-      })
-      -- 针对md help文件只使用path buffer
-      cmp.setup.filetype({ "markdown", "help", vim.g.inobit_filetype }, {
-        sources = {
-          { name = "path" },
-          { name = "buffer" },
-        },
-      })
-      -- sql
-      cmp.setup.filetype({ "sql", "mysql", "plsql" }, {
-        sources = {
-          { name = "cmp-dbee" },
-          { name = "buffer" },
-        },
-      })
-      -- dap
-      cmp.setup.filetype({ "dap-repl", "dapui_watches", "dapui_hover" }, {
-        sources = {
-          { name = "dap" },
-          { name = "buffer" },
-        },
-      })
-      -- 加载friendly-snippets
-      require("luasnip.loaders.from_vscode").lazy_load()
+      },
+      keymap = {
+        preset = "default",
+        ["<A-,>"] = { "show", "fallback" },
+        ["<C-y>"] = { "select_and_accept" },
+        ["<C-u>"] = { "scroll_signature_up", "fallback" },
+        ["<C-d>"] = { "scroll_signature_down", "fallback" },
+      },
+    },
+    config = function(_, opts)
+      -- Register compat sources
+      opts.sources.providers = opts.sources.providers or {}
+      for _, source in ipairs(opts.sources.compat or {}) do
+        opts.sources.providers[source] = vim.tbl_deep_extend(
+          "force",
+          { name = source, module = "blink.compat.source" },
+          opts.sources.providers[source] or {}
+        )
+      end
+      -- Remove before validation
+      opts.sources.compat = nil
+      require("blink.cmp").setup(opts)
     end,
   },
 }

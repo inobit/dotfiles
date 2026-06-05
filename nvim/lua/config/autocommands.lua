@@ -91,15 +91,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- auto load run module
-vim.api.nvim_create_autocmd("FileType", {
-  group = augroup "run",
-  pattern = { "python", "c", "cpp", "javascript" },
-  callback = function()
-    require "lib.run"
-  end,
-})
-
 -- strong,italic highlight
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "md_highlight",

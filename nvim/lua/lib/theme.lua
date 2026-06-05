@@ -110,7 +110,9 @@ M.plugins = {
   { "folke/tokyonight.nvim", lazy = false },
   { "rose-pine/neovim", lazy = false },
   { "navarasu/onedark.nvim", lazy = false },
-  { "catppuccin/nvim", name = "catppuccin", lazy = false },
+  { "catppuccin/nvim", name = "catppuccin", opts = {
+    integrations = { blink_cmp = true },
+  }, lazy = false },
   { "EdenEast/nightfox.nvim", lazy = false },
   { "projekt0n/github-nvim-theme", name = "github-theme", lazy = false },
 }
