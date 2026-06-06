@@ -76,11 +76,10 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete)
 fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
 autoload -Uz compinit
 if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.m-1) ]]; then
-  compinit -C
+	compinit -C
 else
-  compinit
+	compinit
 fi
-
 
 DISABLE_MAGIC_FUNCTIONS=true
 source $ZSH/oh-my-zsh.sh
@@ -233,6 +232,8 @@ set_fzf_options() {
 }
 set_fzf_options
 
+alias sfzf=set_fzf_options
+
 if [[ -d $HOME/.cargo ]]; then
 	. "$HOME/.cargo/env"
 fi
@@ -337,3 +338,23 @@ flush_color_mode() {
 	fi
 }
 alias fcc=flush_color_mode
+
+flush_tmux_env() {
+	local vars=(SSH_AUTH_SOCK TTY_COLOR_MODE)
+	if [[ -z $TMUX ]]; then
+		tmux info &>/dev/null || {
+			echo "tmux server not running, skip"
+			return
+		}
+		for v in "${vars[@]}"; do
+			[[ -n ${(P)v} ]] && tmux setenv "$v" "${(P)v}" 2>/dev/null
+		done
+	else
+		for v in "${vars[@]}"; do
+			eval "$(tmux show-environment -s "$v" 2>/dev/null)"
+		done
+	fi
+}
+flush_tmux_env
+
+alias fte=flush_tmux_env
