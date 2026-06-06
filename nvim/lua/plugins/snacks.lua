@@ -25,6 +25,7 @@ return {
     scope = { enabled = true },
     scroll = { enabled = false },
     statuscolumn = { enabled = false },
+    sudo = { enabled = true },
     words = { enabled = true },
   },
 }
