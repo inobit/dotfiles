@@ -10,7 +10,15 @@ return {
       "rcarriga/cmp-dap",
     },
     build = function()
-      require("blink.cmp").build():pwait()
+      if vim.fn.has("win32") == 1 then
+        local dll = vim.fn.stdpath("data") .. "/lazy/blink.cmp/lib/libblink_cmp_fuzzy.dll"
+        if vim.uv.fs_stat(dll) then
+          return -- prebuilt DLL already downloaded manually
+        end
+        require("blink.cmp").download({ match = "v*" }):pwait()
+      else
+        require("blink.cmp").build():pwait()
+      end
     end,
     opts_extend = {
       "sources.completion.enabled_providers",

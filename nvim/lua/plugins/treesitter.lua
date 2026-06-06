@@ -4,6 +4,19 @@ return {
     branch = "main",
     event = { "BufReadPost", "BufWritePost", "BufNewFile" },
     cmd = { "TSUpdate", "TSInstall", "TSLog", "TSUninstall" },
+    init = function()
+      -- tree-sitter CLI defaults to cl.exe on Windows; override to gcc
+      if vim.fn.has("win32") == 1 then
+        vim.env.CC = "gcc"
+        if vim.fn.executable("gcc") == 0 then
+          vim.notify(
+            "[nvim-treesitter] gcc not found, install MinGW: scoop install mingw",
+            vim.log.levels.WARN,
+            { title = "nvim-treesitter" }
+          )
+        end
+      end
+    end,
     opts_extend = { "ensure_installed" },
     build = function()
       require("nvim-treesitter").update(nil, { summary = true })
