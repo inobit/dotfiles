@@ -230,8 +230,6 @@ set_fzf_options() {
 	fi
 	export FZF_DEFAULT_OPTS="$FZF_LIGHT_THEME --height 60% --tmux bottom,60% --layout reverse --border --preview \"$HOME/.fzf/fzf_preview_handler.sh {}\""
 }
-set_fzf_options
-
 alias sfzf=set_fzf_options
 
 if [[ -d $HOME/.cargo ]]; then
@@ -353,6 +351,10 @@ flush_tmux_env() {
 		for v in "${vars[@]}"; do
 			eval "$(tmux show-environment -s "$v" 2>/dev/null)"
 		done
+	fi
+	# set fzf options in tumx
+	if command -v set_fzf_options >/dev/null 2>&1; then
+		set_fzf_options
 	fi
 }
 flush_tmux_env
