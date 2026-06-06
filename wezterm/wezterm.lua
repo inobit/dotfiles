@@ -578,4 +578,41 @@ if status then
 	end
 end
 
+-- dect colorscheme mode
+
+---@return "light" | "dark"
+local function detect_mode()
+	-- 1) config.colors.background
+	if config.colors and config.colors.background then
+		local c = wezterm.color.parse(config.colors.background)
+		if c then
+			local r, g, b = c:linear_rgba()
+			local lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+			return lum > 0.5 and "light" or "dark"
+		end
+	end
+
+	-- 2) colorscheme
+	if config.color_scheme then
+		local schemes = wezterm.color.get_builtin_schemes()
+		local scheme = schemes[config.color_scheme]
+		if scheme and scheme.background then
+			local c = wezterm.color.parse(scheme.background)
+			if c then
+				local r, g, b = c:linear_rgba()
+				local lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+				return lum > 0.5 and "light" or "dark"
+			end
+		end
+	end
+
+	-- 3) OS
+	local app = wezterm.gui.get_appearance()
+	return (app and app:find("Light")) and "light" or "dark"
+end
+
+config.set_environment_variables = {
+	TTY_COLOR_MODE = detect_mode(),
+}
+
 return config
