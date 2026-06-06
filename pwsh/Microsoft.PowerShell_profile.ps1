@@ -126,6 +126,31 @@ function ln {
     }
 }
 
+# color mode
+function Get-TtyColorMode {
+    if ($env:TTY_COLOR_MODE -in @('light', 'dark')) {
+        return $env:TTY_COLOR_MODE
+    }
+    $env:TTY_COLOR_MODE = 'dark'
+    return 'dark'
+}
+
+function Set-FzfOptions {
+    $mode = Get-TtyColorMode
+
+    $FZF_LIGHT_THEME = if ($mode -eq 'light') {
+        '--color=fg:#797593,bg:#faf4ed,hl:#d7827e --color=fg+:#575279,bg+:#f2e9e1,hl+:#d7827e --color=border:#dfdad9,header:#286983,gutter:#faf4ed --color=spinner:#ea9d34,info:#56949f --color=pointer:#907aa9,marker:#b4637a,prompt:#797593'
+    } else {
+        ''
+    }
+
+    $env:FZF_DEFAULT_OPTS = "$FZF_LIGHT_THEME --height 60% --layout reverse --border"
+}
+
+Set-FzfOptions
+
+Set-Alias -Name tcm -Value Get-TtyColorMode
+
 
 # Import the Chocolatey Profile that contains the necessary code to enable
 # tab-completions to function for `choco`.
