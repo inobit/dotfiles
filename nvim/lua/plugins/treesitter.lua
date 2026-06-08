@@ -6,9 +6,9 @@ return {
     cmd = { "TSUpdate", "TSInstall", "TSLog", "TSUninstall" },
     init = function()
       -- tree-sitter CLI defaults to cl.exe on Windows; override to gcc
-      if vim.fn.has("win32") == 1 then
+      if vim.fn.has "win32" == 1 then
         vim.env.CC = "gcc"
-        if vim.fn.executable("gcc") == 0 then
+        if vim.fn.executable "gcc" == 0 then
           vim.notify(
             "[nvim-treesitter] gcc not found, install MinGW: scoop install mingw",
             vim.log.levels.WARN,
@@ -60,6 +60,7 @@ return {
         "java",
         "rust",
         "ron", -- rust object notation
+        "tmux",
       },
       auto_install = true,
       highlight = { enable = true },
