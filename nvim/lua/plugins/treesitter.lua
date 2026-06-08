@@ -34,7 +34,6 @@ return {
         "html",
         "javascript",
         "json",
-        "jsonc",
         "json5",
         "lua",
         "luadoc",
@@ -71,6 +70,9 @@ return {
 
       -- Setup treesitter (install_dir etc.)
       TS.setup(opts)
+
+      -- Use json5 parser for jsonc filetype (json5 supports comments)
+      vim.treesitter.language.register("json5", "jsonc")
 
       -- Helper: check if a parser is installed
       local function have_parser(lang)
