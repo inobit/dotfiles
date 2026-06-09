@@ -61,6 +61,7 @@ return {
         "rust",
         "ron", -- rust object notation
         "tmux",
+        "make",
       },
       auto_install = true,
       highlight = { enable = true },
