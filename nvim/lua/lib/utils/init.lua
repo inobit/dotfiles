@@ -104,14 +104,14 @@ function M.get_visual_selection(nl_literal)
   local _, csrow, cscol, cerow, cecol
   local mode = vim.fn.mode()
   if mode == "v" or mode == "V" or mode == "\22" then
-    _, csrow, cscol, _ = unpack(vim.fn.getpos("."))
-    _, cerow, cecol, _ = unpack(vim.fn.getpos("v"))
+    _, csrow, cscol, _ = unpack(vim.fn.getpos ".")
+    _, cerow, cecol, _ = unpack(vim.fn.getpos "v")
     if mode == "V" then
       cscol, cecol = 0, 999
     end
   else
-    _, csrow, cscol, _ = unpack(vim.fn.getpos("'<"))
-    _, cerow, cecol, _ = unpack(vim.fn.getpos("'>"))
+    _, csrow, cscol, _ = unpack(vim.fn.getpos "'<")
+    _, cerow, cecol, _ = unpack(vim.fn.getpos "'>")
   end
   if cerow < csrow then
     csrow, cerow = cerow, csrow
@@ -157,23 +157,26 @@ end
 ---@return boolean
 function M.sudo_exec(cmd, filepath, print_output)
   vim.fn.inputsave()
-  local password = vim.fn.inputsecret("Password: ")
+  local password = vim.fn.inputsecret "Password: "
   vim.fn.inputrestore()
   if not password or #password == 0 then
-    M.warn("Invalid password, sudo aborted")
+    M.warn "Invalid password, sudo aborted"
     return false
   end
   local ok, res = pcall(function()
-    return vim.system({ "sh", "-c",
-      string.format("echo '%s' | sudo -p '' -S %s", password, cmd) }):wait()
+    return vim.system({ "sh", "-c", string.format("echo '%s' | sudo -p '' -S %s", password, cmd) }):wait()
   end)
   if not ok or res.code ~= 0 then
     M.warn(not ok and res or assert(res).stderr)
     return false
   else
     if print_output then
-      M.info([["%s" written
-%s]], filepath, res.stderr)
+      M.info(
+        [["%s" written
+%s]],
+        filepath,
+        res.stderr
+      )
     end
     return true
   end
@@ -187,31 +190,45 @@ function M.sudo_write(tmpfile, filepath)
     tmpfile = vim.fn.tempname()
   end
   if not filepath then
-    filepath = vim.fn.expand("%")
+    filepath = vim.fn.expand "%"
   end
   if not filepath or #filepath == 0 then
-    M.warn("E32: No file name")
+    M.warn "E32: No file name"
     return
   end
   -- store alt buffer
-  local alt_buf = vim.fn.bufnr("#")
+  local alt_buf = vim.fn.bufnr "#"
   -- `bs=1048576` is equivalent to `bs=1M` for GNU dd or `bs=1m` for BSD dd
   -- Both `bs=1M` and `bs=1m` are non-POSIX
-  local cmd = string.format(
-    "dd if=%s of=%s bs=1048576",
-    vim.fn.shellescape(tmpfile),
-    vim.fn.shellescape(filepath)
-  )
+  local cmd = string.format("dd if=%s of=%s bs=1048576", vim.fn.shellescape(tmpfile), vim.fn.shellescape(filepath))
   -- no need to check error as this fails the entire function
   vim.api.nvim_exec2(string.format("write! %s", tmpfile), { output = true })
   if M.sudo_exec(cmd, filepath, true) then
-    vim.cmd("e!")
+    vim.cmd "e!"
   end
   -- restore alt buf
   if alt_buf and vim.api.nvim_buf_is_valid(alt_buf) then
     vim.fn.setreg("#", alt_buf)
   end
   vim.fn.delete(tmpfile)
+end
+
+---@param name string
+function M.lsp_format_helper(name)
+  ---@diagnostic disable-next-line: unused-local
+  return function(client, buf)
+    -- format on save
+    local group = vim.api.nvim_create_augroup(string.format("inobit_%s_formatter", name), { clear = false }) -- don't clear autocmds
+    vim.api.nvim_clear_autocmds { group = group, buffer = buf }
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = group,
+      buffer = buf,
+      desc = string.format("Format on save by %s", name),
+      callback = function()
+        vim.lsp.buf.format { async = false }
+      end,
+    })
+  end
 end
 
 return M
