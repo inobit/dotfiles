@@ -41,6 +41,7 @@ M.lsp_servers = {
   "emmet_ls",
   "marksman",
   "eslint", --vsocde eslint, package name is eslint-lsp, need install eslint (global or local)
+  "tombi",
 }
 
 ---@type string[]
