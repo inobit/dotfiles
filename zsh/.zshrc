@@ -360,3 +360,5 @@ flush_tmux_env() {
 flush_tmux_env
 
 alias fte=flush_tmux_env
+
+alias gsn=git_status_open
