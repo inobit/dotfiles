@@ -86,7 +86,7 @@ table.insert(dap.configurations.python, {
   end,
   pathmappings = {
     {
-      localroot = "${worspacefolder}",
+      localroot = "${workspacefolder}",
       remoteroot = ".",
     },
   },
