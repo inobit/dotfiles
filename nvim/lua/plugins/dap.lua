@@ -26,15 +26,22 @@ return {
       desc = "Debug: run",
     },
     -- stylua: ignore start
-    { "<leader>ds", function() require("dap").terminate() end, desc = "Debug: stop", },
-    { "<leader>dS",
+    { "<leader>ds",
       function()
-        require("dap").disconnect({ restart = false, terminateDebuggee = nil }, function()
-          require("dap").close()
-        end)
+        local session = require("dap").session()
+        if session and session.config.request == "attach" then
+          -- attach 模式：仅断开连接，不终止被调试进程
+          require("dap").disconnect({ restart = false, terminateDebuggee = false }, function()
+            require("dap").close()
+          end)
+        else
+          -- launch 模式：终止进程
+          require("dap").terminate()
+        end
       end,
-      desc = "Debug: disconnect ",
+      desc = "Debug: smart stop (disconnect on attach, terminate on launch)",
     },
+    { "<leader>dS", function() require("dap").terminate() end, desc = "Debug: terminate", },
     { "<F7>", function() require("dap").step_into { askForTargets = true } end, desc = "Debug: step into", },
     { "<F8>", function() require("dap").step_over() end, desc = "Debug: step over", },
     { vim.fn.has "win32" == 1 and "<S-F8>" or "<S-F8>", function() require("dap").step_out() end, desc = "Debug: step out", },
