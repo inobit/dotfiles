@@ -84,6 +84,10 @@ vim.keymap.set("n", "<leader>X", ":.lua<CR>", { desc = "execute current lua line
 vim.keymap.set("v", "<leader>X", ":lua<CR>", { desc = "execute selected lua block" })
 vim.keymap.set("n", "<leader><leader>t", "<Cmd>PlenaryBustedFile %<CR>", { desc = "run test" })
 
+-- retart
+
+vim.keymap.set("n", "<leader>R", "<Cmd>restart<CR>")
+
 -- show messages
 vim.keymap.set("n", "<leader><leader>m", function()
   local lines = vim.split(vim.fn.execute("messages", "silent"), "\n")
