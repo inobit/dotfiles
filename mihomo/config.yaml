@@ -40,44 +40,35 @@ dns:
   default-nameserver: # 解析DNS服务器的域名，所以这里必须为ip
     - tls://223.5.5.5:853
     - tls://1.12.12.12:853
+  # nameserver:
+  #   - https://cloudflare-dns.com/dns-query
+  #   - https://dns.google/dns-query
   nameserver:
-    - https://cloudflare-dns.com/dns-query
-    - https://dns.google/dns-query
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
   proxy-server-nameserver: # 代理节点域名解析服务器
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
-  direct-nameserver: # 规则匹配到直连时使用的DNS，既然是可以直连的，当然要用国内DNS
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-  # nameserver-policy:
-  #   "geosite:cn,private": # 国内域名和私有域名强制走国内 DNS
-  #     - https://dns.alidns.com/dns-query # 阿里
-  #     - https://doh.pub/dns-query # 腾讯
-  #     - 223.5.5.5 # 阿里 UDP
-  #     - 119.29.29.29 # 腾讯 UDP
-  #   "geo:cn": # 也可以用 geo:cn 匹配 IP
-  #     - https://dns.alidns.com/dns-query # 阿里
-  #     - https://doh.pub/dns-query
-  #     - 223.5.5.5 # 阿里 UDP
-  #     - 119.29.29.29 # 腾讯 UDP
-  #   "geosite:gfw": # 新增：GFW 列表域名强制走国外 DNS
-  #     - https://1.1.1.1/dns-query
-  #     - https://dns.google/dns-query
-  #     - 1.1.1.1
-  #     - 8.8.8.8
-  #   "geosite:geolocation-!cn": # 新增：非中国大陆域名强制走国外 DNS
-  #     - https://1.1.1.1/dns-query
-  #     - https://dns.google/dns-query
-  #     - 1.1.1.1
-  #     - 8.8.8.8
-  #   "full-nameserver": # 新增：最终兜底，所有未匹配的域名查询强制走国外 DNS
-  #     - https://1.1.1.1/dns-query
-  #     - https://dns.google/dns-query
-  #     - 1.1.1.1
-  #     - 8.8.8.8
-  # fallback:
-  #   - 1.1.1.1 # Cloudflare DNS备用
-  #   - 8.8.8.8 # Google DNS备用
+  fallback:
+    - tls://8.8.4.4:853
+    - tls://1.1.1.1:853
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
+  #当前有BUG，直连的域名，解析后有时候不会覆盖第一阶段(此时还没有进入规则匹配)解析的IP
+  #direct-nameserver: # 规则匹配到直连时使用的DNS，既然是可以直连的，当然要用国内DNS
+  #  - https://dns.alidns.com/dns-query
+  #  - https://doh.pub/dns-query
+  nameserver-policy:
+    "geosite:cn,private":
+      - https://dns.alidns.com/dns-query
+      - https://doh.pub/dns-query
+    "geosite:gfw,geolocation-!cn":
+      - https://cloudflare-dns.com/dns-query
+      - https://dns.google/dns-query
+
 # tun config
 tun:
   enable: true
@@ -97,7 +88,7 @@ tun:
   exclude-interface:
     - "docker0"
     - "br-331d4f0912d3"
-    - "br-de780da745e5"
+    - "br-03bb4e621fce"
 # 流量嗅探，对于redir-host情况（真实ip),嗅探域名
 sniffer:
   enable: true
@@ -134,7 +125,7 @@ proxy-providers:
       enable: true
       url: "https://cp.cloudflare.com/generate_204"
       interval: 86400
-      timeout: 5000
+      timeout: 10000
       lazy: true
       expected-status: 204
 proxy-group-anchor:
@@ -146,7 +137,7 @@ proxy-group-anchor:
     interval: 180
     lazy: true
     tolerance: 50
-    timeout: 2000
+    timeout: 10000
     disable-udp: false
     max-failed-times: 3
   fallback: &fallback
@@ -154,46 +145,45 @@ proxy-group-anchor:
     url: "https://cp.cloudflare.com/generate_204"
     interval: 180
     lazy: true
-    timeout: 2000
+    timeout: 10000
     disable-udp: false
     max-failed-times: 3
   std-groups: &std-groups
-    - 🇭🇰️ 香港
-    - 🇭🇰️ 香港➰
-    - 🇹🇼 台湾
-    - 🇹🇼 台湾➰
-    - 🇯🇵 日本
-    - 🇯🇵 日本➰
-    - 🇸🇬 新加坡
-    - 🇸🇬 新加坡➰
-    - 🇺🇸 美国
-    - 🇺🇸 美国✔️
-    - 🇺🇸 美国➰
-    - 🇬🇧 英国
-    - 🇬🇧 英国➰
+    # - 🇭🇰️ 香港
+    # - 🇭🇰️ 香港➰
+    # - 🇹🇼 台湾
+    # - 🇹🇼 台湾➰
+    # - 🇯🇵 日本
+    # - 🇯🇵 日本➰
+    # - 🇸🇬 新加坡
+    # - 🇸🇬 新加坡➰
+    # - 🇺🇸 美国
+    # - 🇺🇸 美国✔️
+    # - 🇺🇸 美国➰
+    # - 🇬🇧 英国
+    # - 🇬🇧 英国➰
     - 自建
-    - 🧭 Break
+    # - 🧭 Break
   loose-groups: &loose-groups
-    - 🇭🇰️ 香港
-    - 🇭🇰️ 香港➰
-    - 🇹🇼 台湾
-    - 🇹🇼 台湾➰
-    - 🇯🇵 日本
-    - 🇯🇵 日本➰
-    - 🇸🇬 新加坡
-    - 🇸🇬 新加坡➰
-    - 🇺🇸 美国
-    - 🇺🇸 美国✔️
-    - 🇺🇸 美国➰
-    - 🇬🇧 英国
-    - 🇬🇧 英国➰
+    # - 🇭🇰️ 香港
+    # - 🇭🇰️ 香港➰
+    # - 🇹🇼 台湾
+    # - 🇹🇼 台湾➰
+    # - 🇯🇵 日本
+    # - 🇯🇵 日本➰
+    # - 🇸🇬 新加坡
+    # - 🇸🇬 新加坡➰
+    # - 🇺🇸 美国
+    # - 🇺🇸 美国✔️
+    # - 🇺🇸 美国➰
+    # - 🇬🇧 英国
+    # - 🇬🇧 英国➰
     - 自建
-    - 🧭 Break
+    # - 🧭 Break
     - DIRECT
-  ai-groups: &ai-groups
-    - 🇺🇸 美国✔️
+  ai-groups: &ai-groups # - 🇺🇸 美国✔️
     - 自建
-    - 🇺🇸 美国
+    # - 🇺🇸 美国
 proxy-groups:
   - name: 🧭 Break
     <<: *url-test
@@ -425,11 +415,12 @@ rules:
   - DOMAIN-SUFFIX,tfbgeee.com,Video
   - DOMAIN-SUFFIX,wyav.tv,Video
   # - DOMAIN-SUFFIX,debian.org, 🇹🇼 台湾
-  - DOMAIN-SUFFIX,apache.org, 🇹🇼 台湾
-  - DOMAIN-SUFFIX,hotfree.xyz,DIRECT
-  - DOMAIN-SUFFIX,88code.org,DIRECT
+  # - DOMAIN-SUFFIX,apache.org, 🇹🇼 台湾
+  - DOMAIN-SUFFIX,inoecho.xyz,DIRECT
   - RULE-SET,applications,DIRECT
   - RULE-SET,steam,Steam
+  - DOMAIN-SUFFIX,deepseek.com,DIRECT
+  - DOMAIN-SUFFIX,deepseek.com.cn,DIRECT
   - DOMAIN-SUFFIX,diagrams.org,DIRECT
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
