@@ -154,6 +154,54 @@ Set-FzfOptions
 
 Set-Alias -Name tcm -Value Get-TtyColorMode
 
+function sops {
+    $bwFolderName = "keys"
+    $bwItemName   = "secrets_vault_key"
+
+    try {
+        Write-Host "Unlocking Bitwarden..." -ForegroundColor Yellow
+        $env:BW_SESSION = bw unlock --raw
+        if (-not $env:BW_SESSION) {
+            Write-Error "sops: Bitwarden unlock failed"
+            return
+        }
+        bw sync | Out-Null
+
+        # 按文件夹名获取 folder ID
+        $folder = bw list folders |
+            ConvertFrom-Json |
+            Where-Object { $_.name -eq $bwFolderName } |
+            Select-Object -First 1
+        if (-not $folder) {
+            Write-Error "sops: Folder '$bwFolderName' not found"
+            return
+        }
+        $allItems = bw list items --folderid $folder.id --search $bwItemName |
+            ConvertFrom-Json
+
+        # 按名称 + 类型 (5 = SSH Key) 精确匹配，0 或多条均报错
+        $matches = @($allItems | Where-Object { $_.type -eq 5 -and $_.name -eq $bwItemName })
+        if ($matches.Count -eq 0) {
+            Write-Error "sops: No SSH Key item named '$bwItemName' in folder '$bwFolderName'"
+            return
+        }
+        if ($matches.Count -gt 1) {
+            Write-Error "sops: Multiple SSH Key items ($($matches.Count)) match '$bwItemName'"
+            $matches | ForEach-Object { Write-Host "  - $($_.name) ($($_.id))" -ForegroundColor Yellow }
+            return
+        }
+        $itemId = $matches[0].id
+
+        $env:SOPS_AGE_SSH_PRIVATE_KEY_CMD = "powershell -NoProfile -Command `"(bw get item $itemId | ConvertFrom-Json).sshKey.privateKey`""
+        & (Get-Command sops -CommandType Application).Source @args
+    } finally {
+        Remove-Item Env:SOPS_AGE_SSH_PRIVATE_KEY_CMD -ErrorAction SilentlyContinue
+        if ($env:BW_SESSION) {
+            $null = bw lock 2>&1
+            Remove-Item Env:BW_SESSION -ErrorAction SilentlyContinue
+        }
+    }
+}
 
 # Import the Chocolatey Profile that contains the necessary code to enable
 # tab-completions to function for `choco`.
