@@ -4,7 +4,13 @@ $env:EDITOR = "nvim"
 # set PowerShell to UTF-8
 [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
-Invoke-Expression (&starship init powershell)
+$_completionsDir = "$PSScriptRoot\completions"
+$_starshipInit = "$_completionsDir\starship-init.ps1"
+if (Test-Path $_starshipInit) {
+    . $_starshipInit
+} else {
+    Invoke-Expression (&starship init powershell)
+}
 
 # Import-Module posh-git
 # $omp_config = Join-Path -Path $ENV:USERPROFILE -ChildPath ".\powerlevel10k_lean.omp.json"
@@ -12,15 +18,9 @@ Invoke-Expression (&starship init powershell)
 
 Import-Module -Name Terminal-Icons
 
-# PSReadLine
-Import-Module PSReadLine
-# Emacs mode
+# PSReadLine（PS7 已自动加载，无需 Import-Module）
 Set-PSReadLineOption -EditMode Emacs
-
-# history source
 Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-
-# cursor to end
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
 # tab for auto complete
@@ -61,7 +61,6 @@ if (Get-Command -Name "wezterm" -ErrorAction SilentlyContinue) {
 }
 
 # fzf
-$env:_PSFZF_FZF_DEFAULT_OPTS = '--height 60% --tmux bottom,60% --layout reverse --border'
 # replace 'Ctrl+t' and 'Ctrl+r' with your preferred bindings:
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
 Set-PsFzfOption -TabExpansion
@@ -82,19 +81,23 @@ if (Get-Command -Name "bat" -ErrorAction SilentlyContinue) {
 
 # Utilities
 function which ($command) {
-  Get-Command -Name $command -ErrorAction SilentlyContinue |
-      Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+    $result = Get-Command -Name $command -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+    if ($result) {
+        return $result
+    }
+    Write-Host "$command not found" -ForegroundColor Yellow
 }
 
 # ln
 function ln {
     param(
-        [switch]$s,  # soft link
-        [switch]$f,  # force
+        [switch]$s,  # soft link (symbolic), default 为 hard link
+        [switch]$f,  # force overwrite
         [Parameter(Position=0, Mandatory=$true)]
-        [string]$Target,  #  target path
+        [string]$Target,
         [Parameter(Position=1, Mandatory=$true)]
-        [string]$Link     # link name
+        [string]$Link
     )
 
     if (-not (Test-Path $Target)) {
@@ -102,30 +105,38 @@ function ln {
         return
     }
 
-    $targetType = if (Test-Path -Path $Target -PathType Container) {
-        "Directory"
+    $isDir = Test-Path -Path $Target -PathType Container
+
+    if ($s) {
+        $itemType = 'SymbolicLink'
+        $typeLabel = 'symbolic'
     } else {
-        "File"
+        if ($isDir) {
+            Write-Error "Hard link target cannot be a directory, use -s for symbolic link"
+            return
+        }
+        $itemType = 'HardLink'
+        $typeLabel = 'hard'
     }
 
-    # build params
+    if ((Test-Path $Link) -and -not $f) {
+        Write-Error "Link path '$Link' already exists, use -f to force overwrite"
+        return
+    }
+
     $params = @{
-        Path = $Link
-        ItemType = "SymbolicLink"
-        Target = $Target
+        Path     = $Link
+        ItemType = $itemType
+        Target   = $Target
     }
+    if ($f) { $params.Force = $true }
 
-    if ($f) {
-        $params.Force = $true
-    }
-
-    # command map
     try {
         New-Item @params -ErrorAction Stop | Out-Null
-        Write-Host "Created symbolic link: $Link -> $Target ($targetType)"
+        Write-Host "Created $typeLabel link: $Link -> $Target"
     }
     catch {
-        Write-Error "Failed to create symbolic link: $_"
+        Write-Error "Failed to create $typeLabel link: $_"
     }
 }
 
@@ -147,7 +158,10 @@ function Set-FzfOptions {
         ''
     }
 
-    $env:FZF_DEFAULT_OPTS = "$FZF_LIGHT_THEME --height 60% --layout reverse --border"
+    $baseOpts = "$FZF_LIGHT_THEME --height 60% --layout reverse --border"
+    $env:FZF_DEFAULT_OPTS = $baseOpts
+    # PSFzf 读取的是这个变量，必须同步更新颜色
+    $env:_PSFZF_FZF_DEFAULT_OPTS = "--tmux bottom,60% $baseOpts"
 }
 
 Set-FzfOptions
@@ -208,21 +222,45 @@ function sops {
 # Be aware that if you are missing these lines from your profile, tab completion
 # for `choco` will not function.
 # See https://ch0.co/tab-completion for details.
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-  Import-Module "$ChocolateyProfile"
-}
+# $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+# if (Test-Path($ChocolateyProfile)) {
+#   Import-Module "$ChocolateyProfile"
+# }
 
 # uv config
 $env:Path = "$env:USERPROFILE\.local\bin;" + $env:Path
-# uv registe auto complete
-(& uv generate-shell-completion powershell) | Out-String | Invoke-Expression
-(& uvx --generate-shell-completion powershell) | Out-String | Invoke-Expression
+# uv auto complete（优先用静态缓存，避免每次启动 fork Python 进程）
+$_uvCompletion = "$_completionsDir\uv-completion.ps1"
+if (Test-Path $_uvCompletion) { . $_uvCompletion } else { (& uv generate-shell-completion powershell) | Out-String | Invoke-Expression }
+$_uvxCompletion = "$_completionsDir\uvx-completion.ps1"
+if (Test-Path $_uvxCompletion) { . $_uvxCompletion } else { (& uvx --generate-shell-completion powershell) | Out-String | Invoke-Expression }
 
+$_mihomoshCompletion = "$_completionsDir\mihomosh-completion.ps1"
 if (Get-Command -Name mihomosh -ErrorAction SilentlyContinue) {
-  (& mihomosh shell-completion powershell) | Out-String | Invoke-Expression
+    if (Test-Path $_mihomoshCompletion) {
+        . $_mihomoshCompletion
+    } else {
+        (& mihomosh shell-completion powershell) | Out-String | Invoke-Expression
+    }
 }
 
-# fnm config
-fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
-fnm completions --shell powershell | Out-String | Invoke-Expression
+# fnm（优先用静态缓存，避免每次启动 fork Node 进程）
+$_fnmEnv = "$_completionsDir\fnm-env.ps1"
+if (Test-Path $_fnmEnv) { . $_fnmEnv } else { fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression }
+$_fnmComp = "$_completionsDir\fnm-completions.ps1"
+if (Test-Path $_fnmComp) { . $_fnmComp } else { fnm completions --shell powershell | Out-String | Invoke-Expression }
+
+# 升级工具后运行此函数刷新静态 completion 缓存
+function Update-Completions {
+    $d = "$PSScriptRoot\completions"
+    New-Item -ItemType Directory -Force -Path $d | Out-Null
+    starship init powershell | Out-String | Set-Content "$d\starship-init.ps1"
+    fnm env --use-on-cd --shell powershell | Out-String | Set-Content "$d\fnm-env.ps1"
+    fnm completions --shell powershell | Out-String | Set-Content "$d\fnm-completions.ps1"
+    uv generate-shell-completion powershell | Out-String | Set-Content "$d\uv-completion.ps1"
+    uvx --generate-shell-completion powershell | Out-String | Set-Content "$d\uvx-completion.ps1"
+    if (Get-Command -Name mihomosh -ErrorAction SilentlyContinue) {
+        mihomosh shell-completion powershell | Out-String | Set-Content "$d\mihomosh-completion.ps1"
+    }
+    Write-Host "Completions updated: $d" -ForegroundColor Green
+}

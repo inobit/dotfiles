@@ -1,0 +1,83 @@
+# Starship prompt config
+# Deploy to: ~/.config/starship.toml 或设置 $env:STARSHIP_CONFIG
+# Docs: https://starship.rs/config/
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# ── 全局设置 ──────────────────────────────────────────────────────────────────
+add_newline = true
+# 如果你有指向网络文件系统的 symlink，改为 false 可避免卡顿
+follow_symlinks = true
+# 超时（毫秒）
+scan_timeout = 30
+command_timeout = 500
+
+# 单行显式 format，只加载需要的模块
+# 默认 $all 含 60+ 模块，显式指定可减少不必要的探测开销
+format = '$directory$git_branch$git_state$git_status$nodejs$python$rust$golang$cmd_duration$character'
+
+# ── 目录 ──────────────────────────────────────────────────────────────────────
+[directory]
+style = 'bold blue'
+truncation_length = 3
+truncate_to_repo = true
+
+# ── Git（git_status 是最大性能瓶颈，但信息很有用，按需取舍）───────────────
+[git_branch]
+format = '[$symbol$branch]($style) '
+symbol = ' '
+style = 'bold purple'
+
+[git_state]
+format = '([$state( $progress_current/$progress_total)]($style)) '
+style = 'bold yellow'
+
+[git_status]
+style = 'bold red'
+format = '([$all_status$ahead_behind]($style)) '
+ahead = '⇡${count}'
+behind = '⇣${count}'
+conflicted = '=${count}'
+renamed = '»${count}'
+stashed = '\\$${count}'
+deleted = '✘'
+modified = '!'
+staged = '+'
+untracked = '?'
+
+# ── 语言版本（仅项目有对应文件时才显示，检测开销可忽略）───────────────────────
+[nodejs]
+format = 'via [$symbol$version]($style) '
+symbol = ' '
+style = 'bold green'
+detect_files = ['package.json', '.nvmrc', '.node-version']
+
+[python]
+format = 'via [$symbol$version]($style) '
+symbol = ' '
+style = 'bold yellow'
+detect_extensions = ['py']
+
+[rust]
+format = 'via [$symbol$version]($style) '
+symbol = ' '
+style = 'bold red'
+
+[golang]
+format = 'via [$symbol$version]($style) '
+symbol = ' '
+style = 'bold cyan'
+
+# ── 命令耗时 ──────────────────────────────────────────────────────────────────
+[cmd_duration]
+min_time = 2000
+format = 'took [$duration]($style) '
+style = 'bold yellow'
+
+# ── 提示符字符 ────────────────────────────────────────────────────────────────
+[character]
+success_symbol = '[➜](bold green)'
+error_symbol = '[➜](bold red)'
+
+# ── 显式关闭的模块 ────────────────────────────────────────────────────────────
+[package]
+disabled = true
