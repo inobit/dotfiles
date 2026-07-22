@@ -54,7 +54,7 @@ mod.SUPER_CTRL = mod.SUPER .. "|CTRL"
 mod.SUPER_SHIFT = mod.SUPER .. "|SHIFT"
 
 if is_windows then
-	config.default_prog = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" }
+	config.default_prog = { "pwsh.exe" }
 end
 
 -- colors
