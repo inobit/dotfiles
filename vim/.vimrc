@@ -14,6 +14,11 @@ set hidden
 " Set highlight on search, but clear on pressing <Esc> in normal mode
 set hlsearch
 
+" mkdir -p ~/.local/state/vim/undo
+set undodir=~/.local/state/vim/undo//
+set undofile
+
+
 set number
 set relativenumber
 set mouse=a
