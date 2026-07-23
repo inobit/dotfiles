@@ -1,12 +1,16 @@
 # systemd 快捷操作 — 统一入口
-# 用法: sc <action> [service...]
+# 用法: sc [-u] <action> [service...]
+#   -u: 操作 systemctl --user（用户服务），无需 sudo
 #   action: start|s  stop|x  restart|r  reload|re  enable|u  disable|d  status|i  list|l
 # 示例:
 #   sc s nginx          → sudo systemctl start nginx
+#   sc -u s mysvc       → systemctl --user start mysvc
 #   sc x nginx sshd     → sudo systemctl stop nginx sshd
 #   sc re nginx         → sudo systemctl reload nginx
-#   sc i nginx          → systemctl status nginx (无需 sudo)
+#   sc i nginx          → systemctl status nginx
+#   sc -u i mysvc       → systemctl --user status mysvc
 #   sc l                → systemctl list-units
+#   sc -u l             → systemctl --user list-units
 #   sc l -a             → systemctl list-units --all
 #   sc l -A             → systemctl list-unit-files
 #   sc l -t socket      → 指定类型
@@ -14,7 +18,9 @@
 sc() {
 	[[ $# -eq 0 ]] && {
 		cat >&2 <<'EOF'
-Usage: sc <action> [service...]
+Usage: sc [-u] <action> [service...]
+
+  -u            Use systemctl --user (user services, no sudo)
 
 Actions:
   start|s     Start service(s)
@@ -23,11 +29,18 @@ Actions:
   reload|re   Reload service(s)
   enable|u    Enable service(s)
   disable|d   Disable service(s)
-  status|i    Status of service(s)  (no sudo)
+  status|i    Status of service(s)
   list|l      List units  (supports -a / -A / -t <type>)
 EOF
 		return 1
 	}
+
+	# -u: 操作 systemctl --user（用户服务）
+	local use_user=""
+	if [[ "$1" == "-u" ]]; then
+		use_user=1
+		shift
+	fi
 
 	local action=""
 	case "$1" in
@@ -46,6 +59,14 @@ EOF
 		;;
 	esac
 	shift
+
+	if [[ -n "$use_user" ]]; then
+		local sysctl=(systemctl --user)
+		local sudosysctl=(systemctl --user)
+	else
+		local sysctl=(systemctl)
+		local sudosysctl=(sudo systemctl)
+	fi
 
 	# list 有自己的选项解析
 	if [[ "$action" == "list" ]]; then
@@ -70,9 +91,9 @@ EOF
 		shift
 		done
 		if [[ -n "$files" ]]; then
-			systemctl list-unit-files --type="$type" $all
+			"${sysctl[@]}" list-unit-files --type="$type" $all
 		else
-			systemctl list-units --type="$type" $all
+			"${sysctl[@]}" list-units --type="$type" $all
 		fi
 		return $?
 	fi
@@ -84,8 +105,8 @@ EOF
 	}
 
 	if [[ "$action" == "status" ]]; then
-		systemctl status "$@"
+		"${sysctl[@]}" status "$@"
 	else
-		sudo systemctl "$action" "$@"
+		"${sudosysctl[@]}" "$action" "$@"
 	fi
 }
