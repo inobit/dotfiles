@@ -32,5 +32,12 @@ return {
         vim.lsp.buf.hover()
       end
     end)
+    vim.keymap.set("n", "zS", function()
+      local level = vim.v.count
+      if level == 0 then
+        level = 2
+      end
+      require("ufo").closeFoldsWith(level)
+    end, { desc = "Collapse level greater than N (default 2)" })
   end,
 }
