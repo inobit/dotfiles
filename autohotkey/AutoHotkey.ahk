@@ -15,6 +15,7 @@ for (app in apps) {
 #HotIf
 
 ^!p::Run("wezterm-gui.exe")
+^!n::Run("notepad3.exe")
 
 ; 支持 jj 双击和 ESC 切换的应用列表
 global DOUBLE_J_THRESHOLD := 300
@@ -22,6 +23,7 @@ global lastJTime := 0
 global jPressed := false
 
 global TARGET_APPS := [
+    "ahk_exe datagrip64.exe",
     "ahk_exe Obsidian.exe",
     "ahk_exe wezterm-gui.exe",
     "ahk_exe WindowsTerminal.exe",
