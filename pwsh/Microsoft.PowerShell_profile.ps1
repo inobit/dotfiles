@@ -227,8 +227,6 @@ function sops {
 #   Import-Module "$ChocolateyProfile"
 # }
 
-# uv config
-$env:Path = "$env:USERPROFILE\.local\bin;" + $env:Path
 # uv auto complete（优先用静态缓存，避免每次启动 fork Python 进程）
 $_uvCompletion = "$_completionsDir\uv-completion.ps1"
 if (Test-Path $_uvCompletion) { . $_uvCompletion } else { (& uv generate-shell-completion powershell) | Out-String | Invoke-Expression }
