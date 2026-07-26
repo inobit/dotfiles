@@ -1,0 +1,30 @@
+Windows Registry Editor Version 5.00
+
+; --- 1. 所有文件右键「用 Notepad3 打开」---
+[-HKEY_CLASSES_ROOT\*\shell\Open with Notepad3]
+[HKEY_CLASSES_ROOT\*\shell\Open with Notepad3]
+@="用 Notepad3 打开"
+"Icon"="D:\\apps\\Scoop\\apps\\notepad3\\current\\Notepad3.exe"
+
+[HKEY_CLASSES_ROOT\*\shell\Open with Notepad3\command]
+@="\"D:\\apps\\Scoop\\apps\\notepad3\\current\\Notepad3.exe\" \"%1\""
+
+; --- 2. 替换 .txt 文件的「编辑」菜单（HKCU 优先级高于 HKCR）---
+[-HKEY_CURRENT_USER\Software\Classes\txtfile\shell\edit\command]
+[HKEY_CURRENT_USER\Software\Classes\txtfile\shell\edit\command]
+@="\"D:\\apps\\Scoop\\apps\\notepad3\\current\\Notepad3.exe\" \"%1\""
+
+; --- 3. 替换所有文本类型文件的「编辑」菜单 ---
+[-HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\text\shell\edit\command]
+[HKEY_CURRENT_USER\Software\Classes\SystemFileAssociations\text\shell\edit\command]
+@="\"D:\\apps\\Scoop\\apps\\notepad3\\current\\Notepad3.exe\" \"%1\""
+
+; --- 4. 系统级替换 .txt 文件的「编辑」---
+[-HKEY_CLASSES_ROOT\txtfile\shell\edit\command]
+[HKEY_CLASSES_ROOT\txtfile\shell\edit\command]
+@="\"D:\\apps\\Scoop\\apps\\notepad3\\current\\Notepad3.exe\" \"%1\""
+
+; --- 5. 系统级替换所有文本类型的「编辑」---
+[-HKEY_CLASSES_ROOT\SystemFileAssociations\text\shell\edit\command]
+[HKEY_CLASSES_ROOT\SystemFileAssociations\text\shell\edit\command]
+@="\"D:\\apps\\Scoop\\apps\\notepad3\\current\\Notepad3.exe\" \"%1\""
