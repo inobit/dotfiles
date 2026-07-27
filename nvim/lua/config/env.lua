@@ -2,9 +2,10 @@
 require("lib.dotenv").eval(vim.fs.joinpath(vim.fn.stdpath "config", ".env"), true)
 
 -- python env
+local py_ver = vim.env.NVIM_PYTHON_VERSION or "3.12"
 local pylib = require "lib.python"
-_, _, vim.g.python3_host_prog = pylib.setup_nvim_venv("nvim", "3.12")
-local _, mason_python_bin, _ = pylib.setup_nvim_venv("mason", "3.12")
+_, _, vim.g.python3_host_prog = pylib.setup_nvim_venv("nvim", py_ver)
+local _, mason_python_bin, _ = pylib.setup_nvim_venv("mason", py_ver)
 if mason_python_bin then
   if vim.fn.has "win32" == 1 or vim.fn.has "win64" == 1 then
     vim.env.PATH = mason_python_bin .. ";" .. vim.env.PATH
