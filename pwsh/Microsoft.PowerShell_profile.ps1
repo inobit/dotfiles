@@ -79,6 +79,9 @@ if (Get-Command -Name "bat" -ErrorAction SilentlyContinue) {
   Set-Alias cat bat
 }
 
+# Admin shortcut
+function admin { Start-Process pwsh -Verb RunAs }
+
 # Utilities
 function which ($command) {
     $result = Get-Command -Name $command -ErrorAction SilentlyContinue |

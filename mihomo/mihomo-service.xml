@@ -1,0 +1,13 @@
+<service>
+  <id>MihomoProxy</id>
+  <name>Mihomo Proxy</name>
+  <description>Mihomo Proxy Service (scoop managed)</description>
+  <workingdirectory>%BASE%</workingdirectory>  <executable>D:\apps\Scoop\shims\mihomo.exe</executable>
+  <arguments>-d %BASE%</arguments>
+  <startmode>Automatic</startmode>
+  <logpath>%BASE%\logs</logpath>
+  <log mode="roll-by-size">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>3</keepFiles>
+  </log>
+</service>
