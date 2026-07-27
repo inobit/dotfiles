@@ -33,15 +33,14 @@ M.lsp_servers = {
   "cssls",
   "jsonls",
   "bashls", -- If shellcheck is installed, bash-language-server will automatically call it to provide linting
-  "dockerls",
   -- "sqlls", -- disable, conflict with dbee-cmp
   "yamlls",
-  "docker_compose_language_service",
   "clangd",
   "emmet_ls",
   "marksman",
   "eslint", --vsocde eslint, package name is eslint-lsp, need install eslint (global or local)
   "tombi",
+  "docker_language_server"
 }
 
 ---@type string[]
