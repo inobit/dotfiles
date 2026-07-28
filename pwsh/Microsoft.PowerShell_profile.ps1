@@ -42,6 +42,7 @@ Remove-PSReadLineKeyHandler -Chord Ctrl+SpaceBar
 # Set-Alias ll ls
 Set-Alias vim nvim
 Set-Alias grep findstr
+Set-Alias kill Stop-Process
 
 
 # git alias
@@ -80,9 +81,46 @@ if (Get-Command -Name "bat" -ErrorAction SilentlyContinue) {
 }
 
 # Admin shortcut
-function admin { Start-Process pwsh -Verb RunAs }
+function admin { Start-Process wezterm-gui -Verb RunAs }
 
 # Utilities
+# lockkill — 查找并结束占用文件/目录的进程（需 scoop install sysinternals）
+function lockkill {
+    param(
+        [Parameter(Mandatory, Position = 0)][string]$Path,
+        [switch]$DryRun
+    )
+
+    if (-not (Get-Command handle64 -ErrorAction SilentlyContinue)) {
+        Write-Host "handle64 not found. Run:" -ForegroundColor Yellow
+        Write-Host "  scoop install sysinternals" -ForegroundColor Green
+        return
+    }
+
+    $output = & handle64 -accepteula $Path 2>$null
+    if (-not $output) {
+        Write-Host "No process found locking: $Path" -ForegroundColor Gray
+        return
+    }
+
+    $items = @($output | ForEach-Object { if ($_ -match '(.+?)\s+pid:\s*(\d+)') { [pscustomobject]@{ Process = $Matches[1]; PID = [int]$Matches[2] } } })
+    if (-not $items) {
+        Write-Host "Could not parse PID from handle64 output." -ForegroundColor Yellow
+        return
+    }
+
+    $items | Sort-Object PID -Unique | ForEach-Object {
+        if ($DryRun) {
+            Write-Host "Would kill: $($_.Process) (PID $($_.PID))" -ForegroundColor DarkYellow
+        } else {
+            Write-Host "Killing $($_.Process) (PID $($_.PID)) ..." -ForegroundColor Red
+            Stop-Process -Id $_.PID -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    if (-not $DryRun) { Write-Host "Done." -ForegroundColor Green }
+}
+
 function which ($command) {
     $result = Get-Command -Name $command -ErrorAction SilentlyContinue |
         Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
