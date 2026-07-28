@@ -1,8 +1,8 @@
+# mihomo version: v1.19.29
 # global config
 mixed-port: 7890
 allow-lan: true
 mode: rule
-global-client-fingerprint: chrome # 设置全局客户端指纹为 Chrome，使 Clash 在建立连接时模拟 Chrome 浏览器的 TLS 指纹，增强隐私性和绕过某些网站的指纹检测
 # geo config
 geodata-mode: true
 geodata-loader: memconservative
@@ -117,6 +117,7 @@ proxy-providers:
     interval: 3600
     proxy: DIRECT
     size-limit: 0
+    client-fingerprint: chrome
     header:
       User-Agent:
         - "Clash/v1.18.0"
