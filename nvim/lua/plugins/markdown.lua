@@ -4,17 +4,17 @@ return {
     version = "*", -- recommended, use latest release instead of latest commit
     -- ft = "markdown",
     event = {
-      "BufReadPre " .. vim.g.obsidian_vault .. "*.md",
-      "BufNewFile " .. vim.g.obsidian_vault .. "*.md",
-      "BUfWritePre " .. vim.g.obsidian_vault .. "*.md",
+      "BufReadPre " .. vim.fs.joinpath(vim.g.obsidian_vault, "*.md"),
+      "BufNewFile " .. vim.fs.joinpath(vim.g.obsidian_vault, "*.md"),
+      "BUfWritePre " .. vim.fs.joinpath(vim.g.obsidian_vault, "*.md"),
     },
     init = function()
       -- create work and personal dir
-      if vim.fn.isdirectory(vim.g.obsidian_vault .. "personal/") == 0 then
-        vim.fn.mkdir(vim.g.obsidian_vault .. "personal/", "p")
+      if vim.fn.isdirectory(vim.fs.joinpath(vim.g.obsidian_vault, "personal")) == 0 then
+        vim.fn.mkdir(vim.fs.joinpath(vim.g.obsidian_vault, "personal"), "p")
       end
-      if vim.fn.isdirectory(vim.g.obsidian_vault .. "work/") == 0 then
-        vim.fn.mkdir(vim.g.obsidian_vault .. "work/", "p")
+      if vim.fn.isdirectory(vim.fs.joinpath(vim.g.obsidian_vault, "work")) == 0 then
+        vim.fn.mkdir(vim.fs.joinpath(vim.g.obsidian_vault, "work"), "p")
       end
     end,
     ---@module 'obsidian'
@@ -23,14 +23,15 @@ return {
       workspaces = {
         {
           name = "personal",
-          path = vim.fn.expand(vim.g.obsidian_vault .. "personal/"),
+          path = vim.fn.expand(vim.fs.joinpath(vim.g.obsidian_vault, "personal")),
         },
         {
           name = "work",
-          path = vim.fn.expand(vim.g.obsidian_vault .. "work/"),
+          path = vim.fn.expand(vim.fs.joinpath(vim.g.obsidian_vault, "work")),
         },
       },
       legacy_commands = false,
+      ---@diagnostic disable-next-line: missing-fields
       ui = {
         enable = false,
       },
