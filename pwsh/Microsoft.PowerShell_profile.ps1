@@ -274,18 +274,8 @@ if (Test-Path $_uvCompletion) { . $_uvCompletion } else { (& uv generate-shell-c
 $_uvxCompletion = "$_completionsDir\uvx-completion.ps1"
 if (Test-Path $_uvxCompletion) { . $_uvxCompletion } else { (& uvx --generate-shell-completion powershell) | Out-String | Invoke-Expression }
 
-$_mihomoshCompletion = "$_completionsDir\mihomosh-completion.ps1"
-if (Get-Command -Name mihomosh -ErrorAction SilentlyContinue) {
-    if (Test-Path $_mihomoshCompletion) {
-        . $_mihomoshCompletion
-    } else {
-        (& mihomosh shell-completion powershell) | Out-String | Invoke-Expression
-    }
-}
-
-# fnm（优先用静态缓存，避免每次启动 fork Node 进程）
-$_fnmEnv = "$_completionsDir\fnm-env.ps1"
-if (Test-Path $_fnmEnv) { . $_fnmEnv } else { fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression }
+# fnm — 实时生成 env 脚本（不缓存，避免 PATH 快照过时）
+fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
 $_fnmComp = "$_completionsDir\fnm-completions.ps1"
 if (Test-Path $_fnmComp) { . $_fnmComp } else { fnm completions --shell powershell | Out-String | Invoke-Expression }
 
@@ -294,12 +284,8 @@ function Update-Completions {
     $d = "$PSScriptRoot\completions"
     New-Item -ItemType Directory -Force -Path $d | Out-Null
     starship init powershell | Out-String | Set-Content "$d\starship-init.ps1"
-    fnm env --use-on-cd --shell powershell | Out-String | Set-Content "$d\fnm-env.ps1"
     fnm completions --shell powershell | Out-String | Set-Content "$d\fnm-completions.ps1"
     uv generate-shell-completion powershell | Out-String | Set-Content "$d\uv-completion.ps1"
     uvx --generate-shell-completion powershell | Out-String | Set-Content "$d\uvx-completion.ps1"
-    if (Get-Command -Name mihomosh -ErrorAction SilentlyContinue) {
-        mihomosh shell-completion powershell | Out-String | Set-Content "$d\mihomosh-completion.ps1"
-    }
     Write-Host "Completions updated: $d" -ForegroundColor Green
 }
