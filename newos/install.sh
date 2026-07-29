@@ -74,12 +74,13 @@ prepare() {
 # functions
 
 # versions
-GIT_DELTA_VERSION="0.18.2"
-FZF_VERSION="0.65.2"
-NVIM_VERSION="0.11.4"
-TREE_SITTER_VERSION="0.25.9"
-TMUX_VERSION="3.6"
-GO_VERSION="1.26.1"
+GIT_DELTA_VERSION="0.19.2"
+FZF_VERSION="0.74.1"
+NVIM_VERSION="0.12.4"
+TREE_SITTER_VERSION="0.26.11"
+TMUX_VERSION="3.7b"
+GO_VERSION="1.26.5"
+NODE_VERSION="24"
 
 # config locale
 config_locale() {
@@ -148,26 +149,6 @@ EOF
 	info "env and alias configed"
 }
 
-# config proxy
-config_proxy() {
-	info "config proxy"
-	read -r -p "input proxy address: " proxy
-	if [[ -n $proxy ]]; then
-		export ALL_PROXY=$proxy
-		export NO_PROXY="127.0.0.1,localhost,::1"
-		if grep -q 'ID=debian' /etc/os-release || grep -q 'ID=ubuntu' /etc/os-release; then
-			test -f /etc/apt/apt.conf || sudo touch /etc/apt/apt.conf
-			if grep -q '^Acquire' /etc/apt/apt.conf; then
-				sudo sed -i '/^Acquire/d' /etc/apt/apt.conf
-			fi
-			echo "Acquire::http::Proxy \"$proxy\";" | sudo tee -a /etc/apt/apt.conf >/dev/null
-		fi
-		info "Proxy config done."
-	else
-		warn "Proxy config canceled."
-	fi
-}
-
 # config ssh agent
 config_ssh_agent() {
 	info "config ssh agent"
@@ -233,7 +214,7 @@ pull_dotfiles() {
 install_git_delta() {
 	info "install git-delta"
 	if ! which delta >/dev/null 2>&1; then
-		GIT_DELTA_VERSION=${GIT_DELTA_VERSION:-"0.18.2"}
+		GIT_DELTA_VERSION=${GIT_DELTA_VERSION:-"0.19.2"}
 		file_name="git-delta_${GIT_DELTA_VERSION}_amd64.deb"
 		full_name="$DOWNLOADS_DIR/$file_name"
 		if [[ ! -f "$DOWNLOADS_DIR/$file_name" ]]; then
@@ -288,7 +269,7 @@ install_btop() {
 install_fzf() {
 	info "install fzf"
 	if [[ ! -f "$HOME"/.local/bin/fzf ]]; then
-		FZF_VERSION=${FZF_VERSION:-"0.65.2"}
+		FZF_VERSION=${FZF_VERSION:-"0.74.1"}
 		local fzf_home="$HOME/.fzf"
 		curl -fSsL --create-dirs -o "$fzf_home"/bin/fzf.tar.gz https://github.com/junegunn/fzf/releases/download/v"$FZF_VERSION"/fzf-"$FZF_VERSION"-linux_amd64.tar.gz
 		tar -zxf "$fzf_home"/bin/fzf.tar.gz -C "$fzf_home"/bin
@@ -308,7 +289,7 @@ install_fzf() {
 install_nvim() {
 	info "install nvim"
 	if ! which nvim >/dev/null 2>&1; then
-		NVIM_VERSION=${NVIM_VERSION:-"0.11.4"}
+		NVIM_VERSION=${NVIM_VERSION:-"0.12.4"}
 		info "nvim version to install: $NVIM_VERSION"
 		local base_name="nvim-linux-x86_64"
 		local file_name="$base_name.tar.gz"
@@ -340,7 +321,7 @@ install_nvim() {
 
 	info "install tree-sitter"
 	if [[ ! -f $HOME/.local/bin/tree-sitter ]]; then
-		TREE_SITTER_VERSION=${TREE_SITTER_VERSION:-"0.25.9"}
+		TREE_SITTER_VERSION=${TREE_SITTER_VERSION:-"0.26.11"}
 		test -d "$HOME"/.local/bin || mkdir -p "$HOME"/.local/bin
 		local file_name="tree-sitter-linux-x64.gz"
 		local full_name="$DOWNLOADS_DIR/$file_name"
@@ -348,29 +329,19 @@ install_nvim() {
 		file_base_name="${full_name%.*}"
 		if [[ ! -f $full_name ]]; then
 			info "downloading $file_name"
-			curl -fSsLo "$full_name" https://github.com/tree-sitter/tree-sitter/releases/download/v"$TREE_SITTER_VERSION"/"$file_name"
+			curl -fsSLo "$full_name" "https://github.com/tree-sitter/tree-sitter/releases/download/v$TREE_SITTER_VERSION/$file_name"
 		fi
 		gunzip -k -c "$full_name" >"$file_base_name"
 		chmod a+x "$file_base_name"
 		mv "$file_base_name" "$HOME"/.local/bin/tree-sitter
 	fi
 	info "tree-sitter installed"
-
-	info "custom mycurl"
-	if [[ ! -x $HOME/.local/bin/mycurl ]]; then
-		cat <<'EOF' >"$HOME"/.local/bin/mycurl
-#!/bin/bash
-/usr/bin/curl --no-buffer "$@"
-EOF
-		chmod a+x "$HOME"/.local/bin/mycurl
-	fi
-	info "mycurl config done"
 }
 
 install_tmux() {
 	info "install tmux"
 	if ! which tmux >/dev/null 2>&1; then
-		TMUX_VERSION=${TMUX_VERSION:-"3.4"}
+		TMUX_VERSION=${TMUX_VERSION:-"3.7b"}
 		_install libevent-dev ncurses-dev build-essential bison pkg-config
 		# sudo apt install tmux
 		local base_name="tmux-$TMUX_VERSION"
@@ -379,7 +350,7 @@ install_tmux() {
 		local source_dir="$DOWNLOADS_DIR/$base_name"
 		if [[ ! -f $full_name ]]; then
 			info "downloading $file_name"
-			curl -fSsLo "$full_name" "https://github.com/tmux/tmux/releases/download/$TMUX_VERSION/$file_name"
+			curl -fsSLo "$full_name" "https://github.com/tmux/tmux/releases/download/$TMUX_VERSION/$file_name"
 		fi
 		test -d "$source_dir" && rm -rf "$source_dir"
 		tar -zxf "$full_name" -C "$DOWNLOADS_DIR"
@@ -415,7 +386,7 @@ install_tmux() {
 	info "plugin manager installed"
 
 	info "config ssh auth socks"
-	if [[ -f $HOME/documents/dotfiles/ssh/rc ]]; then
+	if [[ -f $DOTFILES/ssh/rc ]]; then
 		test -d "$HOME"/.ssh || mkdir -p "$HOME"/.ssh
 		cp "$DOTFILES"/ssh/rc "$HOME"/.ssh
 		info "ssh auth socks config done"
@@ -432,13 +403,14 @@ install_node_env() {
 	fi
 	info "fnm installed"
 
-	info "install node 22"
-	if [[ -z $(find "$FNM_PATH"/node-versions -maxdepth 1 -type d -regex ".*v22[\.0-9]+$" 2>/dev/null) ]]; then
-		"$FNM_PATH"/fnm install 22
+	info "install node $NODE_VERSION"
+	if [[ -z $(find "$FNM_PATH"/node-versions -maxdepth 1 -type d -regex ".*v${NODE_VERSION}[\.0-9]+$" 2>/dev/null) ]]; then
+		"$FNM_PATH"/fnm install "$NODE_VERSION"
 	fi
-	info "node 22 installed"
+	info "node $NODE_VERSION installed"
 
-	"$FNM_PATH"/fnm default 22
+	"$FNM_PATH"/fnm default "$NODE_VERSION"
+	eval "$("$FNM_PATH"/fnm env)"
 
 	info "install pnpm"
 	if [[ ! -d $HOME/.local/share/pnpm ]]; then
@@ -466,7 +438,7 @@ install_rust_env() {
 install_go_env() {
 	info "install go"
 	if ! which go >/dev/null 2>&1; then
-		GO_VERSION=${GO_VERSION:-"1.26.1"}
+		GO_VERSION=${GO_VERSION:-"1.26.5"}
 		local file_name="go${GO_VERSION}.linux-amd64.tar.gz"
 		local full_name="$DOWNLOADS_DIR/$file_name"
 		if [[ ! -f $full_name ]]; then
@@ -581,15 +553,15 @@ EOF
 install_gh() {
 	info "install gh (GitHub CLI)"
 	if ! which gh >/dev/null 2>&1; then
-		(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
-			&& sudo mkdir -p -m 755 /etc/apt/keyrings \
-			&& out=$(mktemp) && wget -nv -O"$out" https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-			&& cat "$out" | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null \
-			&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-			&& sudo mkdir -p -m 755 /etc/apt/sources.list.d \
-			&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null \
-			&& sudo apt update \
-			&& sudo apt install gh -y
+		(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) &&
+			sudo mkdir -p -m 755 /etc/apt/keyrings &&
+			out=$(mktemp) && wget -nv -O"$out" https://cli.github.com/packages/githubcli-archive-keyring.gpg &&
+			cat "$out" | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null &&
+			sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg &&
+			sudo mkdir -p -m 755 /etc/apt/sources.list.d &&
+			echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null &&
+			sudo apt update &&
+			sudo apt install gh -y
 		info "gh installed"
 	else
 		info "$(gh --version | head -1) is already installed"
@@ -672,7 +644,6 @@ FUNC_REGISTRY=(
 	"config_locale|配置系统语言环境"
 	"config_timezone|配置系统时区"
 	"config_env_and_alias|配置环境变量和别名"
-	"config_proxy|配置系统代理"
 	"config_ssh_agent|配置 SSH 代理"
 	"config_firewall|配置防火墙规则"
 	"pull_dotfiles|克隆 dotfiles 仓库"
