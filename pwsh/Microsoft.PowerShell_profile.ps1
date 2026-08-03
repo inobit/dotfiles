@@ -42,7 +42,6 @@ Remove-PSReadLineKeyHandler -Chord Ctrl+SpaceBar
 # Set-Alias ll ls
 Set-Alias vim nvim
 Set-Alias grep findstr
-Set-Alias kill Stop-Process
 
 
 # git alias
@@ -288,4 +287,95 @@ function Update-Completions {
     uv generate-shell-completion powershell | Out-String | Set-Content "$d\uv-completion.ps1"
     uvx --generate-shell-completion powershell | Out-String | Set-Content "$d\uvx-completion.ps1"
     Write-Host "Completions updated: $d" -ForegroundColor Green
+}
+
+# === 类 Linux 后台任务：bg / jobs / fg / kill ===
+# 用法：bg "ssh -N -L 8080:localhost:80 host" 或 bg { ssh -N -L 8080:localhost:80 host }
+#       jobs           查看后台任务（Job / 状态 / 命令）
+#       fg %<Id>       阻塞等待作业并回放输出（Ctrl+C 仅中断等待，作业仍在后台）
+#       kill %<Id>     终止后台任务（% 开头 → job id，如 kill %1）
+#       kill %<name>   按作业名匹配终止，如 kill %sleep
+#       kill <pid>     杀进程（不带 % 即按 PID）
+# 注：输出统一显示 [N]（同 bash 的 jobs 格式）；%N 仅作为命令参数引用语法
+Remove-Alias kill -Force -ErrorAction SilentlyContinue
+function bg {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [object]$Command
+    )
+
+    $sb = if ($Command -is [scriptblock]) { $Command } else { [scriptblock]::Create($Command) }
+    $job = Start-Job -ScriptBlock $sb -Name ($Command.ToString() -replace '\s+', ' ').Trim()
+    Write-Host ("[{0}] {1}" -f $job.Id, $job.Name)
+}
+
+function jobs {
+    Get-Job |
+        Select-Object @{n = 'Job'; e = { '[' + $_.Id + ']' } }, State, @{n = 'Command'; e = { $_.Name } } |
+        Format-Table -AutoSize
+}
+
+function kill {
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Target
+    )
+
+    if ($Target -match '^%(?<id>\d+)$') {
+        $job = Get-Job -Id ([int]$Matches['id']) -ErrorAction SilentlyContinue
+        if (-not $job) { Write-Host "kill: no such job %$($Matches['id'])" -ForegroundColor Yellow; return }
+        Stop-Job -Id $job.Id -ErrorAction SilentlyContinue
+        Remove-Job -Id $job.Id -Force -ErrorAction SilentlyContinue
+        Write-Host "killed job [$($job.Id)] $($job.Name)"
+    }
+    elseif ($Target -match '^%(?<name>\S+)$') {
+        $jobs = @(Get-Job -Name "$($Matches['name'])*" -ErrorAction SilentlyContinue)
+        if ($jobs.Count -eq 0) { Write-Host "kill: no such job %$($Matches['name'])" -ForegroundColor Yellow; return }
+        if ($jobs.Count -gt 1) {
+            Write-Host "kill: ambiguous job name %$($Matches['name']):" -ForegroundColor Yellow
+            $jobs | ForEach-Object { Write-Host ("  %{0} {1}" -f $_.Id, $_.Name) }
+            return
+        }
+        Stop-Job -Id $jobs[0].Id -ErrorAction SilentlyContinue
+        Remove-Job -Id $jobs[0].Id -Force -ErrorAction SilentlyContinue
+        Write-Host "killed job [$($jobs[0].Id)] $($jobs[0].Name)"
+    }
+    else {
+        Stop-Process -Id ([int]$Target) -Force
+        Write-Host "killed process $Target"
+    }
+}
+
+function fg {
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Target
+    )
+
+    if ($Target -notmatch '^%(?<id>\d+)$') {
+        Write-Host "usage: fg %<jobid>  (e.g. fg %1)" -ForegroundColor Yellow
+        return
+    }
+    $job = Get-Job -Id ([int]$Matches['id']) -ErrorAction SilentlyContinue
+    if (-not $job) { Write-Host "fg: no such job %$($Matches['id'])" -ForegroundColor Yellow; return }
+
+    $jobId = $job.Id
+    try {
+        Receive-Job -Id $jobId -Wait
+    }
+    finally {
+        # Ctrl+C 后 Write-Host 会静默失败（PowerShell 已知问题 #19988/#23786），
+        # 用 Console 直接写，并临时改前景色实现黄色提示
+        $state = (Get-Job -Id $jobId -ErrorAction SilentlyContinue).State
+        $saved = [System.Console]::ForegroundColor
+        [System.Console]::ForegroundColor = [ConsoleColor]::Yellow
+        if ($state -in @('Completed', 'Failed', 'Stopped')) {
+            [System.Console]::WriteLine("tip: 作业 [$jobId] 已结束，状态: $state")
+        }
+        else {
+            [System.Console]::WriteLine("tip: 等待被中断，作业 [$jobId] 仍在后台，用 kill %$jobId 终止")
+        }
+        [System.Console]::ForegroundColor = $saved
+    }
 }
