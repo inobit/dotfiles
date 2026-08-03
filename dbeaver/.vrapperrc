@@ -1,0 +1,160 @@
+" ============================================================
+" Vrapper 配置 - DBeaver
+" 插件安装源: http://vrapper.sourceforge.net/update-site/stable
+" 加载: 本文件软链接到 ~/.vrapperrc (默认加载位置)
+" 修改后重启 DBeaver 或重开编辑器生效
+" 语法: https://vrapper.sourceforge.net/documentation
+" ============================================================
+
+" ---- 前缀键 ----
+" 注意: Vrapper 无法设置空格 mapleader (let 解析有缺陷), 直接使用 <SPACE> 前缀
+" ---- 基础设置 ----
+set ignorecase
+set smartcase
+set hlsearch
+set incsearch
+set number
+set scrolloff=5
+set clipboard=unnamedplus
+
+" ---- 插入模式 ----
+inoremap jj <ESC>
+" 需要解绑key
+imap <C-j> <CR>
+" 需要解绑key
+inoremap <C-l> <Right>
+
+" ---- 文件操作 ----
+nnoremap <SPACE>w :w<ENTER>
+nnoremap <SPACE>nh :noh<ENTER>
+nnoremap <SPACE>p "0p
+nnoremap <SPACE>P "0P
+nnoremap ' `
+
+" ---- 移动行 ----
+nnoremap <A-j> :move-line-down<ENTER>
+vnoremap <A-j> :move-line-down<ENTER>
+nnoremap <A-k> :move-line-up<ENTER>
+vnoremap <A-k> :move-line-up<ENTER>
+
+" ---- 跳转历史 ----
+nnoremap <C-o> :back-history<ENTER>
+nnoremap <C-i> :forward-history<ENTER>
+
+" ---- 代码跳转/提示 ----
+nnoremap gd :goto-sql-object<ENTER>
+nnoremap K :show-info<ENTER>
+nnoremap <A-,> :content-assist<ENTER>
+
+" ---- 注释 ----
+nnoremap gc :line-comment<ENTER>
+vnoremap gc :line-comment<ENTER>
+nnoremap gb :block-comment<ENTER>
+vnoremap gb :block-comment<ENTER>
+
+" ---- 格式化----
+nnoremap gq :format-sql<ENTER>
+vnoremap gq :format-sql<ENTER>
+
+" ---- 折叠 ----
+nnoremap zc :fold-collapse<ENTER>
+nnoremap zo :fold-expand<ENTER>
+nnoremap zC :fold-collapse-all<ENTER>
+nnoremap zO :fold-expand-all<ENTER>
+nnoremap zm :fold-collapse-all<ENTER>
+nnoremap zr :fold-expand-all<ENTER>
+
+" ---- 搜索/跳转对话框 ----
+nnoremap <SPACE>sa :quick-access<ENTER>
+nnoremap <SPACE>sf :open-resource<ENTER>
+nnoremap <SPACE>sg :search-dialog<ENTER>
+vnoremap <SPACE>sg :search-dialog<ENTER>
+nnoremap <SPACE>ss :find-replace<ENTER>
+vnoremap <SPACE>ss :find-replace<ENTER>
+nnoremap <SPACE>sx :find-replace<ENTER>
+vnoremap <SPACE>sx :find-replace<ENTER>
+
+" ---- 文件/脚本管理 ----
+nnoremap <SPACE>rf :rename-script<ENTER>
+
+" 自定义命令名必须以大写字母开头 (Vrapper 限制)
+command Enew new-script
+command Cnew new-console
+cnoremap enew Enew
+cnoremap cnew Cnew
+" 重载配置 (改完 .vrapperrc 后执行, 无需重启)
+command Reload source ~/.vrapperrc
+cnoremap reload Reload
+" 退出整个 DBeaver
+command Exit exit-app
+cnoremap exit Exit
+" 执行整个脚本文件 (原始命令 :run-script)
+command Runs run-script
+cnoremap runs Runs
+
+" ---- 标签页/编辑器 ----
+nnoremap [b :tabprevious<ENTER>
+nnoremap ]b :tabnext<ENTER>
+nnoremap <SPACE>bb :close-editor<ENTER>
+nnoremap <SPACE>bo :close-others<ENTER>
+nnoremap <SPACE>ba :close-all<ENTER>
+
+" ---- 窗口分割 (需安装 Split Editor 特性) ----
+nnoremap <SPACE>sp :split<ENTER>
+nnoremap <SPACE>vp :vsplit<ENTER>
+
+" ---- SQL 执行 ----
+nnoremap <SPACE>rr :run-statement<ENTER>
+vnoremap <SPACE>rr :run-statement<ENTER>
+nnoremap <SPACE>rs :cancel-query<ENTER>
+nnoremap <SPACE>rp :run-explain<ENTER>
+vnoremap <SPACE>rp :run-explain<ENTER>
+nnoremap <SPACE>fc :select-connection<ENTER>
+nnoremap <SPACE>fm :select-schema<ENTER>
+nnoremap <SPACE>fe :toggle-navigator<ENTER>
+nnoremap ]q :next-query<ENTER>
+nnoremap [q :prev-query<ENTER>
+
+" ============================================================
+" Eclipse 标准命令
+" ============================================================
+eclipseaction move-line-down org.eclipse.ui.edit.text.moveLineDown
+eclipseaction move-line-up org.eclipse.ui.edit.text.moveLineUp
+eclipseaction back-history org.eclipse.ui.navigate.backwardHistory
+eclipseaction forward-history org.eclipse.ui.navigate.forwardHistory
+eclipseuiaction show-info org.eclipse.ui.edit.text.showInformation
+eclipseuiaction content-assist org.eclipse.ui.edit.text.contentAssist.proposals
+eclipseaction line-comment org.jkiss.dbeaver.ui.editors.sql.comment.single
+eclipseaction block-comment org.jkiss.dbeaver.ui.editors.sql.comment.multi
+eclipseaction fold-collapse org.eclipse.ui.edit.text.folding.collapse
+eclipseaction fold-expand org.eclipse.ui.edit.text.folding.expand
+eclipseaction fold-collapse-all org.jkiss.dbeaver.ui.editors.sql.CollapseAllFoldings
+eclipseaction fold-expand-all org.jkiss.dbeaver.ui.editors.sql.ExpandAllFoldings
+eclipseuiaction quick-access org.eclipse.ui.window.quickAccess
+eclipseuiaction open-resource org.eclipse.ui.navigate.openResource
+eclipseuiaction find-replace org.eclipse.ui.edit.findReplace
+eclipseuiaction search-dialog org.eclipse.search.ui.openSearchDialog
+eclipseaction close-editor org.eclipse.ui.file.close
+eclipseaction close-others org.eclipse.ui.file.closeOthers
+eclipseaction close-all org.eclipse.ui.file.closeAll
+eclipseaction exit-app org.eclipse.ui.file.exit
+
+" ============================================================
+" DBeaver 命令
+" ============================================================
+eclipseaction run-statement org.jkiss.dbeaver.ui.editors.sql.run.statement
+eclipseaction run-script org.jkiss.dbeaver.ui.editors.sql.run.script
+eclipseaction run-explain org.jkiss.dbeaver.ui.editors.sql.run.explain
+eclipseaction cancel-query org.jkiss.dbeaver.ui.editors.sql.cancel.query
+eclipseaction next-query org.jkiss.dbeaver.ui.editors.sql.query.next
+eclipseaction prev-query org.jkiss.dbeaver.ui.editors.sql.query.prev
+eclipseaction goto-sql-object org.jkiss.dbeaver.ui.editors.sql.navigate.object
+eclipseaction rename-script org.jkiss.dbeaver.ui.editors.sql.rename
+eclipseaction format-sql org.jkiss.dbeaver.ui.editors.text.content.format
+eclipseuiaction sync-connection org.jkiss.dbeaver.ui.editors.sql.sync.connection
+eclipseuiaction select-schema org.jkiss.dbeaver.ui.tools.select.schema
+eclipseuiaction select-connection org.jkiss.dbeaver.ui.tools.select.connection
+eclipseaction new-script org.jkiss.dbeaver.core.sql.editor.create
+eclipseaction new-console org.jkiss.dbeaver.core.sql.editor.console
+eclipseaction toggle-navigator org.jkiss.dbeaver.core.view.toggle(viewId=org.jkiss.dbeaver.core.databaseNavigator)
+eclipseaction toggle-projects org.jkiss.dbeaver.core.view.toggle(viewId=org.jkiss.dbeaver.core.projectExplorer)
