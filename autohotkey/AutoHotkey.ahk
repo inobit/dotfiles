@@ -1,7 +1,7 @@
 ﻿#Requires AutoHotkey v2.0
 #SingleInstance Force
 
-apps := ["ahk_exe chrome.exe", "ahk_exe datagrip64.exe", "ahk_exe idea64.exe", "ahk_exe Obsidian.exe"]
+apps := ["ahk_exe chrome.exe", "ahk_exe datagrip64.exe", "ahk_exe dbeaver.exe", "ahk_exe idea64.exe", "ahk_exe Obsidian.exe"]
 
 for (app in apps) {
      HotIfWinActive(app)
@@ -24,6 +24,7 @@ global jPressed := false
 
 global TARGET_APPS := [
     "ahk_exe datagrip64.exe",
+    "ahk_exe dbeaver.exe",
     "ahk_exe Obsidian.exe",
     "ahk_exe wezterm-gui.exe",
     "ahk_exe WindowsTerminal.exe",
