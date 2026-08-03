@@ -1,9 +1,27 @@
 #Requires -Version 5.1
+<#
+用法:
+  bw-ssh-load.ps1                                # 批量: SSH Key 全部入 agent (ExcludeKeys 可排除)
+  bw-ssh-load.ps1 -ItemName "SSH Keys/A"         # 单 key: 私钥入 agent + 公钥存 ~/.ssh/A.pub
+  bw-ssh-load.ps1 -ItemName "A" -PubName C:\keys\x.pub   # 自定义公钥路径/文件名, 目录须存在
+  bw-ssh-load.ps1 -ItemName "A" -NoAgent         # 只写公钥文件, 不碰 agent
+  bw-ssh-load.ps1 -ItemName "A" -NoPub           # 只入 agent, 不写公钥文件
+  bw-ssh-load.ps1 -ItemName "A" -NoAgent -NoPub  # ✗ 无操作, 拒绝
+  bw-ssh-load.ps1 -DryRun                        # 预演
+
+参数:
+  -ItemName   条目名, 支持 "文件夹/条目" 格式
+  -NoAgent    私钥不写入 ssh-agent
+  -NoPub      不保存公钥文件
+  -PubName    公钥文件名; 格式 (路径)?文件名(.pub)?, 缺省用默认名, 目录须已存在; 仅 -NoPub 未指定时生效
+  -DryRun     预演, 不实际执行
+#>
 param(
     [string]$ItemName,
-    [string]$KeyName,
-    [switch]$DryRun,
-    [switch]$Pub
+    [switch]$NoAgent,
+    [switch]$NoPub,
+    [string]$PubName,
+    [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,6 +40,13 @@ $script:PubKeyNames = @(
     # "GitHub Personal"
     # "Work/GitHub"          # 文件夹名/条目名 格式
     # "Company Server"
+)
+
+# ExcludeKeys: 批量模式下不写入 ssh-agent 的条目
+#   "文件夹/条目"  精确排除; "条目" 排除所有同名条目
+$script:ExcludeKeys = @(
+    # "SSH Keys/Old Key"
+    # "Legacy Key"
 )
 # ============================================================
 
@@ -51,56 +76,31 @@ function Cleanup {
     }
 }
 
+function Resolve-PubPath {
+    param([string]$ItemName, [string]$PubNameArg)
+    $dir  = if ($PubNameArg) { Split-Path -Parent $PubNameArg } else { "" }
+    $leaf = if ($PubNameArg) { Split-Path -Leaf $PubNameArg } else { "" }
+
+    if ($PubNameArg) {
+        if (-not $leaf) { Write-Host "✗ -PubName 缺少文件名: $PubNameArg"; exit 1 }
+        if ($dir) {
+            if (-not (Test-Path -LiteralPath $dir)) { Write-Host "✗ 目录不存在: $dir"; exit 1 }
+        } else {
+            $dir = "$env:USERPROFILE\.ssh"
+        }
+        if (-not ($leaf -match '\.\w+$')) { $leaf += '.pub' }
+    } else {
+        $dir  = "$env:USERPROFILE\.ssh"
+        $leaf = ($ItemName -replace '[^\w.-]', '_') + '.pub'
+    }
+    return (Join-Path $dir $leaf)
+}
+
 PreCheck
 
 Write-Host "Unlocking Bitwarden..."
 $env:BW_SESSION = bw unlock --raw
 if (-not $env:BW_SESSION) { Write-Host "✗ 解锁失败"; exit 1 }
-
-if ($Pub) {
-    if (-not $ItemName) { Write-Host "✗ -Pub 需要指定条目名"; exit 1 }
-
-    # 解析 文件夹名/条目名 格式
-    if ($ItemName -match '/') {
-        $parts = $ItemName -split '/', 2
-        $FolderName = $parts[0]
-        $ItemName   = $parts[1]
-    } else {
-        $FolderName = ""
-    }
-
-    try {
-        if ($FolderName) {
-            $folder = bw list folders | ConvertFrom-Json | Where-Object { $_.name -eq $FolderName } | Select-Object -First 1
-            if (-not $folder) { Write-Host "✗ 未找到文件夹: $FolderName"; exit 1 }
-            $allItems = bw list items --folderid $folder.id --search $ItemName | ConvertFrom-Json
-        } else {
-            $allItems = bw list items --search $ItemName | ConvertFrom-Json
-        }
-        $matches = @($allItems | Where-Object { $_.type -eq 5 -and $_.name -eq $ItemName })
-
-        if ($matches.Count -eq 0) {
-            if ($FolderName) { Write-Host "✗ 文件夹 '$FolderName' 中未找到: $ItemName" } else { Write-Host "✗ 未找到: $ItemName" }
-            exit 1
-        }
-        if ($matches.Count -gt 1) {
-            Write-Host "✗ 有 $($matches.Count) 个条目匹配 '$ItemName'，请用 '文件夹名/条目名' 格式消歧："
-            $matches | ForEach-Object { Write-Host "  - $($_.name)  [文件夹ID: $($_.folderId)]" }
-            exit 1
-        }
-
-        $detail = bw get item $matches[0].id | ConvertFrom-Json
-        if (-not $detail.sshKey.publicKey) { Write-Host "✗ 条目无公钥"; exit 1 }
-        if (-not $DryRun) {
-            Write-Output $detail.sshKey.publicKey
-        } else {
-            Write-Host "[DRY RUN] 将输出 $ItemName 的公钥到 stdout"
-        }
-    } finally {
-        Cleanup
-    }
-    return
-}
 
 try {
     if (-not $ItemName) {
@@ -118,6 +118,21 @@ try {
         # 预先获取文件夹 id → name 映射
         $folderMap = @{}
         bw list folders | ConvertFrom-Json | ForEach-Object { $folderMap[$_.id] = $_.name }
+
+        # 应用排除列表 ExcludeKeys (精确 "文件夹/条目" 或宽松 "条目名")
+        $exMatched = @{}
+        $items = @($items | Where-Object {
+            $fn = if ($_.folderId) { $folderMap[$_.folderId] } else { "" }
+            foreach ($ex in $script:ExcludeKeys) {
+                if ($ex -match '/') { $ef, $ek = $ex -split '/', 2; $isEx = ($_.name -eq $ek) -and ($fn -eq $ef) }
+                else { $isEx = ($_.name -eq $ex) }
+                if ($isEx) { $exMatched[$ex] = $true; Write-Host "  ⏭ 排除: $fn/$($_.name)"; return $false }
+            }
+            return $true
+        })
+        foreach ($ex in $script:ExcludeKeys) {
+            if (-not $exMatched.ContainsKey($ex)) { Write-Host "  ⚠ 排除项未命中任何条目: $ex" }
+        }
 
         $pubWritten = @{}
 
@@ -175,8 +190,6 @@ try {
         } else {
             $FolderName = ""
         }
-        if (-not $KeyName) { $KeyName = $ItemName -replace '[^\w.-]', '_' }
-
         if ($FolderName) {
             $folder = bw list folders | ConvertFrom-Json | Where-Object { $_.name -eq $FolderName } | Select-Object -First 1
             if (-not $folder) { Write-Host "✗ 未找到文件夹: $FolderName"; exit 1 }
@@ -197,19 +210,26 @@ try {
         }
 
         $detail = bw get item $matches[0].id | ConvertFrom-Json
-        if (-not $detail.sshKey.privateKey) { Write-Host "✗ 条目缺少私钥"; exit 1 }
+        if (-not $NoAgent -and -not $detail.sshKey.privateKey) { Write-Host "✗ 条目缺少私钥"; exit 1 }
 
-        if (-not $DryRun) {
-            $detail.sshKey.privateKey | ssh-add - | Out-Null
-        }
-        $tag = if ($DryRun) { "[DRY RUN]" } else { "✔" }
-        Write-Host "$tag $ItemName → agent"
+        if ($NoAgent -and $NoPub) { Write-Host "✗ -NoAgent 且 -NoPub: 没有执行任何操作"; exit 1 }
+        if (-not $NoPub -and -not $detail.sshKey.publicKey) { Write-Host "✗ 条目无公钥"; exit 1 }
 
-        if ($detail.sshKey.publicKey) {
+        if (-not $NoAgent) {
             if (-not $DryRun) {
-                $detail.sshKey.publicKey | Out-File -Encoding ASCII "$env:USERPROFILE\.ssh\$KeyName.pub"
+                $detail.sshKey.privateKey | ssh-add - | Out-Null
             }
-            Write-Host "$tag .pub → ~/.ssh/$KeyName.pub"
+            $tag = if ($DryRun) { "[DRY RUN]" } else { "✔" }
+            Write-Host "$tag $ItemName → agent"
+        }
+
+        if (-not $NoPub) {
+            $pubPath = Resolve-PubPath -ItemName $ItemName -PubNameArg $PubName
+            if (-not $DryRun) {
+                $detail.sshKey.publicKey | Out-File -Encoding ASCII $pubPath
+            }
+            $tag = if ($DryRun) { "[DRY RUN]" } else { "✔" }
+            Write-Host "$tag .pub → $pubPath"
         }
     }
 } finally {
