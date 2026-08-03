@@ -94,7 +94,12 @@ nmap <leader>rf <Action>(RenameFile)
 command! Fnew :action NewFile
 command! Cnew :action NewClass
 command! Dnew :action NewDir
-command! Qnew :action Jdbc.OpenConsole.New
+command! Enew :action Jdbc.OpenConsole.New
+" 小写命令别名 (command 名必须大写开头, 用 cnoremap 支持小写输入)
+cnoremap fnew Fnew
+cnoremap cnew Cnew
+cnoremap dnew Dnew
+cnoremap enew Enew
 
 " buffer navigation
 nmap [b <Action>(PreviousTab)
