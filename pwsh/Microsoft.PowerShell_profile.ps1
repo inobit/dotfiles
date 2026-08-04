@@ -379,3 +379,16 @@ function fg {
         [System.Console]::ForegroundColor = $saved
     }
 }
+
+# === Machine-specific: 本机特有配置（$PSScriptRoot\local，不进 git）===
+$_localDir = Join-Path $PSScriptRoot 'local'
+if (Test-Path $_localDir) {
+    Get-ChildItem $_localDir -Filter '*.ps1' | Sort-Object Name | ForEach-Object {
+        try {
+            . $_.FullName
+        }
+        catch {
+            Write-Warning "local profile error: $($_.FullName) — $_"
+        }
+    }
+}
