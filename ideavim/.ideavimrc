@@ -149,15 +149,15 @@ if has('ide')
     nmap <leader>rs <Action>(Console.Jdbc.Cancel)
     nmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
     vmap <leader>rp <Action>(Console.Jdbc.ExplainPlan)
-    nmap <leader>fe <Action>(ActivateDatabaseToolWindow)
-    nmap <leader>fm <Action>(Console.Jdbc.ChooseSchema)
+    nmap <leader>ef <Action>(ActivateDatabaseToolWindow)
+    nmap <leader>mf <Action>(Console.Jdbc.ChooseSchema)
   else
     " IntelliJ IDEA 配置
     nmap <leader>rr <Action>(ChooseRunConfiguration)
     nmap <leader>rs <Action>(Stop)
     " window navigation
     nmap <leader>ft <Action>(ActivateTerminalToolWindow)
-    nmap <leader>fe <Action>(ActivateProjectToolWindow)
+    nmap <leader>ef <Action>(ActivateProjectToolWindow)
     nmap <leader>fD <Action>(ActivateDebugToolWindow)
     nmap <leader>fr <Action>(ActivateRunToolWindow)
     nmap <leader>fs <Action>(ActivateStructureToolWindow)
