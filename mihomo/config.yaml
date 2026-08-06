@@ -282,7 +282,7 @@ proxy-groups:
     type: select
     icon: https://www.clashverge.dev/assets/icons/link.svg
     include-all: true
-    filter: hotfree
+    filter: mine
   - name: Master
     type: select
     icon: https://www.clashverge.dev/assets/icons/speed.svg
