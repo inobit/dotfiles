@@ -386,6 +386,7 @@ local std_colors = {
 	bat_bg = meta_colors.pink,
 	cpu_bg = meta_colors.peach,
 	ram_bg = meta_colors.teal,
+	net_bg = meta_colors.sapphire,
 	metrics_fg = meta_colors.crust,
 }
 
@@ -509,6 +510,25 @@ local function sys_metrics_cache()
 	return "/tmp/wezterm-sys-metrics.json"
 end
 
+---@param bps integer|nil bytes per second
+---@return string human readable rate, always 7 cells wide
+local function fmt_rate(bps)
+	bps = bps or 0
+	local s
+	if bps >= 104857600 then -- >= 100M
+		s = string.format("%.0fM", bps / 1048576)
+	elseif bps >= 1048576 then -- >= 1M
+		s = string.format("%.1fM", bps / 1048576)
+	elseif bps >= 102400 then -- >= 100K
+		s = string.format("%.0fK", bps / 1024)
+	elseif bps >= 1024 then -- >= 1K
+		s = string.format("%.1fK", bps / 1024)
+	else
+		s = string.format("%dB", bps)
+	end
+	return string.format("%7s", s .. "/s")
+end
+
 ---@return table[] status segments; empty when the daemon binary is missing or data unavailable
 local function update_sys_metrics()
 	local m = nil
@@ -554,6 +574,19 @@ local function update_sys_metrics()
 				.. wezterm.nerdfonts.fa_memory
 				.. "  "
 				.. string.format("%.1fG/%.1fG", m.mem_used_kb / 1048576, m.mem_total_kb / 1048576)
+				.. " ",
+		},
+		{ Foreground = { Color = std_colors.metrics_fg } },
+		{ Background = { Color = std_colors.net_bg } },
+		{
+			Text = " "
+				.. wezterm.nerdfonts.fa_arrow_down
+				.. " "
+				.. fmt_rate(m.net_rx_bps)
+				.. "  "
+				.. wezterm.nerdfonts.fa_arrow_up
+				.. " "
+				.. fmt_rate(m.net_tx_bps)
 				.. " ",
 		},
 	}
