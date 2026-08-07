@@ -381,9 +381,12 @@ local std_colors = {
 	workspace_bg = meta_colors.teal,
 	leader_text = meta_colors.crust,
 	date_fg = meta_colors.crust,
-	date_bg = meta_colors.lavender,
-	bat_fg = meta_colors.white,
+	date_bg = "#bd93f9",
+	bat_fg = meta_colors.crust,
 	bat_bg = meta_colors.peach,
+	cpu_bg = "#ffb86c",
+	ram_bg = "#8be9fd",
+	metrics_fg = meta_colors.crust,
 }
 
 local function basename(s)
@@ -477,14 +480,65 @@ wezterm.on("update-status", function(window, pane)
 	}))
 end)
 
+-- windows only: system metrics via on-demand pwsh sampler
+local sys_metrics_file = wezterm.config_dir .. "\\sys-metrics.ps1"
+local sys_metrics_cache = os.getenv("TEMP") .. "\\wezterm-sys-metrics.json"
+
+---@return table[] status segments; empty when not on windows or data unavailable
+local function update_sys_metrics()
+	if not is_windows then
+		return {}
+	end
+
+	local m = nil
+	local f = io.open(sys_metrics_cache, "r")
+	if f then
+		local raw = f:read("*a")
+		f:close()
+		local ok, parsed = pcall(wezterm.json_parse, raw)
+		if ok and type(parsed) == "table" then
+			m = parsed
+		end
+	end
+
+	local now = os.time()
+	local fresh = m ~= nil and m.ts ~= nil and (now - m.ts) < 10
+	if not fresh then
+		-- spawn a one-shot sampler at most once per 5s; keep showing the last value
+		local last_spawn = wezterm.GLOBAL.sys_metrics_spawned_at or 0
+		if now - last_spawn >= 5 then
+			wezterm.GLOBAL.sys_metrics_spawned_at = now
+			pcall(wezterm.background_child_process, { "pwsh", "-NoProfile", "-File", sys_metrics_file })
+		end
+	end
+
+	if not m then
+		return {}
+	end
+
+	return {
+		{ Foreground = { Color = std_colors.metrics_fg } },
+		{ Background = { Color = std_colors.cpu_bg } },
+		{
+			Text = " " .. wezterm.nerdfonts.fa_microchip .. "  " .. string.format("%d%%", m.cpu) .. " ",
+		},
+		{ Foreground = { Color = std_colors.metrics_fg } },
+		{ Background = { Color = std_colors.ram_bg } },
+		{
+			Text = " "
+				.. wezterm.nerdfonts.fa_memory
+				.. "  "
+				.. string.format("%.1fG/%.1fG", m.mem_used_kb / 1048576, m.mem_total_kb / 1048576)
+				.. " ",
+		},
+	}
+end
+
 wezterm.on("update-right-status", function(window, _)
 	local date = wezterm.strftime("%Y-%m-%d %H:%M")
 	local battery_info = wezterm.battery_info()
-	local right_status = {
-		{ Foreground = { Color = std_colors.date_fg } },
-		{ Background = { Color = std_colors.date_bg } },
-		{ Text = " " .. date .. " " },
-	}
+
+	local segments = {}
 	if #battery_info > 0 then
 		local bat = ""
 		for _, b in ipairs(battery_info) do
@@ -501,18 +555,19 @@ wezterm.on("update-right-status", function(window, _)
 			end
 			bat = icon .. string.format("%.0f%%", state * 100)
 		end
-		local bat_status = {
-			{ Foreground = { Color = std_colors.bat_fg } },
-			{ Background = { Color = std_colors.bat_bg } },
-			{ Text = bat .. " " },
-		}
-		local combined_status = bat_status
-		for _, status in ipairs(right_status) do
-			table.insert(combined_status, status)
-		end
-		right_status = combined_status
+		table.insert(segments, { Foreground = { Color = std_colors.bat_fg } })
+		table.insert(segments, { Background = { Color = std_colors.bat_bg } })
+		table.insert(segments, { Text = bat .. " " })
 	end
-	window:set_right_status(wezterm.format(right_status))
+	-- cpu / ram on windows only
+	for _, status in ipairs(update_sys_metrics()) do
+		table.insert(segments, status)
+	end
+	table.insert(segments, { Foreground = { Color = std_colors.date_fg } })
+	table.insert(segments, { Background = { Color = std_colors.date_bg } })
+	table.insert(segments, { Text = " " .. date .. " " })
+
+	window:set_right_status(wezterm.format(segments))
 end)
 
 table.insert(config.keys, { key = "T", mods = "LEADER", action = act.EmitEvent("tabs.toggle-tab-bar") })
