@@ -480,18 +480,39 @@ wezterm.on("update-status", function(window, pane)
 	}))
 end)
 
--- windows only: system metrics via on-demand pwsh sampler
-local sys_metrics_file = wezterm.config_dir .. "\\sys-metrics.ps1"
-local sys_metrics_cache = os.getenv("TEMP") .. "\\wezterm-sys-metrics.json"
-
----@return table[] status segments; empty when not on windows or data unavailable
-local function update_sys_metrics()
-	if not is_windows then
-		return {}
+-- system metrics via cross-platform go daemon (sys-metrics on PATH)
+-- install: scoop install inosoft/sys-metrics
+---@param name string
+---@return string|nil full path of the executable found in PATH
+local function find_in_path(name)
+	local path = os.getenv("PATH") or ""
+	local sep = is_windows and ";" or ":"
+	for dir in path:gmatch("[^" .. sep .. "]+") do
+		if #dir > 0 then
+			dir = dir:gsub("[/\\]+$", "")
+			local f = io.open(dir .. "/" .. name, "r")
+			if f then
+				f:close()
+				return dir .. "/" .. name
+			end
+		end
 	end
+	return nil
+end
 
+local sys_metrics_bin = find_in_path(is_windows and "sys-metrics.exe" or "sys-metrics")
+
+local function sys_metrics_cache()
+	if is_windows then
+		return os.getenv("TEMP") .. "\\wezterm-sys-metrics.json"
+	end
+	return "/tmp/wezterm-sys-metrics.json"
+end
+
+---@return table[] status segments; empty when the daemon binary is missing or data unavailable
+local function update_sys_metrics()
 	local m = nil
-	local f = io.open(sys_metrics_cache, "r")
+	local f = io.open(sys_metrics_cache(), "r")
 	if f then
 		local raw = f:read("*a")
 		f:close()
@@ -502,13 +523,17 @@ local function update_sys_metrics()
 	end
 
 	local now = os.time()
-	local fresh = m ~= nil and m.ts ~= nil and (now - m.ts) < 10
-	if not fresh then
-		-- spawn a one-shot sampler at most once per 5s; keep showing the last value
+	local fresh = m ~= nil and m.ts ~= nil and (now - m.ts) < 3
+	if not fresh and sys_metrics_bin then
+		-- spawn the daemon at most once per 3s; it self-exits on duplicate
 		local last_spawn = wezterm.GLOBAL.sys_metrics_spawned_at or 0
-		if now - last_spawn >= 5 then
+		if now - last_spawn >= 3 then
 			wezterm.GLOBAL.sys_metrics_spawned_at = now
-			pcall(wezterm.background_child_process, { "pwsh", "-NoProfile", "-File", sys_metrics_file })
+			pcall(wezterm.background_child_process, {
+				sys_metrics_bin,
+				"-parent-pid",
+				tostring(wezterm.procinfo.pid()),
+			})
 		end
 	end
 
