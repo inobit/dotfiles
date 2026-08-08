@@ -565,15 +565,15 @@ local function update_sys_metrics()
 		{ Foreground = { Color = std_colors.metrics_fg } },
 		{ Background = { Color = std_colors.cpu_bg } },
 		{
-			Text = " " .. wezterm.nerdfonts.fa_microchip .. "  " .. string.format("%d%%", m.cpu) .. " ",
+			Text = " " .. wezterm.nerdfonts.fa_microchip .. " " .. string.format("%2d%%", m.cpu) .. " ",
 		},
 		{ Foreground = { Color = std_colors.metrics_fg } },
 		{ Background = { Color = std_colors.ram_bg } },
 		{
 			Text = " "
 				.. wezterm.nerdfonts.fa_memory
-				.. "  "
-				.. string.format("%.1fG/%.1fG", m.mem_used_kb / 1048576, m.mem_total_kb / 1048576)
+				.. " "
+				.. string.format("%4.1fG/%.1fG", m.mem_used_kb / 1048576, m.mem_total_kb / 1048576)
 				.. " ",
 		},
 		{ Foreground = { Color = std_colors.metrics_fg } },
