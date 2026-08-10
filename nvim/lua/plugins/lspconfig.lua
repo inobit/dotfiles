@@ -17,6 +17,10 @@ return {
       for _, server in ipairs(lsp_servers) do
         vim.lsp.enable(server) -- jdtls is configured by nvim-java
       end
+      -- rust-analyzer 由 rustup 安装（不经过 mason），单独启用；跟随 ENABLE_RUST_ENV 开关
+      if vim.env.ENABLE_RUST_ENV ~= "false" then
+        vim.lsp.enable("rust_analyzer")
+      end
 
       -- -- lsp config
       -- local capabilities = vim.lsp.protocol.make_client_capabilities()

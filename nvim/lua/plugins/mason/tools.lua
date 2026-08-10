@@ -9,7 +9,7 @@ M = {}
 
 ---@type mason.Environment
 local rust_env = {
-  lsps = { "rust-analyzer", "bacon_ls" },
+  lsps = { "bacon_ls" }, -- rust-analyzer 用 rustup 安装，不再由 mason 管理
   -- formatters = { "rustfmt" }, - rustfmt is deprecated, install it from rustup
   linters = { "bacon" },
 }
