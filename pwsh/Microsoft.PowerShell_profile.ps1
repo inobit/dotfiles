@@ -392,3 +392,40 @@ if (Test-Path $_localDir) {
         }
     }
 }
+
+# === Kimi WebBridge ===
+function webbridge {
+    param(
+        [Parameter(Position = 0)]
+        [ValidateSet('start', 'stop')]
+        [string]$Action = 'start'
+    )
+
+    $exe = "$env:USERPROFILE\.kimi-webbridge\bin\kimi-webbridge.exe"
+
+    if (-not $env:WEBBRIDGE_SSH_HOST) {
+        Write-Host "WEBBRIDGE_SSH_HOST is not set" -ForegroundColor Yellow
+        return
+    }
+
+    if ($Action -eq 'start') {
+        $s = & $exe status | ConvertFrom-Json
+        if (-not $s.running) {
+            & $exe start
+        }
+        bg { ssh -N -R 127.0.0.1:10086:127.0.0.1:10086 $env:WEBBRIDGE_SSH_HOST }
+    }
+    else {
+        & $exe stop
+        $jobs = @(Get-Job -Name 'ssh -N -R 127.0.0.1:10086*' -ErrorAction SilentlyContinue)
+        foreach ($job in $jobs) {
+            Stop-Job -Id $job.Id -ErrorAction SilentlyContinue
+            Remove-Job -Id $job.Id -Force -ErrorAction SilentlyContinue
+            Write-Host "killed job [$($job.Id)] $($job.Name)"
+        }
+    }
+}
+
+function kimiw {
+    & "$env:USERPROFILE\.kimi-webbridge\bin\kimi-webbridge.exe" @args
+}
