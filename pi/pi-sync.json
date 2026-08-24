@@ -1,0 +1,53 @@
+{
+  "version": 3,
+  "activeSyncSetup": "default",
+  "onSwitch": "ask-before-pull",
+  "storageConnections": {
+    "github": {
+      "type": "git",
+      "remote": "git@github.com:inobit/mypi.git"
+    }
+  },
+  "syncSetups": {
+    "default": {
+      "storage": {
+        "connection": "github",
+        "branch": "main",
+        "path": "default"
+      },
+      "sync": {
+        "include": [
+          "settings.json",
+          "keybindings.json",
+          "models.json",
+          "skills",
+          "prompts",
+          "themes",
+          "extensions",
+          "models-store.json"
+        ],
+        "automatic": false
+      }
+    },
+    "windows": {
+      "storage": {
+        "connection": "github",
+        "branch": "win",
+        "path": "windows"
+      },
+      "sync": {
+        "include": [
+          "settings.json",
+          "keybindings.json",
+          "models.json",
+          "skills",
+          "prompts",
+          "themes",
+          "extensions",
+          "models-store.json"
+        ],
+        "automatic": false
+      }
+    }
+  }
+}
