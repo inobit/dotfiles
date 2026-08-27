@@ -394,6 +394,47 @@ if (Test-Path $_localDir) {
 }
 
 # === Kimi WebBridge ===
+# 隧道目标来自 local/webbridge.ps1：WEBBRIDGE_SSH_HOST = 'ztjt-dev'（ssh config 别名，已含 User/HostName/Port）
+
+# 确保本机 OpenSSH Server（sshd）运行——反向隧道出口；返回 $true 表示可用
+function Test-SshdReady {
+    $svc = Get-Service sshd -ErrorAction SilentlyContinue
+    if (-not $svc) {
+        Write-Host "[X] 未安装 OpenSSH Server，先执行 Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0" -ForegroundColor Red
+        return $false
+    }
+    if ($svc.Status -ne 'Running') {
+        try {
+            Start-Service sshd -ErrorAction Stop   # 非管理员会抛错，需 Stop 让 catch 捕获
+            Write-Host "[OK] 已启动 Windows sshd" -ForegroundColor Green
+        }
+        catch {
+            Write-Host "[X] 无法启动 sshd（需要管理员权限）: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "    可先以管理员执行：Start-Service sshd   或    Set-Service sshd -StartupType Automatic" -ForegroundColor Yellow
+            return $false
+        }
+    }
+    return $true
+}
+
+# 建立反向隧道：VPS 的 127.0.0.1:2222 -> 本机 sshd(22)，VPS 上即可 sftp/ssh 读取 host 文件（如 webbridge 截图）
+# 直接使用 WEBBRIDGE_SSH_HOST 这一 ssh config 别名（已含 User/HostName/Port），无需单独的用户名
+# 始终后台运行（bg），webbridge stop 时自动清理；也可用 kill %<id> 结束
+function Start-ReverseTunnel {
+    $RemoteHost = $env:WEBBRIDGE_SSH_HOST
+    $ListenPort = 2222   # 隧道入口端口（VPS 上）
+    $TargetPort = 22     # 隧道出口端口（本机 sshd）
+
+    if (-not $RemoteHost) {
+        Write-Host "[X] 未设置 WEBBRIDGE_SSH_HOST（见 local/webbridge.ps1）" -ForegroundColor Red
+        return
+    }
+    if (-not (Test-SshdReady)) { return }
+
+    Write-Host "[*] 隧道入口: VPS 的 127.0.0.1:$ListenPort -> 本机 127.0.0.1:$TargetPort" -ForegroundColor Cyan
+    bg "ssh -N -R 127.0.0.1:$ListenPort`:127.0.0.1:$TargetPort -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes $RemoteHost"
+}
+
 function webbridge {
     param(
         [Parameter(Position = 0)]
@@ -414,14 +455,20 @@ function webbridge {
             & $exe start
         }
         bg { ssh -N -R 127.0.0.1:10086:127.0.0.1:10086 $env:WEBBRIDGE_SSH_HOST }
+
+        # 反向隧道：VPS 经 127.0.0.1:2222 -> 本机 sshd，读取 host 文件（如 webbridge 截图）
+        Start-ReverseTunnel
     }
     else {
         & $exe stop
-        $jobs = @(Get-Job -Name 'ssh -N -R 127.0.0.1:10086*' -ErrorAction SilentlyContinue)
-        foreach ($job in $jobs) {
-            Stop-Job -Id $job.Id -ErrorAction SilentlyContinue
-            Remove-Job -Id $job.Id -Force -ErrorAction SilentlyContinue
-            Write-Host "killed job [$($job.Id)] $($job.Name)"
+        # 清理 10086 转发隧道与反向隧道（2222）
+        foreach ($pat in @('ssh -N -R 127.0.0.1:10086*', 'ssh -N -R 127.0.0.1:2222*')) {
+            $jobs = @(Get-Job -Name $pat -ErrorAction SilentlyContinue)
+            foreach ($job in $jobs) {
+                Stop-Job -Id $job.Id -ErrorAction SilentlyContinue
+                Remove-Job -Id $job.Id -Force -ErrorAction SilentlyContinue
+                Write-Host "killed job [$($job.Id)] $($job.Name)"
+            }
         }
     }
 }
