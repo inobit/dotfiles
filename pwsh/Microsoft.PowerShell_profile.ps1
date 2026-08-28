@@ -454,7 +454,7 @@ function webbridge {
         if (-not $s.running) {
             & $exe start
         }
-        bg { ssh -N -R 127.0.0.1:10086:127.0.0.1:10086 $env:WEBBRIDGE_SSH_HOST }
+        bg "ssh -N -R 127.0.0.1:10086:127.0.0.1:10086 $env:WEBBRIDGE_SSH_HOST"
 
         # 反向隧道：VPS 经 127.0.0.1:2222 -> 本机 sshd，读取 host 文件（如 webbridge 截图）
         Start-ReverseTunnel
