@@ -17,6 +17,13 @@
 #   source ~/ask/git-status-open.sh
 
 git_status_open() {
+	# porcelain 输出的是仓库根相对路径，必须拼成绝对路径，
+	# 否则在子目录中 nvim 会按当前目录解析而打不开
+	local root
+	root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+		echo "git_status_open: 不在 git 仓库中" >&2
+		return 1
+	}
 	# ---- 帮助函数：将可能为负数的索引转为正向行号 ----
 	_to_pos() {
 		local n=$1 total=$2
@@ -37,9 +44,24 @@ git_status_open() {
 		echo "$total"
 	}
 
+	# ---- 帮助函数：porcelain 行 → 根相对路径 ----
+	# 去状态位，重命名取新路径，去引号；逐行一对一转换，行号不变
+	_relpaths() {
+		awk '{
+			s = substr($0, 4)
+			if ((i = index(s, " -> ")) > 0) s = substr(s, i + 4)
+			if (s ~ /^".*"$/) { sub(/^"/, "", s); sub(/"$/, "", s) }
+			print s
+		}'
+	}
+	# ---- 帮助函数：根相对路径 → 绝对路径 ----
+	_to_abs() {
+		awk -v r="$1" '{print r "/" $0}'
+	}
+
 	if [[ $# -eq 0 ]]; then
 		# 无参数：打开所有文件
-		git status --porcelain | awk '{print $NF}' | xargs -r -o nvim
+		git status --porcelain | _relpaths | _to_abs "$root" | xargs -r -d '\n' -o nvim --
 
 	# === 逗号分隔: n,m（n/m 可为正数或负数）===
 	elif [[ "$1" =~ ^(-?[0-9]+)(,-?[0-9]+)+$ ]]; then
@@ -65,8 +87,8 @@ git_status_open() {
 
 		local -a sorted
 		sorted=($(printf '%d\n' "${pos_arr[@]}" | sort -nu))
-		git status --porcelain | awk -v lines=" ${sorted[*]} " \
-			'index(lines, " "NR" ") {print $NF}' | xargs -r -o nvim
+		git status --porcelain | awk -v lines=" ${sorted[*]} " 'index(lines, " "NR" ")' \
+			| _relpaths | _to_abs "$root" | xargs -r -d '\n' -o nvim --
 
 	# === 范围: n-m（n/m 可为正数或负数）===
 	elif [[ "$1" =~ ^(-?[0-9]+)-(-?[0-9]+)$ ]]; then
@@ -87,8 +109,8 @@ git_status_open() {
 			return 1
 		fi
 
-		git status --porcelain | awk -v s="$s" -v e="$e" \
-			'NR>=s && NR<=e {print $NF}' | xargs -r -o nvim
+		git status --porcelain | awk -v s="$s" -v e="$e" 'NR>=s && NR<=e' \
+			| _relpaths | _to_abs "$root" | xargs -r -d '\n' -o nvim --
 
 	# === 单数字: n 或 -n ===
 	elif [[ "$1" =~ ^-?[0-9]+$ ]]; then
@@ -101,18 +123,19 @@ git_status_open() {
 			return 1
 		fi
 
-		git status --porcelain | awk -v n="$pos" 'NR==n {print $NF}' | xargs -r -o nvim
+		git status --porcelain | awk -v n="$pos" 'NR==n' \
+			| _relpaths | _to_abs "$root" | xargs -r -d '\n' -o nvim --
 
 	# === 正则匹配 ===
 	else
 		# 按名称/正则匹配：先取路径，再匹配，避免状态标记(如 M、??)干扰
 		local pattern="$1"
 		local matched
-		matched=$(git status --porcelain | awk '{print $NF}' | grep -iE -- "$pattern")
+		matched=$(git status --porcelain | _relpaths | grep -iE -- "$pattern")
 		if [[ -z "$matched" ]]; then
 			echo "git_status_open: 没有匹配 '$pattern' 的记录" >&2
 			return 1
 		fi
-		echo "$matched" | xargs -r -o nvim
+		echo "$matched" | _to_abs "$root" | xargs -r -d '\n' -o nvim --
 	fi
 }
