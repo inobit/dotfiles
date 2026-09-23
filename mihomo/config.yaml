@@ -261,6 +261,11 @@ proxy-groups:
     <<: *fallback
     icon: https://www.clashverge.dev/assets/icons/claude.svg
     proxies: *ai-groups
+  - name: Opencode
+    type: select
+    icon: https://opencode.ai/favicon.svg
+    include-all: true
+    filter: mine
   - name: Chatgpt
     <<: *fallback
     icon: https://www.clashverge.dev/assets/icons/chatgpt.svg
@@ -442,6 +447,8 @@ rules:
   - RULE-SET,openai,Chatgpt
   - DOMAIN-SUFFIX,claudeusercontent.com,Claude
   - DOMAIN-SUFFIX,openrouter.ai,Claude
+  - DOMAIN-SUFFIX,opencode.ai,Opencode
+  - DOMAIN-SUFFIX,opncd.ai,Opencode
   - RULE-SET,claude,Claude
   - RULE-SET,microsoft,Microsoft
   - RULE-SET,telegramcidr,PROXY
