@@ -21,10 +21,26 @@ config.window_padding = {
 	bottom = 0,
 }
 
--- font
-config.font = wezterm.font_with_fallback({ "JetBrainsMonoNL Nerd Font", "Maple Mono Normal CN" })
+-- font（字体只在这一处定义，下方 font_rules 自动跟随，改字体无需同步修改）
+local font_list = { "JetBrainsMonoNL Nerd Font", "Maple Mono Normal CN" }
+config.font = wezterm.font_with_fallback(font_list)
 config.font_size = 12.5
 config.line_height = 1.1
+
+-- 弱化 nightly #8097 的默认字重步进：bold 用 Bold(700)（默认 +400 已到 ExtraBold 800，过重），dim 用 Light
+local function styled_font(weight, italic)
+	return wezterm.font_with_fallback(font_list, {
+		weight = weight,
+		style = italic and "Italic" or "Normal",
+	})
+end
+
+config.font_rules = {
+	{ intensity = "Bold", italic = false, font = styled_font("Bold", false) },
+	{ intensity = "Bold", italic = true, font = styled_font("Bold", true) },
+	{ intensity = "Half", italic = false, font = styled_font("Light", false) },
+	{ intensity = "Half", italic = true, font = styled_font("Light", true) },
+}
 
 -- init size
 config.initial_cols = 160
