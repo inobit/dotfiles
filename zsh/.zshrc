@@ -133,11 +133,11 @@ if [ -d "$FNM_PATH" ]; then
 fi
 
 # pnpm
+# 注意：必须用 $PNPM_HOME/bin，pnpm v11+ 的可执行文件在该子目录，
+# $PNPM_HOME 根目录下是 v10 遗留 shim。放在 fnm 段之后即可，
+# 因为 pnpm 已 corepack disable，不再与 fnm multishell 里的 shim 竞争 PATH。
 export PNPM_HOME="$HOME/.local/share/pnpm"
-case ":$PATH:" in
-*":$PNPM_HOME:"*) ;;
-*) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+add_to_path "$PNPM_HOME/bin"
 # pnpm end
 
 # local .func
