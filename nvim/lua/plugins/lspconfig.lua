@@ -19,7 +19,7 @@ return {
       end
       -- rust-analyzer 由 rustup 安装（不经过 mason），单独启用；跟随 ENABLE_RUST_ENV 开关
       if vim.env.ENABLE_RUST_ENV ~= "false" then
-        vim.lsp.enable("rust_analyzer")
+        vim.lsp.enable "rust_analyzer"
       end
 
       -- -- lsp config
@@ -229,25 +229,9 @@ return {
           --   end,
           -- },
 
-          -- javascript,typescript,javascriptreact,typescriptreact,html,css,scss,sass,less,json,jsonc,json5,markdown,yaml
-          null_ls.builtins.formatting.prettier.with {
-            filetypes = {
-              "javascript",
-              "typescript",
-              "javascriptreact",
-              "typescriptreact",
-              "html",
-              "css",
-              "scss",
-              "sass",
-              "less",
-              "json",
-              "jsonc",
-              "json5",
-              "markdown",
-              "yaml",
-            },
-          },
+          -- 原先的 null_ls.builtins.formatting.prettier 已移除：
+          -- prettier 支持的 filetype 已被 oxfmt 完全覆盖（.sass 除外，oxfmt 不支持缩进语法），
+          -- 为了一个 sass 单独留一个 formatter 不值得。
           -- sh, bash
           null_ls.builtins.formatting.shfmt.with { filetypes = { "sh", "bash", "zsh" } },
           -- sql
@@ -289,39 +273,8 @@ return {
             end,
           },
           -- python
-          null_ls.builtins.diagnostics.mypy.with {
-            command = function()
-              local python_bin = vim.b.python_bin
-              local mypy_bin = python_bin:gsub("/python3$", "/mypy")
-              -- use local mypy first
-              return vim.fn.executable(mypy_bin) == 1 and mypy_bin or "mypy"
-            end,
-            condition = function()
-              if vim.env.TOOL_MYPY ~= nil then
-                if vim.env.TOOL_MYPY:lower() == "true" then
-                  return true
-                end
-                return false
-              end
-              local root = require("null-ls.utils").get_root()
-              if root and vim.fn.executable "grep" == 1 then
-                local res = vim
-                  .system({ "grep", "-qsE", "^\\[tool\\.mypy\\]", vim.fs.joinpath(root, "pyproject.toml") }, { text = true })
-                  :wait()
-                if res.code == 0 then
-                  return true
-                end
-              end
-              return false
-            end,
-            runtime_condition = function(params)
-              local uri = params.lsp_params.textDocument.uri
-              return not (uri:match "site%-packages" or uri:match "__pycache__") -- exclude site-packages and __pycache__
-            end,
-            extra_args = function(_)
-              return { "--python-executable", vim.b.python_bin }
-            end,
-          },
+          -- 原先的 null_ls.builtins.diagnostics.mypy 已移除
+          -- python 诊断现由 ruff（LSP）+ ty（LSP）覆盖，见 plugins/mason/tools.lua。
           -- html
           {
             name = "htmlhint",

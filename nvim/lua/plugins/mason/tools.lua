@@ -28,7 +28,12 @@ M.lsp_servers = {
   "ruff", -- python lsp
   -- "pyright", -- python lsp
   "ty", -- python lsp and type checker
-  "ts_ls",
+  -- JS/TS 三件套：tsc 提供智能（补全/跳转/类型诊断），oxlint 提供 lint，oxfmt 提供格式化
+  "tsc", -- TypeScript 7 原生 LSP (tsc --lsp --stdio)，取代 ts_ls（tsserver 协议已被 TS7 移除）
+  "oxlint", -- JS/TS linter (oxlint --lsp)，取代 eslint-lsp
+  "oxfmt", -- JS/TS/CSS/Markdown/YAML/HTML 等 formatter (oxfmt --lsp)，oxfmt 不覆盖的 filetype 见下方 formatters
+  "vue_ls", -- Vue SFC（mason 包名是 vue-language-server，由 mason/init.lua 自动映射）
+  "vtsls", -- .vue 里的 TypeScript（TS7 无编程API，嵌入语言只能用 tsserver 体系），配置见 after/lsp/vtsls.lua
   "html",
   "cssls",
   "jsonls",
@@ -38,9 +43,8 @@ M.lsp_servers = {
   "clangd",
   "emmet_ls",
   "marksman",
-  "eslint", --vsocde eslint, package name is eslint-lsp, need install eslint (global or local)
   "tombi",
-  "docker_language_server"
+  "docker_language_server",
 }
 
 ---@type string[]
@@ -50,7 +54,8 @@ M.debugger_adapter = { "codelldb", "js-debug-adapter" }
 M.formatters = {
   "stylua", -- lua formatter
   "clang-format", -- c cpp formatter
-  "prettier", -- html,css,js,ts,json,markdown,yaml formatter
+  -- JS/TS/CSS/Markdown/YAML/HTML 等由 oxfmt LSP 接管，不在此列
+  -- "prettier", -- 已移除：oxfmt 完全覆盖其filetype，格式化统一由 oxfmt LSP 负责
   "shfmt", -- shell formatter
   "xmlformatter", -- xml formatter
   "sql-formatter", --sql formatter
@@ -59,8 +64,8 @@ M.formatters = {
 
 ---@type string[]
 M.linters = {
-  "mypy", -- python linter
-  -- "eslint_d", -- use eslint-lsp
+  -- "mypy", -- python linter，已移除；python 诊断由 ruff + ty 两个 LSP 覆盖
+  -- "eslint_d", -- 已由 oxlint LSP 取代
   "htmlhint", -- html linter
   "stylelint", -- css,scss,sass,less linter
   "shellcheck", -- shell linter
