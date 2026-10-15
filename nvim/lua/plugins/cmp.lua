@@ -77,12 +77,12 @@ return {
         ghost_text = { enabled = true },
       },
       sources = {
-        compat = { "cmp-dbee", "dap" },
+        compat = { "dap" },
         default = { "lsp", "path", "snippets", "buffer" },
         per_filetype = {
-          sql = { "cmp-dbee", "buffer" },
-          mysql = { "cmp-dbee", "buffer" },
-          plsql = { "cmp-dbee", "buffer" },
+          sql = { "sqmeow", "buffer" },
+          mysql = { "sqmeow", "buffer" },
+          plsql = { "sqmeow", "buffer" },
           ["dap-repl"] = { "dap", "buffer" },
           dapui_watches = { "dap", "buffer" },
           dapui_hover = { "dap", "buffer" },
@@ -93,6 +93,10 @@ return {
             name = "LazyDev",
             module = "lazydev.integrations.blink",
             score_offset = 100, -- show at a higher priority than lsp
+          },
+          sqmeow = {
+            name = "Sqmeow",
+            module = "sqmeow.completion.blink",
           },
         },
       },

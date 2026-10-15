@@ -38,7 +38,11 @@ M.lsp_servers = {
   "cssls",
   "jsonls",
   "bashls", -- If shellcheck is installed, bash-language-server will automatically call it to provide linting
-  -- "sqlls", -- disable, conflict with dbee-cmp
+  -- sql 静态语法诊断 + 关键字补全（schema 智能由 sqmeow 提供）
+  -- 注意：mason 装的 sqlls 1.7.1 会被 npm 解析出的新版 vscode-languageserver-protocol(3.18.x)/
+  -- vscode-jsonrpc(9.x) 拖崩（ERR_PACKAGE_PATH_NOT_EXPORTED），需手动把 sqlls 包内这两个
+  -- 嵌套依赖降级为 3.17.5 / 8.0.2；重装 sqlls 后需重新 pin
+  "sqlls",
   "yamlls",
   "clangd",
   "emmet_ls",

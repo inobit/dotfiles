@@ -43,6 +43,7 @@ return {
         "python",
         "query",
         "regex",
+        "sql",
         "toml",
         "tsx",
         "typescript",
@@ -75,6 +76,9 @@ return {
 
       -- Use json5 parser for jsonc filetype (json5 supports comments)
       vim.treesitter.language.register("json5", "jsonc")
+
+      -- Use sql parser for mysql/plsql filetypes
+      vim.treesitter.language.register("sql", { "mysql", "plsql" })
 
       -- Helper: check if a parser is installed
       local function have_parser(lang)

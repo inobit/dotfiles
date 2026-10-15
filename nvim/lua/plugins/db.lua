@@ -1,179 +1,76 @@
 return {
   {
-    "kndndrj/nvim-dbee",
+    "2giosangmitom/sqmeow.nvim",
     dependencies = {
       "MunifTanjim/nui.nvim",
     },
+    -- 自动下载预编译的 Rust engine（Linux/macOS/Windows 均有，失败才回退 cargo）
     build = function()
-      -- Install tries to automatically detect the install method.
-      -- if it fails, try calling it with one of these parameters:
-      --    "curl", "wget", "bitsadmin", "go"
-      if vim.fn.has "win32" ~= 1 then
-        local file_dir = vim.fn.expand "~/.local/bin"
-        local pack_name = "dbee_linux_amd64.tar.gz"
-        local file_name = "dbee"
-        local full_pack_name = vim.fs.joinpath(file_dir, pack_name)
-        local full_file_name = vim.fs.joinpath(file_dir, file_name)
-        if not vim.uv.fs_stat(full_file_name) then
-          ---@param callback fun(out: vim.SystemCompleted)
-          local function callback_wrap(callback)
-            return function(out)
-              if out.code == 0 then
-                callback(out)
-              else
-                print("Dbee install failed: " .. out.stderr)
-              end
-            end
-          end
-          vim.notify "Downloading dbee"
-          local function clean()
-            vim.system({ "rm", "-f", full_pack_name }, { text = true }, function()
-              print "Dbee installed"
-            end)
-          end
-          local function chmod()
-            vim.system({ "chmod", "+x", full_file_name }, { text = true }, callback_wrap(clean))
-          end
-          local function unpack()
-            vim.system({ "tar", "-xzf", full_pack_name, "-C", file_dir }, { text = true }, callback_wrap(chmod))
-          end
-          vim.system({
-            "curl",
-            "-L",
-            "https://github.com/kndndrj/nvim-dbee/releases/download/v0.1.9/dbee_linux_amd64.tar.gz",
-            "--create-dirs",
-            "-o",
-            full_pack_name,
-          }, { text = true }, callback_wrap(unpack))
-        end
-      end
-      -- windows manual install
+      require("sqmeow").install()
     end,
     keys = {
       {
-        "<leader>D",
+        "<leader>Q",
         function()
-          if require("dbee").is_open() then
-            local bufnr = require("dbee.api").ui.editor_get_current_note().bufnr
-            if bufnr then
-              if vim.api.nvim_get_option_value("modified", { buf = bufnr }) then
-                vim.api.nvim_buf_call(bufnr, function()
-                  vim.cmd.write()
-                end)
-              end
-              --BUG: null-ls(vim.lsp.buf.format) and supermaven inline mode, will cause the unlisted property of the buffer to become true
-              if vim.api.nvim_get_option_value("buflisted", { buf = bufnr }) then
-                vim.api.nvim_buf_delete(bufnr, { force = true })
-              end
-            end
-          end
-
-          require("dbee").toggle()
+          require("sqmeow.api.view").toggle()
         end,
-        desc = "DBee: toggle",
+        desc = "Sqmeow: toggle",
       },
     },
-    config = function()
-      local api = require "dbee.api"
-      local dbee = require "dbee"
-      dbee.setup {
-        sources = {
-          require("dbee.sources").FileSource:new(vim.fn.expand "~/.dbee/connections.json"),
+    opts = {
+      keymaps = {
+        -- 沿用全局 run 约定：<leader>rr>（与 nvim-java、lib/run 一致）
+        editor = {
+          execute_statement = "<leader>rr", -- normal：运行光标下语句
+          execute_selection = "<leader>rr", -- visual：运行选中
         },
         drawer = {
-          mappings = {
-            -- manually refresh drawer
-            { key = "R", mode = "n", action = "refresh" },
-            -- actions perform different stuff depending on the node:
-            -- action_1 opens a note or executes a helper
-            { key = "<CR>", mode = "n", action = "action_1" },
-            -- action_2 renames a note or sets the connection as active manually
-            { key = "r", mode = "n", action = "action_2" },
-            -- action_3 deletes a note or connection (removes connection from the file if you configured it like so)
-            { key = "dd", mode = "n", action = "action_3" },
-            -- these are self-explanatory:
-            -- { key = "c", mode = "n", action = "collapse" },
-            -- { key = "e", mode = "n", action = "expand" },
-            { key = "o", mode = "n", action = "toggle" },
-            -- mappings for menu popups:
-            { key = "<CR>", mode = "n", action = "menu_confirm" },
-            { key = "y", mode = "n", action = "menu_yank" },
-            { key = "<Esc>", mode = "n", action = "menu_close" },
-            { key = "q", mode = "n", action = "menu_close" },
-          },
+          refresh = "R",
+          rename = "r",
         },
         result = {
-          focus_result = false,
-          mappings = {
-            { key = ">", mode = "", action = "page_next" },
-            { key = "<", mode = "", action = "page_prev" },
-            { key = "<leader>>", mode = "", action = "page_last" },
-            { key = "<leader><", mode = "", action = "page_first" },
-            -- yank rows as csv/json
-            { key = "<leader>yj", mode = "n", action = "yank_current_json" },
-            { key = "<leader>yj", mode = "v", action = "yank_selection_json" },
-            { key = "<leader>yJ", mode = "", action = "yank_all_json" },
-            { key = "<leader>yc", mode = "n", action = "yank_current_csv" },
-            { key = "<leader>yc", mode = "v", action = "yank_selection_csv" },
-            { key = "<leader>yC", mode = "", action = "yank_all_csv" },
-          },
+          next_page = ">",
+          prev_page = "<",
+          first_page = "<leader><",
+          last_page = "<leader>>",
+          export = "e",
+          export_selection = "e",
         },
-        editor = {
-          mappings = {
-            -- run what's currently selected on the active connection
-            { key = "<leader>rr", mode = "v", action = "run_selection" },
-            -- run the whole file on the active connection
-            -- { key = "", mode = "n", action = "run_file" },
-            -- run what's under the cursor to the next newline
-            { key = "<leader>rr", mode = "n", action = "run_under_cursor" },
-          },
-        },
-      }
-
-      -- export result to csv
-      vim.api.nvim_create_user_command("DbeeExport", function()
-        if dbee.is_open() then
-          if api.ui.result_get_call() then
-            local note = api.ui.editor_get_current_note().name
-            if note:match ".*%.sql$" then
-              note = note:gsub("%.sql$", "")
-            end
-            vim.ui.input({
-              prompt = "Export to: ",
-              default = "~/downloads/" .. note .. ".csv",
-            }, function(input)
-              if input then
-                vim.cmd("Dbee store csv file " .. vim.fn.expand(input))
-                vim.notify "Export completion!"
-              end
-            end)
-          else
-            vim.notify "No Dbee call is selected!"
-          end
-        else
-          vim.notify "No DBee opened!"
-        end
-      end, { desc = "Dbee: export" })
-
-      -- show current connection in winbar
-      local show_current_connection = require("lib.dbee").show_current_connection
-      vim.schedule(function()
-        api.core.register_event_listener("current_connection_changed", function()
-          show_current_connection()
-        end)
-        api.ui.editor_register_event_listener("current_note_changed", function()
-          show_current_connection()
-        end)
-      end)
-    end,
-  },
-  {
-    "MattiasMTS/cmp-dbee",
-    -- cond = false,
-    dependencies = {
-      { "kndndrj/nvim-dbee" },
+      },
     },
-    ft = "sql", -- optional but good to have
-    opts = {}, -- needed
+    config = function(_, opts)
+      require("sqmeow").setup(opts)
+
+      -- sqmeow 原生的 editor 键位只映射在自己的 scratchpad 里；
+      -- 这里让任意 .sql/.mysql/.plsql 文件也能用同样的键运行查询
+      local pattern = { "sql", "mysql", "plsql" }
+      local function attach(ev)
+        local buf = type(ev) == "number" and ev or ev.buf
+        if not vim.tbl_contains(pattern, vim.bo[buf].filetype) then
+          return
+        end
+        local keymap = require "sqmeow.keymap"
+        local query = require "sqmeow.api.query"
+        local lhs = keymap.lhs("editor", "execute_statement")
+        if lhs then
+          vim.keymap.set("n", lhs, function()
+            query.execute_statement()
+          end, { buffer = buf, desc = "Sqmeow: run statement" })
+        end
+        local lhs_v = keymap.lhs("editor", "execute_selection")
+        if lhs_v then
+          vim.keymap.set("x", lhs_v, function()
+            query.execute_selection()
+          end, { buffer = buf, desc = "Sqmeow: run selection" })
+        end
+      end
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("sqmeow_editor_keys", { clear = true }),
+        pattern = pattern,
+        callback = attach,
+      })
+      -- 启动时已加载的 sql buffer（FileType 早于 config 触发）
+      vim.tbl_map(attach, vim.api.nvim_list_bufs())
+    end,
   },
 }

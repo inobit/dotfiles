@@ -17,11 +17,6 @@ return { -- Useful plugin to show you pending keybinds.
         { "<leader>m", group = "ai chat", icon = { icon = "󰅾 ", color = "green" } },
         { "<leader>t", group = "translate", icon = { icon = "󰗊 ", color = "green" } },
         { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
-        {
-          "<leader>y",
-          group = "dbee-yank",
-          icon = { icon = " ", color = "green" },
-        },
         { "[", group = "prev" },
         { "]", group = "next" },
       },

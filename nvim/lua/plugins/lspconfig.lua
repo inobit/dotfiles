@@ -374,22 +374,6 @@ return {
           },
           -- hover
           {
-            name = "dbee_hover",
-            method = null_ls.methods.HOVER,
-            filetypes = { "dbee" },
-            generator = {
-              fn = function(params, done)
-                local status, _ = pcall(require, "dbee")
-                if status then
-                  require("lib.dbee").get_selected_row_in_prettier(params.bufnr, params.lsp_params.position.line, done)
-                else
-                  done()
-                end
-              end,
-              async = true,
-            },
-          },
-          {
             name = "man_hover",
             method = null_ls.methods.HOVER,
             filetypes = { "man" },
@@ -406,18 +390,18 @@ return {
             },
           },
           -- action
+          -- sql（scratchpad）：schema 查看 / EXPLAIN 系列，见 lib/sqmeow.lua
           {
-            name = "dbee_action",
+            name = "sqmeow_action",
             method = null_ls.methods.CODE_ACTION,
-            filetypes = { "dbee" },
+            filetypes = { "sql", "mysql", "plsql" },
             call_run = function()
-              local status, _ = pcall(require, "dbee")
+              local status, _ = pcall(require, "sqmeow.api.connection")
               return status
             end,
             generator = {
               fn = function(params)
-                local actions = require("lib.dbee").code_actions(params.bufnr, params.range.row)
-                return actions
+                return require("lib.sqmeow").scratch_actions(params.bufnr)
               end,
             },
           },
