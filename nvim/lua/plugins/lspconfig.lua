@@ -235,23 +235,9 @@ return {
           -- sh, bash
           null_ls.builtins.formatting.shfmt.with { filetypes = { "sh", "bash", "zsh" } },
           -- sql
-          null_ls.builtins.formatting.sql_formatter.with {
-            extra_args = function()
-              return {
-                "-c",
-                vim.json.encode {
-                  language = "sql",
-                  tabWidth = 2,
-                  keywordCase = "upper",
-                  dataTypeCase = "upper",
-                  functionCase = "upper",
-                  linesBetweenQueries = 2,
-                  denseOperators = true,
-                  paramTypes = { named = { ":" } },
-                },
-              }
-            end,
-          },
+          -- sqlfmt：行宽驱动（默认 88），放得下的短查询合并为单行，关键字小写；
+          -- CLI-only 无 LSP，由 null-ls builtin 封装（filetypes: sql/jinja）
+          null_ls.builtins.formatting.sqlfmt,
           -- java
           null_ls.builtins.formatting.google_java_format,
           -- xml(manual register)

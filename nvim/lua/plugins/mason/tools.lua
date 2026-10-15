@@ -62,7 +62,7 @@ M.formatters = {
   -- "prettier", -- 已移除：oxfmt 完全覆盖其filetype，格式化统一由 oxfmt LSP 负责
   "shfmt", -- shell formatter
   "xmlformatter", -- xml formatter
-  "sql-formatter", --sql formatter
+  "sqlfmt", -- sql formatter（替代 sql-formatter：行宽驱动，短查询单行，关键字小写）
   "google-java-format", -- java formatter
 }
 
