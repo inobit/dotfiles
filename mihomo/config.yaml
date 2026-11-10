@@ -185,6 +185,15 @@ proxy-group-anchor:
   ai-groups: &ai-groups # - 🇺🇸 美国✔️
     - 自建
     # - 🇺🇸 美国
+  mine-proxies: &mine-proxies
+    proxies:
+      - DIRECT
+    include-all: true
+    filter: ^mine
+  # 无 DIRECT 版本
+  mine-nodes: &mine-nodes
+    include-all: true
+    filter: ^mine
 proxy-groups:
   - name: 🧭 Break
     <<: *url-test
@@ -230,73 +239,65 @@ proxy-groups:
     filter: (?i)^master.*(英|UK)[^|]*$
   - name: Microsoft
     type: select
-    icon: https://www.clashverge.dev/assets/icons/microsoft.svg
-    proxies: *loose-groups
+    <<: *mine-proxies
   - name: Steam
     type: select
-    icon: https://www.clashverge.dev/assets/icons/steam.svg
-    proxies: *std-groups
+    <<: *mine-nodes
   - name: Video
     type: select
-    icon: https://www.clashverge.dev/assets/icons/netflix.svg
-    proxies: *loose-groups
+    <<: *mine-proxies
   - name: Github
-    <<: *fallback
-    icon: https://www.clashverge.dev/assets/icons/github.svg
-    proxies: *std-groups
+    type: fallback
+    <<: [*fallback, *mine-nodes]
   - name: Google
-    <<: *fallback
-    icon: https://www.clashverge.dev/assets/icons/google.svg
-    proxies: *std-groups
-    lazy: true
+    type: select
+    <<: *mine-nodes
   - name: Spotify
     type: select
-    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Spotify.png
-    proxies: *std-groups
+    <<: *mine-nodes
   - name: Twitter
     type: select
-    icon: https://www.clashverge.dev/assets/icons/twitter.svg
-    proxies: *std-groups
+    <<: *mine-nodes
+  - name: Cline
+    type: select
+    <<: *mine-proxies
   - name: Claude
-    <<: *fallback
-    icon: https://www.clashverge.dev/assets/icons/claude.svg
-    proxies: *ai-groups
+    type: fallback
+    <<: *mine-nodes
   - name: Opencode
     type: select
-    icon: https://opencode.ai/favicon.svg
-    include-all: true
-    filter: mine
+    <<: *mine-proxies
+  - name: Meta
+    type: select
+    <<: *mine-nodes
+  - name: Openrouter
+    type: select
+    <<: *mine-proxies
   - name: Chatgpt
-    <<: *fallback
-    icon: https://www.clashverge.dev/assets/icons/chatgpt.svg
-    proxies: *ai-groups
+    type: select
+    <<: *mine-nodes
   - name: 广告拦截
     type: select
-    icon: https://www.clashverge.dev/assets/icons/block.svg
     proxies:
       - REJECT
       - DIRECT
       - PROXY
   - name: 代理模式
     type: select
-    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png
     proxies:
       - PROXY
       - DIRECT
   - name: 自建
     type: select
-    icon: https://www.clashverge.dev/assets/icons/link.svg
     include-all: true
-    filter: mine
+    filter: ^mine
   - name: Master
     type: select
-    icon: https://www.clashverge.dev/assets/icons/speed.svg
     proxies: *std-groups
     include-all: true
     filter: (?i)^master
   - name: PROXY
     type: select
-    icon: https://www.clashverge.dev/assets/icons/adjust.svg
     proxies:
       - Master
       - 自建
@@ -384,6 +385,16 @@ rule-providers:
     <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
     path: ./ruleset/private.yaml
+  meta-domain:
+    <<: *domian
+    format: mrs
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/meta.mrs"
+    path: ./ruleset/meta.mrs
+  meta-ip:
+    <<: *ip
+    format: mrs
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/facebook.mrs"
+    path: ./ruleset/meta-ip.mrs
   gfw:
     <<: *domian
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt
@@ -413,32 +424,20 @@ rule-providers:
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
     path: ./ruleset/applications.yaml
 rules:
-  - DOMAIN-SUFFIX,olevod.com,Video
-  - DOMAIN-SUFFIX,olelive.com,Video
-  - DOMAIN-SUFFIX,olemovienews.com,Video
-  - DOMAIN-SUFFIX,iyf.tv,Video
-  - DOMAIN-SUFFIX,anygate.vip,Video
-  - DOMAIN-SUFFIX,generalcdn.com,Video
-  - DOMAIN-SUFFIX,newwycdn.com,Video
-  - DOMAIN-SUFFIX,newyvpa.com,Video
-  - DOMAIN-SUFFIX,tfbgddd.com,Video
-  - DOMAIN-SUFFIX,tfbgeee.com,Video
-  - DOMAIN-SUFFIX,wyav.tv,Video
   # - DOMAIN-SUFFIX,debian.org, 🇹🇼 台湾
   # - DOMAIN-SUFFIX,apache.org, 🇹🇼 台湾
-  - DOMAIN-SUFFIX,inoecho.xyz,DIRECT
   - RULE-SET,applications,DIRECT
   - RULE-SET,steam,Steam
   - DOMAIN-SUFFIX,deepseek.com,DIRECT
   - DOMAIN-SUFFIX,deepseek.com.cn,DIRECT
-  - DOMAIN-SUFFIX,diagrams.org,DIRECT
-  - DOMAIN,clash.razord.top,DIRECT
-  - DOMAIN,yacd.haishan.me,DIRECT
   - RULE-SET,reject,广告拦截
   - RULE-SET,private,DIRECT
   - RULE-SET,wechat,DIRECT
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
+  - RULE-SET,meta-domain,Meta
+  - RULE-SET,meta-ip,Meta,no-resolve
+  - DOMAIN-SUFFIX,cline.bot,Cline
   - RULE-SET,gemini,Claude
   - RULE-SET,google,Google
   - RULE-SET,github,Github
@@ -446,7 +445,7 @@ rules:
   - RULE-SET,twitter,Twitter
   - RULE-SET,openai,Chatgpt
   - DOMAIN-SUFFIX,claudeusercontent.com,Claude
-  - DOMAIN-SUFFIX,openrouter.ai,Claude
+  - DOMAIN-SUFFIX,openrouter.ai,Openrouter
   - DOMAIN-SUFFIX,opencode.ai,Opencode
   - DOMAIN-SUFFIX,opncd.ai,Opencode
   - RULE-SET,claude,Claude
