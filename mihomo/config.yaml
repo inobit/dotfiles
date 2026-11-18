@@ -276,6 +276,9 @@ proxy-groups:
   - name: Chatgpt
     type: select
     <<: *mine-nodes
+  - name: Instabox
+    type: select
+    <<: *mine-proxies
   - name: 广告拦截
     type: select
     proxies:
@@ -444,6 +447,7 @@ rules:
   - RULE-SET,spotify,Spotify
   - RULE-SET,twitter,Twitter
   - RULE-SET,openai,Chatgpt
+  - DOMAIN-SUFFIX,instabox.sh,Instabox
   - DOMAIN-SUFFIX,claudeusercontent.com,Claude
   - DOMAIN-SUFFIX,openrouter.ai,Openrouter
   - DOMAIN-SUFFIX,opencode.ai,Opencode
