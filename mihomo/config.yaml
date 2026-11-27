@@ -247,8 +247,8 @@ proxy-groups:
     type: select
     <<: *mine-proxies
   - name: Github
-    type: fallback
-    <<: [*fallback, *mine-nodes]
+    type: select
+    <<: *mine-nodes
   - name: Google
     type: select
     <<: *mine-nodes
